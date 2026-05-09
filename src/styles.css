@@ -255,7 +255,7 @@
 
 .fideo__volume {
   position: absolute;
-  bottom: calc(100% + 14px);
+  bottom: calc(100% + 24px);
   left: 50%;
   width: 76px;
   height: 24px;
@@ -271,7 +271,7 @@
 .fideo__volume-group:hover .fideo__volume,
 .fideo__volume-group.is-open .fideo__volume,
 .fideo__volume-group:focus-within .fideo__volume {
-  bottom: calc(100% + 18px);
+  bottom: calc(100% + 30px);
   opacity: 1;
   pointer-events: auto;
 }

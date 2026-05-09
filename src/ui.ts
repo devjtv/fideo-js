@@ -69,7 +69,7 @@ export class FideoControls {
 
     this.playButton.addEventListener('click', () => this.togglePlay());
     this.muteButton.addEventListener('click', () => this.toggleMute());
-    this.volume.addEventListener('input', () => this.adapter.setVolume(Number(this.volume.value)).catch(() => undefined));
+    this.volume.addEventListener('input', () => this.changeVolume());
     this.track.addEventListener('pointerdown', () => {
       this.seeking = true;
     });
@@ -136,6 +136,12 @@ export class FideoControls {
 
     const state = this.adapter.getState();
     this.adapter.setMuted(!state.muted).catch(() => undefined);
+  }
+
+  private changeVolume(): void {
+    const volume = Number(this.volume.value);
+    if (volume > 0) this.adapter.setMuted(false).catch(() => undefined);
+    this.adapter.setVolume(volume).catch(() => undefined);
   }
 
   private previewSeek(): void {
