@@ -1,0 +1,59 @@
+{
+  "name": "fideo-js",
+  "version": "0.1.0",
+  "description": "A lightweight, data-attribute driven video UI for HTML video, YouTube, Vimeo, and Wistia.",
+  "type": "module",
+  "license": "MIT",
+  "author": "devjtv",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/devjtv/fideo-js.git"
+  },
+  "homepage": "https://github.com/devjtv/fideo-js#readme",
+  "bugs": {
+    "url": "https://github.com/devjtv/fideo-js/issues"
+  },
+  "main": "./dist/fideo.umd.cjs",
+  "module": "./dist/fideo.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/fideo.js",
+      "require": "./dist/fideo.umd.cjs"
+    },
+    "./styles.css": "./dist/styles.css"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": [
+    "./src/styles.css",
+    "./dist/styles.css"
+  ],
+  "scripts": {
+    "build": "vite build && tsc -p tsconfig.types.json",
+    "dev": "vite --host 127.0.0.1",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run typecheck && npm run test && npm run build"
+  },
+  "keywords": [
+    "video",
+    "youtube",
+    "vimeo",
+    "wistia",
+    "player",
+    "autoplay",
+    "responsive"
+  ],
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "jsdom": "^25.0.1",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5",
+    "vitest": "^3.1.3"
+  }
+}

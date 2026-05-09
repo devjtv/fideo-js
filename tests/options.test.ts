@@ -1,0 +1,47 @@
+import { describe, expect, it } from 'vitest';
+import { getResponsiveValue, resolveOptions } from '../src/utils/dom';
+
+describe('data attribute options', () => {
+  it('reads provider, autoplay, viewport, responsive sources, posters, and css variables', () => {
+    document.body.innerHTML = `
+      <video
+        data-fideo
+        data-fideo-provider="html5"
+        data-fideo-autoplay="true"
+        data-fideo-muted="true"
+        data-fideo-viewport="play-pause"
+        data-fideo-volume="0.4"
+        data-fideo-src="/desktop.mp4"
+        data-fideo-src-mobile="/mobile.mp4"
+        data-fideo-poster="/desktop.jpg"
+        data-fideo-poster-mobile="/mobile.jpg"
+        data-fideo-accent="#ff3366"
+      ></video>
+    `;
+
+    const video = document.querySelector('video')!;
+    const options = resolveOptions(video);
+
+    expect(options.provider).toBe('html5');
+    expect(options.autoplay).toBe(true);
+    expect(options.muted).toBe(true);
+    expect(options.viewport).toBe('play-pause');
+    expect(options.volume).toBe(0.4);
+    expect(options.sources).toEqual({ desktop: '/desktop.mp4', tablet: undefined, mobile: '/mobile.mp4' });
+    expect(options.posters).toEqual({ desktop: '/desktop.jpg', tablet: undefined, mobile: '/mobile.jpg' });
+    expect(options.cssVars['--fideo-accent']).toBe('#ff3366');
+  });
+
+  it('selects mobile, tablet, and desktop media values by breakpoint', () => {
+    const values = {
+      desktop: '/desktop.mp4',
+      tablet: '/tablet.mp4',
+      mobile: '/mobile.mp4',
+    };
+    const breakpoints = { mobile: 640, tablet: 1024 };
+
+    expect(getResponsiveValue(values, breakpoints, 390)).toBe('/mobile.mp4');
+    expect(getResponsiveValue(values, breakpoints, 800)).toBe('/tablet.mp4');
+    expect(getResponsiveValue(values, breakpoints, 1280)).toBe('/desktop.mp4');
+  });
+});

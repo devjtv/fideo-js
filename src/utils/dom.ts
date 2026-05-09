@@ -1,0 +1,171 @@
+import type {
+  FideoBreakpoints,
+  FideoOptions,
+  FideoPosters,
+  FideoProviderName,
+  FideoResolvedOptions,
+  FideoSources,
+  FideoViewportMode,
+} from '../types';
+
+const DEFAULT_BREAKPOINTS: FideoBreakpoints = {
+  mobile: 767,
+  tablet: 1024,
+};
+
+const TRUE_VALUES = new Set(['', 'true', '1', 'yes', 'on']);
+const FALSE_VALUES = new Set(['false', '0', 'no', 'off']);
+
+export const DEFAULT_SELECTOR = '[data-fideo]';
+
+export function boolFromAttr(value: string | null | undefined, fallback: boolean): boolean {
+  if (value == null) return fallback;
+  const normalized = value.trim().toLowerCase();
+  if (TRUE_VALUES.has(normalized)) return true;
+  if (FALSE_VALUES.has(normalized)) return false;
+  return fallback;
+}
+
+export function numberFromAttr(value: string | null | undefined, fallback: number): number {
+  if (value == null || value.trim() === '') return fallback;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+export function splitRates(value: string | null | undefined, fallback: number[]): number[] {
+  if (!value) return fallback;
+  const rates = value
+    .split(',')
+    .map((rate) => Number(rate.trim()))
+    .filter((rate) => Number.isFinite(rate) && rate > 0);
+  return rates.length ? rates : fallback;
+}
+
+export function inferProvider(element: HTMLVideoElement | HTMLIFrameElement): FideoProviderName {
+  if (element instanceof HTMLVideoElement) return 'html5';
+
+  const src = element.src || '';
+  if (/youtube(?:-nocookie)?\.com|youtu\.be/i.test(src)) return 'youtube';
+  if (/vimeo\.com/i.test(src)) return 'vimeo';
+  if (/wistia\.(?:com|net)|fast\.wistia/i.test(src)) return 'wistia';
+
+  return 'html5';
+}
+
+export function parseViewportMode(value: string | null | undefined, fallback: FideoViewportMode): FideoViewportMode {
+  if (!value) return fallback;
+  const normalized = value.trim().toLowerCase();
+  if (FALSE_VALUES.has(normalized) || normalized === 'none') return false;
+  if (normalized === 'play' || normalized === 'pause' || normalized === 'play-pause') return normalized;
+  if (TRUE_VALUES.has(normalized)) return 'play-pause';
+  return fallback;
+}
+
+export function readSources(element: HTMLElement): FideoSources {
+  const data = element.dataset;
+  return {
+    desktop: data.fideoSrcDesktop || data.fideoSrc || undefined,
+    tablet: data.fideoSrcTablet || undefined,
+    mobile: data.fideoSrcMobile || undefined,
+  };
+}
+
+export function readPosters(element: HTMLElement): FideoPosters {
+  const data = element.dataset;
+  return {
+    desktop: data.fideoPosterDesktop || data.fideoPoster || undefined,
+    tablet: data.fideoPosterTablet || undefined,
+    mobile: data.fideoPosterMobile || undefined,
+  };
+}
+
+export function resolveOptions(
+  element: HTMLVideoElement | HTMLIFrameElement,
+  options: FideoOptions = {},
+): FideoResolvedOptions {
+  const data = element.dataset;
+  const breakpoints = {
+    mobile: numberFromAttr(data.fideoBreakpointMobile, options.breakpoints?.mobile ?? DEFAULT_BREAKPOINTS.mobile),
+    tablet: numberFromAttr(data.fideoBreakpointTablet, options.breakpoints?.tablet ?? DEFAULT_BREAKPOINTS.tablet),
+  };
+  const providerAttr = data.fideoProvider as FideoProviderName | 'auto' | undefined;
+  const requestedProvider = options.provider ?? providerAttr ?? 'auto';
+  const provider = requestedProvider === 'auto' ? inferProvider(element) : requestedProvider;
+  const viewportFallback = options.viewport ?? false;
+
+  return {
+    selector: options.selector ?? DEFAULT_SELECTOR,
+    provider,
+    autoplay: boolFromAttr(data.fideoAutoplay, options.autoplay ?? false),
+    muted: boolFromAttr(data.fideoMuted, options.muted ?? false),
+    loop: boolFromAttr(data.fideoLoop, options.loop ?? false),
+    playsInline: boolFromAttr(data.fideoPlaysinline ?? data.fideoPlaysInline, options.playsInline ?? true),
+    controls: boolFromAttr(data.fideoControls, options.controls ?? true),
+    viewport: parseViewportMode(data.fideoViewport, viewportFallback),
+    viewportThreshold: numberFromAttr(data.fideoViewportThreshold, options.viewportThreshold ?? 0.35),
+    volume: numberFromAttr(data.fideoVolume, options.volume ?? 1),
+    playbackRates: splitRates(data.fideoPlaybackRates, options.playbackRates ?? [0.5, 1, 1.25, 1.5, 2]),
+    sources: { ...readSources(element), ...options.sources },
+    posters: { ...readPosters(element), ...options.posters },
+    breakpoints,
+    icons: options.icons ?? {},
+    className: data.fideoClass || options.className || '',
+    cssVars: {
+      ...readCssVars(element),
+      ...(options.cssVars ?? {}),
+    },
+  };
+}
+
+export function readCssVars(element: HTMLElement): Record<string, string> {
+  const vars: Record<string, string> = {};
+  const entries: Array<[string, string | undefined]> = [
+    ['--fideo-accent', element.dataset.fideoAccent],
+    ['--fideo-control-bg', element.dataset.fideoControlBg],
+    ['--fideo-control-color', element.dataset.fideoControlColor],
+    ['--fideo-track', element.dataset.fideoTrack],
+    ['--fideo-track-fill', element.dataset.fideoTrackFill],
+    ['--fideo-radius', element.dataset.fideoRadius],
+  ];
+
+  for (const [name, value] of entries) {
+    if (value) vars[name] = value;
+  }
+
+  return vars;
+}
+
+export function getResponsiveValue<T extends FideoSources | FideoPosters>(
+  values: T,
+  breakpoints: FideoBreakpoints,
+  width = window.innerWidth,
+): string | undefined {
+  if (width <= breakpoints.mobile) return values.mobile ?? values.tablet ?? values.desktop;
+  if (width <= breakpoints.tablet) return values.tablet ?? values.desktop ?? values.mobile;
+  return values.desktop ?? values.tablet ?? values.mobile;
+}
+
+export function addUrlParams(url: string, params: Record<string, string | number | boolean>): string {
+  if (!url) return url;
+  const parsed = new URL(url, window.location.href);
+  for (const [key, value] of Object.entries(params)) {
+    parsed.searchParams.set(key, String(value));
+  }
+  return parsed.toString();
+}
+
+export function createElement<K extends keyof HTMLElementTagNameMap>(
+  tag: K,
+  className?: string,
+): HTMLElementTagNameMap[K] {
+  const element = document.createElement(tag);
+  if (className) element.className = className;
+  return element;
+}
+
+export function ensureElementId(element: HTMLElement, prefix = 'fideo'): string {
+  if (!element.id) {
+    element.id = `${prefix}-${Math.random().toString(36).slice(2, 10)}`;
+  }
+  return element.id;
+}

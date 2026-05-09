@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fideo JS Demo</title>
+    <script type="module" src="./main.ts"></script>
+    <style>
+      body {
+        margin: 0;
+        color: #17201c;
+        background: #f7f8f5;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      main {
+        width: min(1040px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 48px 0;
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: clamp(36px, 6vw, 72px);
+        line-height: 0.95;
+      }
+
+      p {
+        max-width: 680px;
+        margin: 0 0 28px;
+        color: #4a544f;
+        font-size: 18px;
+        line-height: 1.6;
+      }
+
+      section {
+        display: grid;
+        gap: 16px;
+        margin-top: 36px;
+      }
+
+      h2 {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      .brand-demo {
+        --fideo-accent: #ff6f61;
+        --fideo-radius: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Fideo JS</h1>
+      <p>
+        Drop in a normal video or iframe, add data attributes, and keep the player controls consistent across local files,
+        YouTube, Vimeo, and Wistia.
+      </p>
+
+      <section>
+        <h2>Responsive HTML5 Video</h2>
+        <video
+          class="brand-demo"
+          data-fideo
+          data-fideo-muted="true"
+          data-fideo-viewport="play-pause"
+          data-fideo-src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+          data-fideo-src-mobile="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+          data-fideo-poster="https://interactive-examples.mdn.mozilla.net/media/examples/flower.jpg"
+        ></video>
+      </section>
+
+      <section>
+        <h2>YouTube Embed</h2>
+        <iframe
+          data-fideo
+          data-fideo-provider="youtube"
+          data-fideo-muted="true"
+          src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+          title="YouTube video"
+        ></iframe>
+      </section>
+
+      <section>
+        <h2>Vimeo Embed</h2>
+        <iframe
+          data-fideo
+          data-fideo-provider="vimeo"
+          src="https://player.vimeo.com/video/76979871"
+          title="Vimeo video"
+        ></iframe>
+      </section>
+    </main>
+  </body>
+</html>
