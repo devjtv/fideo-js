@@ -6,6 +6,7 @@
   --fideo-muted-color: rgba(255, 255, 255, 0.92);
   --fideo-track: rgba(255, 255, 255, 0.46);
   --fideo-track-fill: rgba(255, 255, 255, 0.9);
+  --fideo-track-size: 5px;
   --fideo-radius: 8px;
   --fideo-button-size: 26px;
   --fideo-gap: 12px;
@@ -64,12 +65,12 @@
 .fideo__controls {
   position: absolute;
   right: 16px;
-  bottom: 11px;
+  bottom: 10px;
   left: 16px;
   z-index: 3;
   display: grid;
   grid-template-rows: auto auto;
-  gap: 4px;
+  gap: 6px;
   padding: 0;
   background: var(--fideo-control-bg);
   border: 0;
@@ -129,7 +130,7 @@
 
 .fideo__control-row {
   display: flex;
-  gap: var(--fideo-gap);
+  gap: 10px;
   align-items: center;
   min-width: 0;
 }
@@ -171,7 +172,7 @@
 .fideo__volume {
   --fideo-progress: 0%;
   width: 100%;
-  height: 10px;
+  height: 18px;
   padding: 0;
   background: transparent;
   accent-color: var(--fideo-accent);
@@ -181,7 +182,7 @@
 
 .fideo__track::-webkit-slider-runnable-track,
 .fideo__volume::-webkit-slider-runnable-track {
-  height: 3px;
+  height: var(--fideo-track-size);
   background: linear-gradient(
     to right,
     var(--fideo-track-fill) 0%,
@@ -194,53 +195,85 @@
 
 .fideo__track::-moz-range-track,
 .fideo__volume::-moz-range-track {
-  height: 3px;
+  height: var(--fideo-track-size);
   background: var(--fideo-track);
   border-radius: 999px;
 }
 
 .fideo__track::-moz-range-progress,
 .fideo__volume::-moz-range-progress {
-  height: 3px;
+  height: var(--fideo-track-size);
   background: var(--fideo-track-fill);
   border-radius: 999px;
 }
 
 .fideo__track::-webkit-slider-thumb,
 .fideo__volume::-webkit-slider-thumb {
-  width: 0;
-  height: 0;
-  margin-top: 1.5px;
-  background: transparent;
+  width: 13px;
+  height: 13px;
+  margin-top: -4px;
+  background: var(--fideo-control-color);
   border: 0;
   border-radius: 999px;
   appearance: none;
 }
 
+.fideo__track::-webkit-slider-thumb {
+  opacity: 0;
+}
+
+.fideo__track:hover::-webkit-slider-thumb,
+.fideo__track:focus-visible::-webkit-slider-thumb {
+  opacity: 1;
+}
+
 .fideo__track::-moz-range-thumb,
 .fideo__volume::-moz-range-thumb {
-  width: 0;
-  height: 0;
-  background: transparent;
+  width: 13px;
+  height: 13px;
+  background: var(--fideo-control-color);
   border: 0;
   border-radius: 999px;
 }
 
+.fideo__track::-moz-range-thumb {
+  opacity: 0;
+}
+
+.fideo__track:hover::-moz-range-thumb,
+.fideo__track:focus-visible::-moz-range-thumb {
+  opacity: 1;
+}
+
 .fideo__volume-group {
-  display: flex;
-  gap: 8px;
-  align-items: center;
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: var(--fideo-button-size);
+  height: var(--fideo-button-size);
 }
 
 .fideo__volume {
-  width: 52px;
+  position: absolute;
+  bottom: calc(100% + 14px);
+  left: 50%;
+  width: 76px;
+  height: 24px;
   opacity: 0;
-  transition: opacity 140ms ease;
+  pointer-events: none;
+  transform: translateX(-50%) rotate(-90deg);
+  transform-origin: center;
+  transition:
+    opacity 140ms ease,
+    bottom 140ms ease;
 }
 
 .fideo__volume-group:hover .fideo__volume,
-.fideo__volume:focus-visible {
+.fideo__volume-group.is-open .fideo__volume,
+.fideo__volume-group:focus-within .fideo__volume {
+  bottom: calc(100% + 18px);
   opacity: 1;
+  pointer-events: auto;
 }
 
 .fideo__settings {

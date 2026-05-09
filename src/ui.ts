@@ -12,6 +12,7 @@ export class FideoControls {
   private duration: HTMLElement;
   private fullscreenButton: HTMLButtonElement;
   private speedMenu: HTMLElement;
+  private volumeGroup: HTMLElement;
   private seeking = false;
   private icons: Required<NonNullable<FideoResolvedOptions['icons']>>;
   private handleFullscreenChange = () => this.render(this.adapter.getState());
@@ -42,8 +43,8 @@ export class FideoControls {
     separator.textContent = '/';
     timeGroup.append(this.currentTime, separator, this.duration);
 
-    const volumeGroup = createElement('div', 'fideo__volume-group');
-    volumeGroup.append(this.muteButton, this.volume);
+    this.volumeGroup = createElement('div', 'fideo__volume-group');
+    this.volumeGroup.append(this.muteButton, this.volume);
 
     const settingsGroup = createElement('div', 'fideo__settings');
     settingsGroup.append(settings, this.speedMenu);
@@ -54,7 +55,7 @@ export class FideoControls {
     if (options.controlVisibility.play) primaryControls.append(this.playButton);
     if (options.controlVisibility.currentTime || options.controlVisibility.duration) primaryControls.append(timeGroup);
     primaryControls.append(spacer);
-    if (options.controlVisibility.volume) primaryControls.append(volumeGroup);
+    if (options.controlVisibility.volume) primaryControls.append(this.volumeGroup);
     if (options.controlVisibility.settings) primaryControls.append(settingsGroup);
     if (options.controlVisibility.fullscreen) primaryControls.append(this.fullscreenButton);
 
@@ -128,6 +129,11 @@ export class FideoControls {
   }
 
   private toggleMute(): void {
+    if (!this.volumeGroup.classList.contains('is-open')) {
+      this.volumeGroup.classList.add('is-open');
+      return;
+    }
+
     const state = this.adapter.getState();
     this.adapter.setMuted(!state.muted).catch(() => undefined);
   }
