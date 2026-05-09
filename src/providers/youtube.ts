@@ -1,5 +1,5 @@
 import { BaseProvider } from './base';
-import { addUrlParams, ensureElementId } from '../utils/dom';
+import { addUrlParams, ensureElementId, normalizeYouTubeEmbedUrl } from '../utils/dom';
 
 type YouTubeState = -1 | 0 | 1 | 2 | 3 | 5;
 
@@ -55,7 +55,7 @@ export class YouTubeProvider extends BaseProvider {
 
   constructor(readonly element: HTMLIFrameElement) {
     super();
-    this.element.src = addUrlParams(this.element.src, {
+    this.element.src = addUrlParams(normalizeYouTubeEmbedUrl(this.element.src), {
       enablejsapi: 1,
       playsinline: 1,
       controls: 0,
@@ -118,7 +118,7 @@ export class YouTubeProvider extends BaseProvider {
 
   async setSource(source: string): Promise<void> {
     await this.ready;
-    this.player?.loadVideoByUrl(source);
+    this.player?.loadVideoByUrl(normalizeYouTubeEmbedUrl(source));
   }
 
   destroy(): void {

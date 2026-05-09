@@ -38,6 +38,36 @@ describe('Fideo player', () => {
     expect(video.controls).toBe(false);
   });
 
+  it('can hide individual custom controls', () => {
+    document.body.innerHTML = `
+      <video
+        data-fideo
+        data-fideo-show-volume="false"
+        data-fideo-show-settings="false"
+        data-fideo-show-fullscreen="false"
+        data-fideo-src="/movie.mp4"
+      ></video>
+    `;
+
+    const video = document.querySelector('video')!;
+    const player = mountFideo(video);
+
+    expect(player.wrapper.querySelector('.fideo__volume-group')).toBeNull();
+    expect(player.wrapper.querySelector('.fideo__settings')).toBeNull();
+    expect(player.wrapper.querySelector('[title="Fullscreen"]')).toBeNull();
+    expect(player.wrapper.querySelector('.fideo__play')).toBeTruthy();
+    expect(player.wrapper.querySelector('.fideo__timeline')).toBeTruthy();
+  });
+
+  it('skips custom controls without removing native controls', () => {
+    document.body.innerHTML = '<video controls data-fideo data-fideo-controls="false" data-fideo-src="/one.mp4"></video>';
+    const video = document.querySelector('video')!;
+    const player = mountFideo(video);
+
+    expect(player.wrapper.querySelector('.fideo__controls')).toBeNull();
+    expect(video.controls).toBe(true);
+  });
+
   it('initializes all data-fideo elements and can destroy them together', () => {
     document.body.innerHTML = `
       <video data-fideo data-fideo-src="/one.mp4"></video>

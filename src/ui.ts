@@ -41,12 +41,19 @@ export class FideoControls {
     const settingsGroup = createElement('div', 'fideo__settings');
     settingsGroup.append(settings, this.speedMenu);
 
-    this.element.append(this.playButton, timeline, volumeGroup, settingsGroup, fullscreen);
+    if (options.controlVisibility.play) this.element.append(this.playButton);
+    if (options.controlVisibility.timeline) this.element.append(timeline);
+    if (options.controlVisibility.volume) this.element.append(volumeGroup);
+    if (options.controlVisibility.settings) this.element.append(settingsGroup);
+    if (options.controlVisibility.fullscreen) this.element.append(fullscreen);
     this.wrapper.append(this.element);
+
+    if (!options.controlVisibility.currentTime) this.currentTime.remove();
+    if (!options.controlVisibility.duration) this.duration.remove();
 
     this.playButton.addEventListener('click', () => this.togglePlay());
     this.muteButton.addEventListener('click', () => this.toggleMute());
-    this.volume.addEventListener('input', () => this.adapter.setVolume(Number(this.volume.value)));
+    this.volume.addEventListener('input', () => this.adapter.setVolume(Number(this.volume.value)).catch(() => undefined));
     this.track.addEventListener('pointerdown', () => {
       this.seeking = true;
     });
@@ -89,7 +96,7 @@ export class FideoControls {
       const button = this.button('fideo__speed', `${rate}x`, '');
       button.textContent = `${rate}x`;
       button.addEventListener('click', () => {
-        this.adapter.setPlaybackRate(rate);
+        this.adapter.setPlaybackRate(rate).catch(() => undefined);
         menu.parentElement?.classList.remove('is-open');
       });
       menu.append(button);
@@ -99,13 +106,13 @@ export class FideoControls {
 
   private togglePlay(): void {
     const state = this.adapter.getState();
-    if (state.paused) this.adapter.play();
-    else this.adapter.pause();
+    if (state.paused) this.adapter.play().catch(() => undefined);
+    else this.adapter.pause().catch(() => undefined);
   }
 
   private toggleMute(): void {
     const state = this.adapter.getState();
-    this.adapter.setMuted(!state.muted);
+    this.adapter.setMuted(!state.muted).catch(() => undefined);
   }
 
   private previewSeek(): void {
@@ -118,7 +125,7 @@ export class FideoControls {
     const state = this.adapter.getState();
     this.seeking = false;
     if (!state.duration) return;
-    this.adapter.seek((Number(this.track.value) / 1000) * state.duration);
+    this.adapter.seek((Number(this.track.value) / 1000) * state.duration).catch(() => undefined);
   }
 
   private toggleFullscreen(): void {
@@ -132,7 +139,10 @@ export class FideoControls {
   private render(state: FideoState): void {
     this.playButton.innerHTML = state.paused ? this.icons.play : this.icons.pause;
     this.playButton.ariaLabel = state.paused ? 'Play' : 'Pause';
+    this.playButton.title = state.paused ? 'Play' : 'Pause';
     this.muteButton.innerHTML = state.muted || state.volume === 0 ? this.icons.muted : this.icons.volume;
+    this.muteButton.ariaLabel = state.muted || state.volume === 0 ? 'Unmute' : 'Mute';
+    this.muteButton.title = state.muted || state.volume === 0 ? 'Unmute' : 'Mute';
     this.volume.value = String(state.muted ? 0 : state.volume);
     this.currentTime.textContent = formatTime(state.currentTime);
     this.duration.textContent = formatTime(state.duration);

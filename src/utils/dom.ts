@@ -1,5 +1,6 @@
 import type {
   FideoBreakpoints,
+  FideoControlVisibility,
   FideoOptions,
   FideoPosters,
   FideoProviderName,
@@ -17,6 +18,16 @@ const TRUE_VALUES = new Set(['', 'true', '1', 'yes', 'on']);
 const FALSE_VALUES = new Set(['false', '0', 'no', 'off']);
 
 export const DEFAULT_SELECTOR = '[data-fideo]';
+
+const DEFAULT_CONTROL_VISIBILITY: FideoControlVisibility = {
+  play: true,
+  timeline: true,
+  currentTime: true,
+  duration: true,
+  volume: true,
+  settings: true,
+  fullscreen: true,
+};
 
 export function boolFromAttr(value: string | null | undefined, fallback: boolean): boolean {
   if (value == null) return fallback;
@@ -101,6 +112,7 @@ export function resolveOptions(
     loop: boolFromAttr(data.fideoLoop, options.loop ?? false),
     playsInline: boolFromAttr(data.fideoPlaysinline ?? data.fideoPlaysInline, options.playsInline ?? true),
     controls: boolFromAttr(data.fideoControls, options.controls ?? true),
+    controlVisibility: resolveControlVisibility(element, options.controlVisibility),
     viewport: parseViewportMode(data.fideoViewport, viewportFallback),
     viewportThreshold: numberFromAttr(data.fideoViewportThreshold, options.viewportThreshold ?? 0.35),
     volume: numberFromAttr(data.fideoVolume, options.volume ?? 1),
@@ -114,6 +126,27 @@ export function resolveOptions(
       ...readCssVars(element),
       ...(options.cssVars ?? {}),
     },
+  };
+}
+
+export function resolveControlVisibility(
+  element: HTMLElement,
+  options: Partial<FideoControlVisibility> = {},
+): FideoControlVisibility {
+  const data = element.dataset;
+  const timeFallback = boolFromAttr(data.fideoShowTime, true);
+
+  return {
+    play: boolFromAttr(data.fideoShowPlay, options.play ?? DEFAULT_CONTROL_VISIBILITY.play),
+    timeline: boolFromAttr(data.fideoShowTimeline, options.timeline ?? DEFAULT_CONTROL_VISIBILITY.timeline),
+    currentTime: boolFromAttr(
+      data.fideoShowCurrentTime,
+      options.currentTime ?? timeFallback ?? DEFAULT_CONTROL_VISIBILITY.currentTime,
+    ),
+    duration: boolFromAttr(data.fideoShowDuration, options.duration ?? timeFallback ?? DEFAULT_CONTROL_VISIBILITY.duration),
+    volume: boolFromAttr(data.fideoShowVolume, options.volume ?? DEFAULT_CONTROL_VISIBILITY.volume),
+    settings: boolFromAttr(data.fideoShowSettings, options.settings ?? DEFAULT_CONTROL_VISIBILITY.settings),
+    fullscreen: boolFromAttr(data.fideoShowFullscreen, options.fullscreen ?? DEFAULT_CONTROL_VISIBILITY.fullscreen),
   };
 }
 
@@ -152,6 +185,34 @@ export function addUrlParams(url: string, params: Record<string, string | number
     parsed.searchParams.set(key, String(value));
   }
   return parsed.toString();
+}
+
+export function normalizeYouTubeEmbedUrl(url: string): string {
+  if (!url) return url;
+
+  const parsed = new URL(url, window.location.href);
+  const host = parsed.hostname.replace(/^www\./, '').toLowerCase();
+  let videoId: string | undefined;
+
+  if (host === 'youtu.be') {
+    videoId = parsed.pathname.split('/').filter(Boolean)[0];
+  } else if (host === 'youtube.com' || host === 'youtube-nocookie.com') {
+    const parts = parsed.pathname.split('/').filter(Boolean);
+    if (parts[0] === 'embed') videoId = parts[1];
+    if (parts[0] === 'watch') videoId = parsed.searchParams.get('v') ?? undefined;
+    if (parts[0] === 'shorts') videoId = parts[1];
+  }
+
+  if (!videoId) {
+    parsed.hostname = 'www.youtube-nocookie.com';
+    return parsed.toString();
+  }
+
+  const normalized = new URL(`https://www.youtube-nocookie.com/embed/${videoId}`);
+  parsed.searchParams.forEach((value, key) => {
+    if (key !== 'v') normalized.searchParams.set(key, value);
+  });
+  return normalized.toString();
 }
 
 export function createElement<K extends keyof HTMLElementTagNameMap>(

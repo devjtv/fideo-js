@@ -46,7 +46,7 @@ Or use the browser global from the bundled UMD file:
   data-fideo-provider="youtube"
   data-fideo-muted="true"
   data-fideo-viewport="pause"
-  src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+  src="https://www.youtube-nocookie.com/embed/M7lc1UVf-VE"
 ></iframe>
 ```
 
@@ -59,11 +59,19 @@ Or use the browser global from the bundled UMD file:
 | `data-fideo-autoplay` | Starts playback on init. Muted autoplay is the most reliable browser path. |
 | `data-fideo-muted` | Starts muted. |
 | `data-fideo-loop` | Loops HTML5 video. |
+| `data-fideo-controls` | `true` for Fideo controls, `false` to skip the custom UI. |
 | `data-fideo-viewport` | `play`, `pause`, `play-pause`, or `false`. |
 | `data-fideo-viewport-threshold` | Intersection ratio needed before viewport playback runs. Default: `0.35`. |
 | `data-fideo-src`, `data-fideo-src-tablet`, `data-fideo-src-mobile` | Responsive video/embed sources. |
 | `data-fideo-poster`, `data-fideo-poster-tablet`, `data-fideo-poster-mobile` | Responsive HTML5 posters. |
 | `data-fideo-breakpoint-mobile`, `data-fideo-breakpoint-tablet` | Responsive cutoffs in pixels. Defaults: `767`, `1024`. |
+| `data-fideo-show-play` | Show or hide the play/pause button. |
+| `data-fideo-show-timeline` | Show or hide the seek bar. |
+| `data-fideo-show-time` | Show or hide both time labels. |
+| `data-fideo-show-current-time`, `data-fideo-show-duration` | Control individual time labels. |
+| `data-fideo-show-volume` | Show or hide mute and volume controls. |
+| `data-fideo-show-settings` | Show or hide playback-rate settings. |
+| `data-fideo-show-fullscreen` | Show or hide fullscreen control. |
 | `data-fideo-accent`, `data-fideo-control-bg`, `data-fideo-control-color` | Quick CSS variable overrides. |
 
 ## JavaScript API
@@ -73,6 +81,10 @@ import { Fideo, mountFideo } from 'fideo-js';
 
 const pagePlayers = Fideo.init({
   selector: '[data-video]',
+  controlVisibility: {
+    volume: false,
+    settings: false,
+  },
   cssVars: {
     '--fideo-accent': '#ff4f8b',
   },
@@ -117,9 +129,9 @@ initFideo({
 
 Fideo loads provider APIs only when needed:
 
-- YouTube uses the YouTube IFrame Player API.
+- YouTube uses the YouTube IFrame Player API and normalizes YouTube, youtu.be, and standard embed URLs to `youtube-nocookie.com/embed/...` while preserving player parameters.
 - Vimeo uses Vimeo `player.js`.
 - Wistia iframe embeds use Wistia's external player API.
 - HTML5 videos use the browser media APIs and can play any local format supported by the visitor's browser.
 
-For iframe providers, browser autoplay rules still apply. Use `data-fideo-muted="true"` for the best autoplay and viewport-playback reliability.
+For iframe providers, browser autoplay rules still apply. Use `data-fideo-muted="true"` for the best autoplay and viewport-playback reliability. YouTube no-cookie embeds reduce cookies on page load, but playback can still send data to YouTube, so consent requirements may still apply depending on your jurisdiction.

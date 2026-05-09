@@ -46,6 +46,7 @@ export function mountFideo(
 export type {
   FideoAdapter,
   FideoBreakpoints,
+  FideoControlVisibility,
   FideoIcons,
   FideoInitResult,
   FideoOptions,

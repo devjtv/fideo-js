@@ -15,29 +15,33 @@
       }
 
       main {
-        width: min(1040px, calc(100% - 32px));
+        width: min(1080px, calc(100% - 32px));
         margin: 0 auto;
-        padding: 48px 0;
+        padding: 44px 0 72px;
+      }
+
+      header {
+        margin-bottom: 30px;
       }
 
       h1 {
-        margin: 0 0 12px;
-        font-size: clamp(36px, 6vw, 72px);
+        margin: 0 0 10px;
+        font-size: clamp(38px, 6vw, 76px);
         line-height: 0.95;
       }
 
       p {
-        max-width: 680px;
-        margin: 0 0 28px;
-        color: #4a544f;
+        max-width: 720px;
+        margin: 0;
+        color: #4d5852;
         font-size: 18px;
         line-height: 1.6;
       }
 
       section {
         display: grid;
-        gap: 16px;
-        margin-top: 36px;
+        gap: 14px;
+        margin-top: 34px;
       }
 
       h2 {
@@ -45,24 +49,42 @@
         font-size: 18px;
       }
 
-      .brand-demo {
+      pre {
+        overflow: auto;
+        margin: 0;
+        padding: 14px 16px;
+        color: #dce8df;
+        background: #151816;
+        border-radius: 8px;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .fideo.brand-coral {
         --fideo-accent: #ff6f61;
         --fideo-radius: 6px;
+      }
+
+      .fideo.brand-blue {
+        --fideo-accent: #66a3ff;
+        --fideo-control-bg: rgba(20, 31, 45, 0.48);
       }
     </style>
   </head>
   <body>
     <main>
-      <h1>Fideo JS</h1>
-      <p>
-        Drop in a normal video or iframe, add data attributes, and keep the player controls consistent across local files,
-        YouTube, Vimeo, and Wistia.
-      </p>
+      <header>
+        <h1>Fideo JS</h1>
+        <p>
+          Normal video and iframe embeds with a small custom UI, responsive sources, viewport playback, and per-control
+          configuration.
+        </p>
+      </header>
 
       <section>
-        <h2>Responsive HTML5 Video</h2>
+        <h2>HTML5 video, full controls, viewport play/pause</h2>
         <video
-          class="brand-demo"
+          class="brand-coral"
           data-fideo
           data-fideo-muted="true"
           data-fideo-viewport="play-pause"
@@ -70,27 +92,105 @@
           data-fideo-src-mobile="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
           data-fideo-poster="https://interactive-examples.mdn.mozilla.net/media/examples/flower.jpg"
         ></video>
+        <pre><code>&lt;video
+  data-fideo
+  data-fideo-muted="true"
+  data-fideo-viewport="play-pause"
+  data-fideo-src="/videos/desktop.mp4"
+  data-fideo-src-mobile="/videos/mobile.mp4"
+  data-fideo-poster="/posters/desktop.jpg"
+&gt;&lt;/video&gt;</code></pre>
       </section>
 
       <section>
-        <h2>YouTube Embed</h2>
+        <h2>Minimal controls: play and timeline only</h2>
+        <video
+          data-fideo
+          data-fideo-show-volume="false"
+          data-fideo-show-settings="false"
+          data-fideo-show-fullscreen="false"
+          data-fideo-src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+        ></video>
+        <pre><code>&lt;video
+  data-fideo
+  data-fideo-show-volume="false"
+  data-fideo-show-settings="false"
+  data-fideo-show-fullscreen="false"
+  data-fideo-src="/videos/clip.mp4"
+&gt;&lt;/video&gt;</code></pre>
+      </section>
+
+      <section>
+        <h2>Timeline only, no buttons</h2>
+        <video
+          data-fideo
+          data-fideo-show-play="false"
+          data-fideo-show-time="false"
+          data-fideo-show-volume="false"
+          data-fideo-show-settings="false"
+          data-fideo-show-fullscreen="false"
+          data-fideo-src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+        ></video>
+        <pre><code>&lt;video
+  data-fideo
+  data-fideo-show-play="false"
+  data-fideo-show-time="false"
+  data-fideo-show-volume="false"
+  data-fideo-show-settings="false"
+  data-fideo-show-fullscreen="false"
+  data-fideo-src="/videos/quiet-loop.mp4"
+&gt;&lt;/video&gt;</code></pre>
+      </section>
+
+      <section>
+        <h2>YouTube no-cookie embed</h2>
         <iframe
+          class="brand-blue"
           data-fideo
           data-fideo-provider="youtube"
           data-fideo-muted="true"
-          src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+          src="https://www.youtube-nocookie.com/embed/M7lc1UVf-VE"
           title="YouTube video"
         ></iframe>
+        <pre><code>&lt;iframe
+  data-fideo
+  data-fideo-provider="youtube"
+  data-fideo-muted="true"
+  src="https://www.youtube-nocookie.com/embed/M7lc1UVf-VE"
+&gt;&lt;/iframe&gt;</code></pre>
       </section>
 
       <section>
-        <h2>Vimeo Embed</h2>
+        <h2>Vimeo embed with hidden settings</h2>
         <iframe
           data-fideo
           data-fideo-provider="vimeo"
+          data-fideo-show-settings="false"
           src="https://player.vimeo.com/video/76979871"
           title="Vimeo video"
         ></iframe>
+        <pre><code>&lt;iframe
+  data-fideo
+  data-fideo-provider="vimeo"
+  data-fideo-show-settings="false"
+  src="https://player.vimeo.com/video/76979871"
+&gt;&lt;/iframe&gt;</code></pre>
+      </section>
+
+      <section>
+        <h2>No custom controls</h2>
+        <video
+          controls
+          data-fideo
+          data-fideo-controls="false"
+          data-fideo-src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+        ></video>
+        <pre><code>&lt;video
+  controls
+  data-fideo
+  data-fideo-controls="false"
+  data-fideo-src="/videos/native.mp4"
+&gt;&lt;/video&gt;</code></pre>
       </section>
     </main>
   </body>

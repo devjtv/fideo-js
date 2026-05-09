@@ -28,6 +28,16 @@ export interface FideoIcons {
   fullscreen?: string;
 }
 
+export interface FideoControlVisibility {
+  play: boolean;
+  timeline: boolean;
+  currentTime: boolean;
+  duration: boolean;
+  volume: boolean;
+  settings: boolean;
+  fullscreen: boolean;
+}
+
 export interface FideoOptions {
   selector?: string;
   provider?: FideoProviderName | 'auto';
@@ -36,6 +46,7 @@ export interface FideoOptions {
   loop?: boolean;
   playsInline?: boolean;
   controls?: boolean;
+  controlVisibility?: Partial<FideoControlVisibility>;
   viewport?: FideoViewportMode;
   viewportThreshold?: number;
   volume?: number;
@@ -48,7 +59,7 @@ export interface FideoOptions {
   cssVars?: Record<string, string>;
 }
 
-export interface FideoResolvedOptions extends Omit<FideoOptions, 'provider' | 'breakpoints'> {
+export interface FideoResolvedOptions extends Omit<FideoOptions, 'provider' | 'breakpoints' | 'controlVisibility'> {
   provider: FideoProviderName;
   selector: string;
   autoplay: boolean;
@@ -56,6 +67,7 @@ export interface FideoResolvedOptions extends Omit<FideoOptions, 'provider' | 'b
   loop: boolean;
   playsInline: boolean;
   controls: boolean;
+  controlVisibility: FideoControlVisibility;
   viewport: FideoViewportMode;
   viewportThreshold: number;
   volume: number;

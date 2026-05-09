@@ -12,6 +12,7 @@ export class FideoPlayer implements FideoPlayerInstance {
   private observer?: IntersectionObserver;
   private currentSource?: string;
   private resizeController = new AbortController();
+  private activityTimer?: number;
 
   constructor(element: HTMLVideoElement | HTMLIFrameElement, options: FideoResolvedOptions) {
     this.element = element;
@@ -23,6 +24,7 @@ export class FideoPlayer implements FideoPlayerInstance {
 
     if (options.controls) this.controls = new FideoControls(this.adapter, this.wrapper, options);
     this.bindAdapterEvents();
+    this.bindClickToToggle();
     this.bindResponsiveMedia();
     this.bindViewportPlayback();
 
@@ -47,6 +49,7 @@ export class FideoPlayer implements FideoPlayerInstance {
     this.resizeController.abort();
     this.controls?.destroy();
     this.adapter.destroy();
+    if (this.activityTimer) window.clearTimeout(this.activityTimer);
     this.wrapper.classList.remove('is-ready');
     this.element.removeAttribute('data-fideo-ready');
   }
@@ -66,6 +69,7 @@ export class FideoPlayer implements FideoPlayerInstance {
   private configureElement(): void {
     this.wrapper.classList.add(`fideo--${this.options.provider}`);
     this.wrapper.classList.add('is-ready');
+    this.wrapper.classList.add('is-paused');
     this.element.classList.add('fideo__media');
     this.element.setAttribute('data-fideo-ready', 'true');
 
@@ -74,7 +78,7 @@ export class FideoPlayer implements FideoPlayerInstance {
     }
 
     if (this.element instanceof HTMLVideoElement) {
-      this.element.controls = false;
+      if (this.options.controls) this.element.controls = false;
       this.element.loop = this.options.loop;
       this.element.muted = this.options.muted;
       this.element.playsInline = this.options.playsInline;
@@ -89,6 +93,7 @@ export class FideoPlayer implements FideoPlayerInstance {
     const events = ['play', 'pause', 'ended', 'timeupdate', 'volumechange', 'change'];
     for (const eventName of events) {
       this.adapter.addEventListener(eventName, () => {
+        this.syncPlaybackClasses();
         this.element.dispatchEvent(
           new CustomEvent(`fideo:${eventName}`, {
             bubbles: true,
@@ -100,6 +105,47 @@ export class FideoPlayer implements FideoPlayerInstance {
         );
       });
     }
+  }
+
+  private bindClickToToggle(): void {
+    if (!this.options.controls) return;
+
+    const clickTarget = document.createElement('button');
+    clickTarget.className = 'fideo__click-target';
+    clickTarget.type = 'button';
+    clickTarget.ariaLabel = 'Play or pause video';
+    this.wrapper.prepend(clickTarget);
+
+    clickTarget.addEventListener('click', () => {
+      const state = this.adapter.getState();
+      this.activateControls();
+      if (state.paused) this.play().catch(() => undefined);
+      else this.pause().catch(() => undefined);
+    });
+
+    this.wrapper.addEventListener('pointermove', () => this.activateControls(), { passive: true });
+    this.wrapper.addEventListener('pointerleave', () => this.clearActivity(), { passive: true });
+  }
+
+  private syncPlaybackClasses(): void {
+    const paused = this.adapter.getState().paused;
+    this.wrapper.classList.toggle('is-playing', !paused);
+    this.wrapper.classList.toggle('is-paused', paused);
+    if (paused) this.activateControls(0);
+  }
+
+  private activateControls(duration = 1800): void {
+    this.wrapper.classList.add('is-user-active');
+    if (this.activityTimer) window.clearTimeout(this.activityTimer);
+    if (!duration || this.adapter.getState().paused) return;
+    this.activityTimer = window.setTimeout(() => {
+      this.wrapper.classList.remove('is-user-active');
+    }, duration);
+  }
+
+  private clearActivity(): void {
+    if (this.activityTimer) window.clearTimeout(this.activityTimer);
+    if (!this.adapter.getState().paused) this.wrapper.classList.remove('is-user-active');
   }
 
   private bindResponsiveMedia(): void {

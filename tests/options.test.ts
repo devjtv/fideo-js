@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getResponsiveValue, resolveOptions } from '../src/utils/dom';
+import { getResponsiveValue, normalizeYouTubeEmbedUrl, resolveOptions } from '../src/utils/dom';
 
 describe('data attribute options', () => {
   it('reads provider, autoplay, viewport, responsive sources, posters, and css variables', () => {
@@ -11,6 +11,8 @@ describe('data attribute options', () => {
         data-fideo-muted="true"
         data-fideo-viewport="play-pause"
         data-fideo-volume="0.4"
+        data-fideo-show-volume="false"
+        data-fideo-show-settings="false"
         data-fideo-src="/desktop.mp4"
         data-fideo-src-mobile="/mobile.mp4"
         data-fideo-poster="/desktop.jpg"
@@ -27,6 +29,8 @@ describe('data attribute options', () => {
     expect(options.muted).toBe(true);
     expect(options.viewport).toBe('play-pause');
     expect(options.volume).toBe(0.4);
+    expect(options.controlVisibility.volume).toBe(false);
+    expect(options.controlVisibility.settings).toBe(false);
     expect(options.sources).toEqual({ desktop: '/desktop.mp4', tablet: undefined, mobile: '/mobile.mp4' });
     expect(options.posters).toEqual({ desktop: '/desktop.jpg', tablet: undefined, mobile: '/mobile.jpg' });
     expect(options.cssVars['--fideo-accent']).toBe('#ff3366');
@@ -43,5 +47,14 @@ describe('data attribute options', () => {
     expect(getResponsiveValue(values, breakpoints, 390)).toBe('/mobile.mp4');
     expect(getResponsiveValue(values, breakpoints, 800)).toBe('/tablet.mp4');
     expect(getResponsiveValue(values, breakpoints, 1280)).toBe('/desktop.mp4');
+  });
+
+  it('normalizes YouTube URLs to no-cookie embed URLs and preserves params', () => {
+    expect(normalizeYouTubeEmbedUrl('https://www.youtube.com/watch?v=M7lc1UVf-VE&start=4')).toBe(
+      'https://www.youtube-nocookie.com/embed/M7lc1UVf-VE?start=4',
+    );
+    expect(normalizeYouTubeEmbedUrl('https://youtu.be/M7lc1UVf-VE?si=abc')).toBe(
+      'https://www.youtube-nocookie.com/embed/M7lc1UVf-VE?si=abc',
+    );
   });
 });

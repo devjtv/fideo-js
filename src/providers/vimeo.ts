@@ -36,6 +36,7 @@ export class VimeoProvider extends BaseProvider {
   constructor(readonly element: HTMLIFrameElement) {
     super();
     this.element.src = addUrlParams(this.element.src, {
+      api: 1,
       controls: 0,
       playsinline: 1,
     });
@@ -48,13 +49,15 @@ export class VimeoProvider extends BaseProvider {
   }
 
   async play(): Promise<void> {
-    await this.ready;
-    await this.player?.play();
+    this.postMessage('play');
+    this.update({ paused: false }, 'play');
+    this.ready.then(() => this.player?.play()).catch(() => undefined);
   }
 
   async pause(): Promise<void> {
-    await this.ready;
-    await this.player?.pause();
+    this.postMessage('pause');
+    this.update({ paused: true }, 'pause');
+    this.ready.then(() => this.player?.pause()).catch(() => undefined);
   }
 
   async seek(time: number): Promise<void> {
@@ -95,21 +98,21 @@ export class VimeoProvider extends BaseProvider {
     const events = ['play', 'pause', 'ended', 'timeupdate', 'volumechange', 'durationchange', 'playbackratechange'];
     for (const eventName of events) {
       this.player?.on(eventName, (event = {}) => {
-        this.applyEvent(event);
+        this.applyEvent(eventName, event);
         this.dispatchEvent(new CustomEvent(eventName, { detail: this.getState() }));
         this.dispatchEvent(new CustomEvent('change', { detail: this.getState() }));
       });
     }
   }
 
-  private applyEvent(event: Record<string, number | boolean>): void {
+  private applyEvent(eventName: string, event: Record<string, number | boolean>): void {
     this.state = {
       ...this.state,
       currentTime: typeof event.seconds === 'number' ? event.seconds : this.state.currentTime,
       duration: typeof event.duration === 'number' ? event.duration : this.state.duration,
       volume: typeof event.volume === 'number' ? event.volume : this.state.volume,
       muted: typeof event.muted === 'boolean' ? event.muted : this.state.muted,
-      paused: typeof event.paused === 'boolean' ? event.paused : this.state.paused,
+      paused: eventName === 'play' ? false : eventName === 'pause' || eventName === 'ended' ? true : this.state.paused,
     };
   }
 
@@ -123,6 +126,11 @@ export class VimeoProvider extends BaseProvider {
       this.player.getPlaybackRate().catch(() => 1),
     ]);
     this.update({ currentTime, duration, volume, muted, playbackRate });
+  }
+
+  private postMessage(method: string, value?: unknown): void {
+    const targetOrigin = new URL(this.element.src, window.location.href).origin;
+    this.element.contentWindow?.postMessage(JSON.stringify({ method, value }), targetOrigin);
   }
 }
 

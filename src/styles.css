@@ -1,14 +1,14 @@
 .fideo {
   --fideo-accent: #46d9a7;
-  --fideo-bg: #080a0d;
-  --fideo-control-bg: rgba(9, 12, 16, 0.78);
+  --fideo-bg: transparent;
+  --fideo-control-bg: rgba(12, 14, 16, 0.5);
   --fideo-control-color: #ffffff;
-  --fideo-muted-color: rgba(255, 255, 255, 0.68);
+  --fideo-muted-color: rgba(255, 255, 255, 0.76);
   --fideo-track: rgba(255, 255, 255, 0.28);
   --fideo-track-fill: var(--fideo-accent);
   --fideo-radius: 8px;
-  --fideo-button-size: 40px;
-  --fideo-gap: 10px;
+  --fideo-button-size: 36px;
+  --fideo-gap: 8px;
   position: relative;
   display: block;
   overflow: hidden;
@@ -27,23 +27,34 @@
   object-fit: cover;
 }
 
+.fideo__click-target {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
 .fideo__controls {
   position: absolute;
   right: 12px;
   bottom: 12px;
   left: 12px;
   z-index: 2;
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto auto auto;
+  display: flex;
   gap: var(--fideo-gap);
   align-items: center;
-  min-height: 56px;
-  padding: 8px;
+  min-height: 48px;
+  padding: 6px;
   background: var(--fideo-control-bg);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: calc(var(--fideo-radius) * 0.75);
-  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(14px);
   opacity: 0;
+  pointer-events: none;
   transform: translateY(8px);
   transition:
     opacity 160ms ease,
@@ -52,8 +63,10 @@
 
 .fideo:hover .fideo__controls,
 .fideo:focus-within .fideo__controls,
-.fideo.is-ready .fideo__controls {
+.fideo.is-paused .fideo__controls,
+.fideo.is-user-active .fideo__controls {
   opacity: 1;
+  pointer-events: auto;
   transform: translateY(0);
 }
 
@@ -64,7 +77,7 @@
   height: var(--fideo-button-size);
   padding: 0;
   color: var(--fideo-control-color);
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.1);
   border: 0;
   border-radius: 999px;
   cursor: pointer;
@@ -87,12 +100,22 @@
 .fideo__button svg {
   width: 20px;
   height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.fideo__play svg {
   fill: currentColor;
+  stroke: none;
 }
 
 .fideo__timeline {
   display: grid;
   grid-template-columns: auto minmax(72px, 1fr) auto;
+  flex: 1 1 auto;
   gap: 8px;
   align-items: center;
   min-width: 0;
@@ -167,7 +190,7 @@
 
 .fideo__volume-group {
   display: grid;
-  grid-template-columns: auto 72px;
+  grid-template-columns: auto 68px;
   gap: 6px;
   align-items: center;
 }
@@ -219,7 +242,6 @@
 
 @media (max-width: 700px) {
   .fideo__controls {
-    grid-template-columns: auto minmax(0, 1fr) auto;
     gap: 8px;
   }
 
