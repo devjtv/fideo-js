@@ -78,7 +78,7 @@ export class FideoPlayer implements FideoPlayerInstance {
     }
 
     if (this.element instanceof HTMLVideoElement) {
-      if (this.options.controls) this.element.controls = false;
+      this.element.controls = false;
       this.element.loop = this.options.loop;
       this.element.muted = this.options.muted;
       this.element.playsInline = this.options.playsInline;

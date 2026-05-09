@@ -23,9 +23,11 @@ export interface FideoIcons {
   play?: string;
   pause?: string;
   volume?: string;
+  volumeLow?: string;
   muted?: string;
   settings?: string;
   fullscreen?: string;
+  fullscreenExit?: string;
 }
 
 export interface FideoControlVisibility {

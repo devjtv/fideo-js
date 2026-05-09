@@ -1,14 +1,14 @@
 .fideo {
   --fideo-accent: #46d9a7;
   --fideo-bg: transparent;
-  --fideo-control-bg: rgba(12, 14, 16, 0.5);
+  --fideo-control-bg: transparent;
   --fideo-control-color: #ffffff;
-  --fideo-muted-color: rgba(255, 255, 255, 0.76);
-  --fideo-track: rgba(255, 255, 255, 0.28);
-  --fideo-track-fill: var(--fideo-accent);
+  --fideo-muted-color: rgba(255, 255, 255, 0.92);
+  --fideo-track: rgba(255, 255, 255, 0.46);
+  --fideo-track-fill: rgba(255, 255, 255, 0.9);
   --fideo-radius: 8px;
-  --fideo-button-size: 36px;
-  --fideo-gap: 8px;
+  --fideo-button-size: 30px;
+  --fideo-gap: 10px;
   position: relative;
   display: block;
   overflow: hidden;
@@ -39,23 +39,22 @@
 
 .fideo__controls {
   position: absolute;
-  right: 12px;
-  bottom: 12px;
-  left: 12px;
+  right: 16px;
+  bottom: 10px;
+  left: 16px;
   z-index: 2;
-  display: flex;
-  gap: var(--fideo-gap);
-  align-items: center;
-  min-height: 48px;
-  padding: 6px;
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: 4px;
+  padding: 0;
   background: var(--fideo-control-bg);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: calc(var(--fideo-radius) * 0.75);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
-  backdrop-filter: blur(14px);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.72));
   opacity: 0;
   pointer-events: none;
-  transform: translateY(8px);
+  transform: translateY(5px);
   transition:
     opacity 160ms ease,
     transform 160ms ease;
@@ -77,20 +76,20 @@
   height: var(--fideo-button-size);
   padding: 0;
   color: var(--fideo-control-color);
-  background: rgba(255, 255, 255, 0.1);
+  background: transparent;
   border: 0;
-  border-radius: 999px;
+  border-radius: 4px;
   cursor: pointer;
   transition:
-    background 140ms ease,
+    opacity 140ms ease,
     color 140ms ease,
     transform 140ms ease;
 }
 
 .fideo__button:hover,
 .fideo__button:focus-visible {
-  color: #07100d;
-  background: var(--fideo-accent);
+  color: var(--fideo-accent);
+  background: transparent;
 }
 
 .fideo__button:active {
@@ -98,42 +97,50 @@
 }
 
 .fideo__button svg {
-  width: 20px;
-  height: 20px;
-  fill: none;
-  stroke: currentColor;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 2;
+  width: 18px;
+  height: 18px;
 }
 
-.fideo__play svg {
-  fill: currentColor;
-  stroke: none;
-}
-
-.fideo__timeline {
-  display: grid;
-  grid-template-columns: auto minmax(72px, 1fr) auto;
-  flex: 1 1 auto;
-  gap: 8px;
+.fideo__control-row {
+  display: flex;
+  gap: var(--fideo-gap);
   align-items: center;
   min-width: 0;
 }
 
+.fideo__spacer {
+  flex: 1 1 auto;
+}
+
+.fideo__timeline {
+  display: block;
+  min-width: 0;
+}
+
+.fideo__time-group {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+
 .fideo__time {
-  min-width: 38px;
+  min-width: auto;
   color: var(--fideo-muted-color);
-  font: 600 12px/1.2 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font: 600 12px/1 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-variant-numeric: tabular-nums;
-  text-align: center;
+  text-align: left;
+}
+
+.fideo__time-separator {
+  color: var(--fideo-muted-color);
+  font: 600 12px/1 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 .fideo__track,
 .fideo__volume {
   --fideo-progress: 0%;
   width: 100%;
-  height: 18px;
+  height: 12px;
   padding: 0;
   background: transparent;
   accent-color: var(--fideo-accent);
@@ -143,7 +150,7 @@
 
 .fideo__track::-webkit-slider-runnable-track,
 .fideo__volume::-webkit-slider-runnable-track {
-  height: 4px;
+  height: 3px;
   background: linear-gradient(
     to right,
     var(--fideo-track-fill) 0%,
@@ -156,43 +163,53 @@
 
 .fideo__track::-moz-range-track,
 .fideo__volume::-moz-range-track {
-  height: 4px;
+  height: 3px;
   background: var(--fideo-track);
   border-radius: 999px;
 }
 
 .fideo__track::-moz-range-progress,
 .fideo__volume::-moz-range-progress {
-  height: 4px;
+  height: 3px;
   background: var(--fideo-track-fill);
   border-radius: 999px;
 }
 
 .fideo__track::-webkit-slider-thumb,
 .fideo__volume::-webkit-slider-thumb {
-  width: 14px;
-  height: 14px;
-  margin-top: -5px;
-  background: var(--fideo-control-color);
-  border: 2px solid var(--fideo-accent);
+  width: 0;
+  height: 0;
+  margin-top: 1.5px;
+  background: transparent;
+  border: 0;
   border-radius: 999px;
   appearance: none;
 }
 
 .fideo__track::-moz-range-thumb,
 .fideo__volume::-moz-range-thumb {
-  width: 10px;
-  height: 10px;
-  background: var(--fideo-control-color);
-  border: 2px solid var(--fideo-accent);
+  width: 0;
+  height: 0;
+  background: transparent;
+  border: 0;
   border-radius: 999px;
 }
 
 .fideo__volume-group {
-  display: grid;
-  grid-template-columns: auto 68px;
+  display: flex;
   gap: 6px;
   align-items: center;
+}
+
+.fideo__volume {
+  width: 56px;
+  opacity: 0;
+  transition: opacity 140ms ease;
+}
+
+.fideo__volume-group:hover .fideo__volume,
+.fideo__volume:focus-visible {
+  opacity: 1;
 }
 
 .fideo__settings {
@@ -207,7 +224,7 @@
   min-width: 90px;
   padding: 6px;
   pointer-events: none;
-  background: rgba(8, 10, 13, 0.95);
+  background: rgba(8, 10, 13, 0.88);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
   opacity: 0;
@@ -242,7 +259,9 @@
 
 @media (max-width: 700px) {
   .fideo__controls {
-    gap: 8px;
+    right: 12px;
+    bottom: 8px;
+    left: 12px;
   }
 
   .fideo__volume-group,
@@ -250,8 +269,8 @@
     display: none;
   }
 
-  .fideo__time {
-    min-width: 32px;
+  .fideo__time,
+  .fideo__time-separator {
     font-size: 11px;
   }
 }

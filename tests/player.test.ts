@@ -59,13 +59,13 @@ describe('Fideo player', () => {
     expect(player.wrapper.querySelector('.fideo__timeline')).toBeTruthy();
   });
 
-  it('skips custom controls without removing native controls', () => {
+  it('skips all controls when controls is false', () => {
     document.body.innerHTML = '<video controls data-fideo data-fideo-controls="false" data-fideo-src="/one.mp4"></video>';
     const video = document.querySelector('video')!;
     const player = mountFideo(video);
 
     expect(player.wrapper.querySelector('.fideo__controls')).toBeNull();
-    expect(video.controls).toBe(true);
+    expect(video.controls).toBe(false);
   });
 
   it('initializes all data-fideo elements and can destroy them together', () => {

@@ -59,7 +59,7 @@ Or use the browser global from the bundled UMD file:
 | `data-fideo-autoplay` | Starts playback on init. Muted autoplay is the most reliable browser path. |
 | `data-fideo-muted` | Starts muted. |
 | `data-fideo-loop` | Loops HTML5 video. |
-| `data-fideo-controls` | `true` for Fideo controls, `false` to skip the custom UI. |
+| `data-fideo-controls` | `true` for Fideo controls, `false` for no custom or native controls. |
 | `data-fideo-viewport` | `play`, `pause`, `play-pause`, or `false`. |
 | `data-fideo-viewport-threshold` | Intersection ratio needed before viewport playback runs. Default: `0.35`. |
 | `data-fideo-src`, `data-fideo-src-tablet`, `data-fideo-src-mobile` | Responsive video/embed sources. |

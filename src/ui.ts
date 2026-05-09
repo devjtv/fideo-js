@@ -10,9 +10,11 @@ export class FideoControls {
   private volume: HTMLInputElement;
   private currentTime: HTMLElement;
   private duration: HTMLElement;
+  private fullscreenButton: HTMLButtonElement;
   private speedMenu: HTMLElement;
   private seeking = false;
   private icons: Required<NonNullable<FideoResolvedOptions['icons']>>;
+  private handleFullscreenChange = () => this.render(this.adapter.getState());
 
   constructor(
     private adapter: FideoAdapter,
@@ -28,12 +30,17 @@ export class FideoControls {
     this.currentTime = createElement('span', 'fideo__time');
     this.duration = createElement('span', 'fideo__time');
     this.speedMenu = this.createSpeedMenu(options.playbackRates);
+    this.fullscreenButton = this.button('fideo__button', 'Fullscreen', this.icons.fullscreen);
 
-    const fullscreen = this.button('fideo__button', 'Fullscreen', this.icons.fullscreen);
     const settings = this.button('fideo__button fideo__settings-toggle', 'Settings', this.icons.settings);
 
     const timeline = createElement('div', 'fideo__timeline');
-    timeline.append(this.currentTime, this.track, this.duration);
+    timeline.append(this.track);
+
+    const timeGroup = createElement('span', 'fideo__time-group');
+    const separator = createElement('span', 'fideo__time-separator');
+    separator.textContent = '/';
+    timeGroup.append(this.currentTime, separator, this.duration);
 
     const volumeGroup = createElement('div', 'fideo__volume-group');
     volumeGroup.append(this.muteButton, this.volume);
@@ -41,15 +48,23 @@ export class FideoControls {
     const settingsGroup = createElement('div', 'fideo__settings');
     settingsGroup.append(settings, this.speedMenu);
 
-    if (options.controlVisibility.play) this.element.append(this.playButton);
+    const primaryControls = createElement('div', 'fideo__control-row');
+    const spacer = createElement('span', 'fideo__spacer');
+
+    if (options.controlVisibility.play) primaryControls.append(this.playButton);
+    if (options.controlVisibility.currentTime || options.controlVisibility.duration) primaryControls.append(timeGroup);
+    primaryControls.append(spacer);
+    if (options.controlVisibility.volume) primaryControls.append(volumeGroup);
+    if (options.controlVisibility.settings) primaryControls.append(settingsGroup);
+    if (options.controlVisibility.fullscreen) primaryControls.append(this.fullscreenButton);
+
+    this.element.append(primaryControls);
     if (options.controlVisibility.timeline) this.element.append(timeline);
-    if (options.controlVisibility.volume) this.element.append(volumeGroup);
-    if (options.controlVisibility.settings) this.element.append(settingsGroup);
-    if (options.controlVisibility.fullscreen) this.element.append(fullscreen);
     this.wrapper.append(this.element);
 
     if (!options.controlVisibility.currentTime) this.currentTime.remove();
     if (!options.controlVisibility.duration) this.duration.remove();
+    if (!options.controlVisibility.currentTime || !options.controlVisibility.duration) separator.remove();
 
     this.playButton.addEventListener('click', () => this.togglePlay());
     this.muteButton.addEventListener('click', () => this.toggleMute());
@@ -60,13 +75,15 @@ export class FideoControls {
     this.track.addEventListener('input', () => this.previewSeek());
     this.track.addEventListener('change', () => this.commitSeek());
     settings.addEventListener('click', () => settingsGroup.classList.toggle('is-open'));
-    fullscreen.addEventListener('click', () => this.toggleFullscreen());
+    this.fullscreenButton.addEventListener('click', () => this.toggleFullscreen());
+    document.addEventListener('fullscreenchange', this.handleFullscreenChange);
 
     this.adapter.addEventListener('change', () => this.render(this.adapter.getState()));
     this.render(this.adapter.getState());
   }
 
   destroy(): void {
+    document.removeEventListener('fullscreenchange', this.handleFullscreenChange);
     this.element.remove();
   }
 
@@ -141,8 +158,13 @@ export class FideoControls {
     this.playButton.ariaLabel = state.paused ? 'Play' : 'Pause';
     this.playButton.title = state.paused ? 'Play' : 'Pause';
     this.muteButton.innerHTML = state.muted || state.volume === 0 ? this.icons.muted : this.icons.volume;
+    if (!state.muted && state.volume > 0 && state.volume <= 0.5) this.muteButton.innerHTML = this.icons.volumeLow;
     this.muteButton.ariaLabel = state.muted || state.volume === 0 ? 'Unmute' : 'Mute';
     this.muteButton.title = state.muted || state.volume === 0 ? 'Unmute' : 'Mute';
+    const fullscreenActive = document.fullscreenElement === this.wrapper;
+    this.fullscreenButton.innerHTML = fullscreenActive ? this.icons.fullscreenExit : this.icons.fullscreen;
+    this.fullscreenButton.ariaLabel = fullscreenActive ? 'Exit fullscreen' : 'Fullscreen';
+    this.fullscreenButton.title = fullscreenActive ? 'Exit fullscreen' : 'Fullscreen';
     this.volume.value = String(state.muted ? 0 : state.volume);
     this.currentTime.textContent = formatTime(state.currentTime);
     this.duration.textContent = formatTime(state.duration);
