@@ -193,6 +193,18 @@
   border-radius: 999px;
 }
 
+.fideo__volume::-webkit-slider-runnable-track {
+  width: var(--fideo-track-size);
+  height: 100%;
+  background: linear-gradient(
+    to top,
+    var(--fideo-track-fill) 0%,
+    var(--fideo-track-fill) var(--fideo-progress),
+    var(--fideo-track) var(--fideo-progress),
+    var(--fideo-track) 100%
+  );
+}
+
 .fideo__track::-moz-range-track,
 .fideo__volume::-moz-range-track {
   height: var(--fideo-track-size);
@@ -200,11 +212,20 @@
   border-radius: 999px;
 }
 
+.fideo__volume::-moz-range-track {
+  width: var(--fideo-track-size);
+  height: 100%;
+}
+
 .fideo__track::-moz-range-progress,
 .fideo__volume::-moz-range-progress {
   height: var(--fideo-track-size);
   background: var(--fideo-track-fill);
   border-radius: 999px;
+}
+
+.fideo__volume::-moz-range-progress {
+  width: var(--fideo-track-size);
 }
 
 .fideo__track::-webkit-slider-thumb,
@@ -216,6 +237,11 @@
   border: 0;
   border-radius: 999px;
   appearance: none;
+}
+
+.fideo__volume::-webkit-slider-thumb {
+  margin-top: 0;
+  margin-left: -4px;
 }
 
 .fideo__track::-webkit-slider-thumb {
@@ -253,24 +279,32 @@
   height: var(--fideo-button-size);
 }
 
-.fideo__volume {
+.fideo__volume-panel {
   position: absolute;
   bottom: calc(100% + 24px);
-  left: calc(50% + 2px);
-  width: 76px;
-  height: 24px;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 76px;
   opacity: 0;
   pointer-events: none;
-  transform: translateX(-50%) rotate(-90deg);
-  transform-origin: center;
+  transform: translateX(-50%);
   transition:
     opacity 140ms ease,
     bottom 140ms ease;
 }
 
-.fideo__volume-group:hover .fideo__volume,
-.fideo__volume-group.is-open .fideo__volume,
-.fideo__volume-group:focus-within .fideo__volume {
+.fideo__volume {
+  width: 18px;
+  height: 76px;
+  direction: rtl;
+  writing-mode: vertical-lr;
+}
+
+.fideo__volume-group:hover .fideo__volume-panel,
+.fideo__volume-group.is-open .fideo__volume-panel,
+.fideo__volume-group:focus-within .fideo__volume-panel {
   bottom: calc(100% + 30px);
   opacity: 1;
   pointer-events: auto;

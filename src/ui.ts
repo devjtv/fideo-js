@@ -13,6 +13,7 @@ export class FideoControls {
   private fullscreenButton: HTMLButtonElement;
   private speedMenu: HTMLElement;
   private volumeGroup: HTMLElement;
+  private volumePanel: HTMLElement;
   private seeking = false;
   private icons: Required<NonNullable<FideoResolvedOptions['icons']>>;
   private handleFullscreenChange = () => this.render(this.adapter.getState());
@@ -44,7 +45,9 @@ export class FideoControls {
     timeGroup.append(this.currentTime, separator, this.duration);
 
     this.volumeGroup = createElement('div', 'fideo__volume-group');
-    this.volumeGroup.append(this.muteButton, this.volume);
+    this.volumePanel = createElement('div', 'fideo__volume-panel');
+    this.volumePanel.append(this.volume);
+    this.volumeGroup.append(this.muteButton, this.volumePanel);
 
     const settingsGroup = createElement('div', 'fideo__settings');
     settingsGroup.append(settings, this.speedMenu);
