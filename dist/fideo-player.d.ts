@@ -11,7 +11,6 @@ export declare class FideoPlayer implements FideoPlayerInstance {
     private activityTimer?;
     private resizeObserver?;
     private posterImage?;
-    private posterDismissed;
     constructor(element: HTMLVideoElement | HTMLIFrameElement, options: FideoResolvedOptions);
     play(): Promise<void>;
     pause(): Promise<void>;
@@ -28,7 +27,7 @@ export declare class FideoPlayer implements FideoPlayerInstance {
     private bindViewportPlayback;
     private bindBackgroundCover;
     private applyBackgroundCover;
-    private applyIframePoster;
+    private applyPosterOverlay;
     private ensurePosterImage;
     private syncPosterVisibility;
 }

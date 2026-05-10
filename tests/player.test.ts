@@ -160,8 +160,38 @@ describe('Fideo player', () => {
     window.dispatchEvent(new Event('resize'));
     expect(poster.src.endsWith('/mobile-poster.jpg')).toBe(true);
 
+    (player as any).adapter.state.paused = false;
     (player as any).adapter.dispatchEvent(new Event('play'));
     expect(player.wrapper.classList.contains('is-poster-visible')).toBe(false);
+
+    (player as any).adapter.state.paused = true;
+    (player as any).adapter.dispatchEvent(new Event('pause'));
+    expect(player.wrapper.classList.contains('is-poster-visible')).toBe(true);
+  });
+
+  it('shows poster overlays for native video while paused and hides them during playback', () => {
+    document.body.innerHTML = `
+      <video
+        data-fideo
+        data-fideo-poster="/desktop-poster.jpg"
+        data-fideo-src="/movie.mp4"
+      ></video>
+    `;
+    const video = document.querySelector('video')!;
+    const player = mountFideo(video);
+    const poster = player.wrapper.querySelector('.fideo__poster') as HTMLImageElement;
+
+    expect(poster).toBeTruthy();
+    expect(poster.src.endsWith('/desktop-poster.jpg')).toBe(true);
+    expect(player.wrapper.classList.contains('is-poster-visible')).toBe(true);
+
+    Object.defineProperty(video, 'paused', { configurable: true, value: false });
+    video.dispatchEvent(new Event('play'));
+    expect(player.wrapper.classList.contains('is-poster-visible')).toBe(false);
+
+    Object.defineProperty(video, 'paused', { configurable: true, value: true });
+    video.dispatchEvent(new Event('pause'));
+    expect(player.wrapper.classList.contains('is-poster-visible')).toBe(true);
   });
 
   it('initializes all data-fideo elements and can destroy them together', () => {

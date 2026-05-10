@@ -111,12 +111,12 @@ function $(s, t) {
   const r = Number(e);
   return Number.isFinite(r) && r > 0 ? r : t;
 }
-function U(s, t) {
+function O(s, t) {
   if (!s) return t;
   const e = s.split(",").map((i) => Number(i.trim())).filter((i) => Number.isFinite(i) && i > 0);
   return e.length ? e : t;
 }
-function O(s, t = {}) {
+function U(s, t = {}) {
   if (s instanceof HTMLVideoElement) return "html5";
   const e = [s.getAttribute("src") || s.src, t.desktop, t.tablet, t.mobile].filter(
     (i) => !!i
@@ -133,7 +133,7 @@ function j(s, t) {
   const e = s.trim().toLowerCase();
   return B.has(e) || e === "none" ? !1 : e === "play" || e === "pause" || e === "play-pause" ? e : R.has(e) ? "play-pause" : t;
 }
-function D(s) {
+function Y(s) {
   const t = s.dataset;
   return {
     desktop: t.fideoSrcDesktop || t.fideoSrc || void 0,
@@ -141,7 +141,7 @@ function D(s) {
     mobile: t.fideoSrcMobile || void 0
   };
 }
-function Y(s) {
+function D(s) {
   const t = s.dataset;
   return {
     desktop: t.fideoPosterDesktop || t.fideoPoster || void 0,
@@ -154,7 +154,7 @@ function q(s, t = {}) {
   const e = s.dataset, i = {
     mobile: y(e.fideoBreakpointMobile, ((p = t.breakpoints) == null ? void 0 : p.mobile) ?? M.mobile),
     tablet: y(e.fideoBreakpointTablet, ((f = t.breakpoints) == null ? void 0 : f.tablet) ?? M.tablet)
-  }, r = e.fideoProvider, a = t.provider ?? r ?? "auto", o = { ...D(s), ...t.sources }, l = a === "auto" ? O(s, o) : a, h = t.viewport ?? !1, d = c(e.fideoBackground, t.background ?? !1);
+  }, r = e.fideoProvider, a = t.provider ?? r ?? "auto", o = { ...Y(s), ...t.sources }, l = a === "auto" ? U(s, o) : a, h = t.viewport ?? !1, d = c(e.fideoBackground, t.background ?? !1);
   return {
     selector: t.selector ?? I,
     provider: l,
@@ -168,10 +168,10 @@ function q(s, t = {}) {
     viewport: j(e.fideoViewport, h),
     viewportThreshold: y(e.fideoViewportThreshold, t.viewportThreshold ?? 0.35),
     volume: y(e.fideoVolume, t.volume ?? 1),
-    playbackRates: U(e.fideoPlaybackRates, t.playbackRates ?? [0.5, 1, 1.25, 1.5, 2]),
+    playbackRates: O(e.fideoPlaybackRates, t.playbackRates ?? [0.5, 1, 1.25, 1.5, 2]),
     backgroundAspectRatio: $(e.fideoBackgroundAspectRatio ?? t.backgroundAspectRatio, 16 / 9),
     sources: o,
-    posters: { ...Y(s), ...t.posters },
+    posters: { ...D(s), ...t.posters },
     breakpoints: i,
     icons: t.icons ?? {},
     className: e.fideoClass || t.className || "",
@@ -698,7 +698,6 @@ class oe {
     n(this, "activityTimer");
     n(this, "resizeObserver");
     n(this, "posterImage");
-    n(this, "posterDismissed", !1);
     this.element = t, this.options = e, this.wrapper = this.wrapElement(t, e), this.configureElement(), this.adapter = re(e.provider, t, e), this.applyResponsiveMedia(), e.controls && (this.controls = new ne(this.adapter, this.wrapper, e)), this.bindAdapterEvents(), this.bindClickToToggle(), this.bindResponsiveMedia(), this.bindBackgroundCover(), this.bindViewportPlayback(), this.adapter.setVolume(e.volume), this.adapter.setMuted(e.muted), e.autoplay && this.play().catch(() => {
     });
   }
@@ -729,7 +728,7 @@ class oe {
     const t = ["play", "pause", "ended", "timeupdate", "volumechange", "change"];
     for (const e of t)
       this.adapter.addEventListener(e, () => {
-        e === "play" && (this.posterDismissed = !0, this.syncPosterVisibility()), this.syncPlaybackClasses(), this.element.dispatchEvent(
+        this.syncPosterVisibility(), this.syncPlaybackClasses(), this.element.dispatchEvent(
           new CustomEvent(`fideo:${e}`, {
             bubbles: !0,
             detail: {
@@ -779,9 +778,9 @@ class oe {
   }
   applyResponsiveMedia() {
     const t = S(this.options.posters, this.options.breakpoints);
-    t && this.adapter.setPoster ? this.adapter.setPoster(t) : this.applyIframePoster(t);
+    this.adapter.setPoster && this.adapter.setPoster(t ?? ""), this.applyPosterOverlay(t);
     const e = S(this.options.sources, this.options.breakpoints);
-    e && e !== this.currentSource && (this.currentSource = e, this.posterDismissed = !1, this.syncPosterVisibility(), this.adapter.setSource(e));
+    e && e !== this.currentSource && (this.currentSource = e, this.syncPosterVisibility(), this.adapter.setSource(e));
   }
   bindViewportPlayback() {
     !this.options.viewport || !("IntersectionObserver" in window) || (this.observer = new IntersectionObserver(
@@ -807,9 +806,8 @@ class oe {
     let a = t, o = e;
     i > r ? o = t / r : a = e * r, this.element.style.width = `${a}px`, this.element.style.height = `${o}px`, this.element.style.left = `${(t - a) / 2}px`, this.element.style.top = `${(e - o) / 2}px`;
   }
-  applyIframePoster(t) {
+  applyPosterOverlay(t) {
     var i;
-    if (this.element instanceof HTMLVideoElement) return;
     if (!t) {
       (i = this.posterImage) == null || i.remove(), this.posterImage = void 0, this.wrapper.classList.remove("has-poster", "is-poster-visible");
       return;
@@ -824,7 +822,7 @@ class oe {
   }
   syncPosterVisibility() {
     var i;
-    const t = !!((i = this.posterImage) != null && i.getAttribute("src")), e = t && !this.posterDismissed;
+    const t = !!((i = this.posterImage) != null && i.getAttribute("src")), e = t && this.adapter.getState().paused;
     this.wrapper.classList.toggle("has-poster", t), this.wrapper.classList.toggle("is-poster-visible", e);
   }
 }

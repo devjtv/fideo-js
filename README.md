@@ -144,7 +144,7 @@ Use the same pattern for iframe providers:
 ></iframe>
 ```
 
-Fideo will normalize that YouTube URL to a no-cookie embed URL and add the provider API parameters it needs. When poster images are configured for an iframe player, Fideo renders them as an overlay image inside the wrapper until playback begins.
+Fideo will normalize that YouTube URL to a no-cookie embed URL and add the provider API parameters it needs. When poster images are configured, Fideo renders them as a visual cover while the player is paused or still getting ready, then fades them away when playback starts.
 
 ## JavaScript Initialization
 
@@ -301,7 +301,7 @@ Fideo lets you swap video source and poster assets by breakpoint. This is useful
 ></video>
 ```
 
-The same poster attributes and `posters` object also work for iframe providers. In that case, Fideo creates an `<img>` inside the player wrapper and treats it like a poster overlay. The `desktop`, `tablet`, and `mobile` poster values should still describe the original poster assets you want shown for each breakpoint.
+The same poster attributes and `posters` object also work for iframe providers. In that case, Fideo creates an `<img>` inside the player wrapper and treats it like a paused/loading poster overlay. The `desktop`, `tablet`, and `mobile` poster values should still describe the original poster assets you want shown for each breakpoint.
 
 ```html
 <iframe
@@ -547,7 +547,7 @@ Existing Vimeo embed URLs with `?h=` are preserved.
 | `volume` | `number` | `1` | Initial volume from `0` to `1`. |
 | `playbackRates` | `number[]` | `[0.5, 1, 1.25, 1.5, 2]` | Playback speed options. |
 | `sources` | `FideoSources` | `{}` | Responsive media sources. |
-| `posters` | `FideoPosters` | `{}` | Responsive poster images. For iframe providers, Fideo renders them as an overlay image inside the wrapper until playback starts. |
+| `posters` | `FideoPosters` | `{}` | Responsive poster images. Fideo keeps them visible while the player is paused or waiting, and fades them out once playback starts. |
 | `breakpoints` | `Partial<FideoBreakpoints>` | `{ mobile: 767, tablet: 1024 }` | Responsive cutoffs. |
 | `icons` | `FideoIcons` | `{}` | Custom SVG icons. |
 | `className` | `string` | `''` | Additional wrapper class. |

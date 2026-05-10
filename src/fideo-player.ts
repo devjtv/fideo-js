@@ -15,7 +15,6 @@ export class FideoPlayer implements FideoPlayerInstance {
   private activityTimer?: number;
   private resizeObserver?: ResizeObserver;
   private posterImage?: HTMLImageElement;
-  private posterDismissed = false;
 
   constructor(element: HTMLVideoElement | HTMLIFrameElement, options: FideoResolvedOptions) {
     this.element = element;
@@ -101,10 +100,7 @@ export class FideoPlayer implements FideoPlayerInstance {
     const events = ['play', 'pause', 'ended', 'timeupdate', 'volumechange', 'change'];
     for (const eventName of events) {
       this.adapter.addEventListener(eventName, () => {
-        if (eventName === 'play') {
-          this.posterDismissed = true;
-          this.syncPosterVisibility();
-        }
+        this.syncPosterVisibility();
         this.syncPlaybackClasses();
         this.element.dispatchEvent(
           new CustomEvent(`fideo:${eventName}`, {
@@ -181,13 +177,12 @@ export class FideoPlayer implements FideoPlayerInstance {
 
   private applyResponsiveMedia(): void {
     const poster = getResponsiveValue(this.options.posters, this.options.breakpoints);
-    if (poster && this.adapter.setPoster) this.adapter.setPoster(poster);
-    else this.applyIframePoster(poster);
+    if (this.adapter.setPoster) this.adapter.setPoster(poster ?? '');
+    this.applyPosterOverlay(poster);
 
     const source = getResponsiveValue(this.options.sources, this.options.breakpoints);
     if (source && source !== this.currentSource) {
       this.currentSource = source;
-      this.posterDismissed = false;
       this.syncPosterVisibility();
       this.adapter.setSource(source);
     }
@@ -249,8 +244,7 @@ export class FideoPlayer implements FideoPlayerInstance {
     this.element.style.top = `${(height - mediaHeight) / 2}px`;
   }
 
-  private applyIframePoster(poster?: string): void {
-    if (this.element instanceof HTMLVideoElement) return;
+  private applyPosterOverlay(poster?: string): void {
     if (!poster) {
       this.posterImage?.remove();
       this.posterImage = undefined;
@@ -279,7 +273,7 @@ export class FideoPlayer implements FideoPlayerInstance {
 
   private syncPosterVisibility(): void {
     const hasPoster = Boolean(this.posterImage?.getAttribute('src'));
-    const showPoster = hasPoster && !this.posterDismissed;
+    const showPoster = hasPoster && this.adapter.getState().paused;
     this.wrapper.classList.toggle('has-poster', hasPoster);
     this.wrapper.classList.toggle('is-poster-visible', showPoster);
   }
