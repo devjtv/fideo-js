@@ -15,6 +15,14 @@
   <img alt="No dependencies" src="https://img.shields.io/badge/runtime-lightweight-f97316">
 </p>
 
+<p align="center">
+  <a href="https://devjtv.github.io/fideo-js/"><strong>Live Demo</strong></a>
+  ·
+  <a href="./examples/index.html">Demo Source</a>
+  ·
+  <a href="#quick-start">Quick Start</a>
+</p>
+
 Fideo JS turns normal `<video>` and `<iframe>` elements into polished, configurable video experiences. Keep your markup simple, add `data-fideo`, and get custom controls, responsive sources, posters, viewport playback, background video mode, and provider normalization without giving up control of your HTML.
 
 ## Highlights
@@ -560,7 +568,10 @@ Individual commands:
 npm run typecheck
 npm run test
 npm run build
+npm run build:demo
 ```
+
+The hosted demo is published to GitHub Pages from `.github/workflows/demo.yml` whenever `main` changes: [https://devjtv.github.io/fideo-js/](https://devjtv.github.io/fideo-js/).
 
 ## Browser Notes
 
