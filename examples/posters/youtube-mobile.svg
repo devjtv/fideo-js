@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 1280" role="img" aria-labelledby="title desc">
+  <title id="title">Fideo mobile poster</title>
+  <desc id="desc">Mobile poster demo for an iframe video player.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#301f36" />
+      <stop offset="100%" stop-color="#5b3668" />
+    </linearGradient>
+  </defs>
+  <rect width="720" height="1280" fill="url(#bg)" />
+  <circle cx="564" cy="204" r="150" fill="#ff8f70" fill-opacity="0.2" />
+  <circle cx="164" cy="1012" r="180" fill="#46d9a7" fill-opacity="0.16" />
+  <text x="72" y="420" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="700" letter-spacing="0">Fideo JS</text>
+  <text x="72" y="492" fill="#fff4ff" font-family="Inter, Arial, sans-serif" font-size="66" font-weight="700" letter-spacing="0">Mobile poster</text>
+  <text x="72" y="558" fill="#f1dcf7" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="500" letter-spacing="0">Portrait asset for smaller screens.</text>
+  <circle cx="360" cy="744" r="76" fill="#ffffff" fill-opacity="0.9" />
+  <path d="M334 704l60 40l-60 40z" fill="#341f3a" />
+</svg>
