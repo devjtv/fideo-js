@@ -281,7 +281,7 @@
 
 .fideo__volume-panel {
   position: absolute;
-  bottom: calc(100% + 24px);
+  bottom: calc(100% + 10px);
   left: 50%;
   display: grid;
   place-items: center;
@@ -295,6 +295,15 @@
     bottom 140ms ease;
 }
 
+.fideo__volume-panel::after {
+  position: absolute;
+  right: -10px;
+  bottom: -18px;
+  left: -10px;
+  height: 22px;
+  content: "";
+}
+
 .fideo__volume {
   width: 18px;
   height: 76px;
@@ -305,7 +314,7 @@
 .fideo__volume-group:hover .fideo__volume-panel,
 .fideo__volume-group.is-open .fideo__volume-panel,
 .fideo__volume-group:focus-within .fideo__volume-panel {
-  bottom: calc(100% + 30px);
+  bottom: calc(100% + 14px);
   opacity: 1;
   pointer-events: auto;
 }
