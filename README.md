@@ -9,10 +9,17 @@ npm install fideo-js
 ```
 
 ```ts
-import { initFideo } from 'fideo-js';
+import { Fideo, initFideo } from 'fideo-js';
 import 'fideo-js/styles.css';
 
 initFideo();
+
+const player = new Fideo('#player', {
+  muted: true,
+  sources: {
+    desktop: '/videos/desktop.mp4',
+  },
+});
 ```
 
 Or use the browser global from the bundled UMD file:
@@ -22,6 +29,13 @@ Or use the browser global from the bundled UMD file:
 <script src="./dist/fideo.umd.cjs"></script>
 <script>
   Fideo.init();
+
+  const player = new Fideo('#player', {
+    muted: true,
+    sources: {
+      desktop: '/videos/desktop.mp4',
+    },
+  });
 </script>
 ```
 
@@ -76,8 +90,48 @@ Or use the browser global from the bundled UMD file:
 
 ## JavaScript API
 
+Fideo can be initialized with data attributes, with JavaScript options, or with both. JavaScript options are useful when you do not want video configuration in markup.
+
 ```ts
-import { Fideo, mountFideo } from 'fideo-js';
+import { Fideo, createFideo, mountFideo } from 'fideo-js';
+
+const player = new Fideo('#player', {
+  autoplay: true,
+  muted: true,
+  loop: true,
+  controls: false,
+  sources: {
+    desktop: '/videos/background-loop.mp4',
+    mobile: '/videos/background-loop-mobile.mp4',
+  },
+  posters: {
+    desktop: '/posters/background-loop.jpg',
+    mobile: '/posters/background-loop-mobile.jpg',
+  },
+});
+
+player.play();
+```
+
+Browser global:
+
+```html
+<script src="path/to/fideo.umd.cjs"></script>
+<script>
+  const player = new Fideo('#player', {
+    muted: true,
+    viewport: 'play-pause',
+    sources: {
+      desktop: '/videos/desktop.mp4',
+    },
+  });
+</script>
+```
+
+Helper functions are still available:
+
+```ts
+import { Fideo, createFideo, mountFideo } from 'fideo-js';
 
 const pagePlayers = Fideo.init({
   selector: '[data-video]',
@@ -96,8 +150,16 @@ const singlePlayer = mountFideo(document.querySelector('video')!, {
   viewport: 'play-pause',
 });
 
+const objectPlayer = createFideo('#object-player', {
+  controls: false,
+  sources: {
+    desktop: '/videos/object-player.mp4',
+  },
+});
+
 singlePlayer.play();
 pagePlayers.destroy();
+objectPlayer.destroy();
 ```
 
 ## Styling

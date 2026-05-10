@@ -212,6 +212,25 @@
   data-fideo-poster="/posters/background-loop.jpg"
 &gt;&lt;/video&gt;</code></pre>
       </section>
+
+      <section>
+        <h2>JavaScript object initialization</h2>
+        <video id="object-player"></video>
+        <pre><code>import { Fideo } from 'fideo-js';
+
+new Fideo('#object-player', {
+  autoplay: true,
+  muted: true,
+  loop: true,
+  controls: false,
+  sources: {
+    desktop: '/videos/background-loop.mp4',
+  },
+  posters: {
+    desktop: '/posters/background-loop.jpg',
+  },
+});</code></pre>
+      </section>
     </main>
   </body>
 </html>

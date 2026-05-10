@@ -2,6 +2,8 @@ export type FideoProviderName = 'html5' | 'youtube' | 'vimeo' | 'wistia';
 
 export type FideoViewportMode = false | 'play' | 'pause' | 'play-pause';
 
+export type FideoTarget = string | HTMLVideoElement | HTMLIFrameElement;
+
 export interface FideoBreakpoints {
   mobile: number;
   tablet: number;

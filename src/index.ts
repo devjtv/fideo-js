@@ -1,11 +1,41 @@
 import './styles.css';
 import { FideoPlayer } from './fideo-player';
-import type { FideoInitResult, FideoOptions, FideoPlayerInstance } from './types';
+import type { FideoInitResult, FideoOptions, FideoPlayerInstance, FideoResolvedOptions, FideoTarget } from './types';
 import { DEFAULT_SELECTOR, resolveOptions } from './utils/dom';
 
 const instances = new WeakMap<Element, FideoPlayer>();
 
-export class Fideo {
+export class Fideo implements FideoPlayerInstance {
+  private player: FideoPlayerInstance;
+
+  constructor(target: FideoTarget, options: FideoOptions = {}) {
+    this.player = mountFideo(resolveTarget(target), options);
+  }
+
+  get element(): HTMLVideoElement | HTMLIFrameElement {
+    return this.player.element;
+  }
+
+  get wrapper(): HTMLElement {
+    return this.player.wrapper;
+  }
+
+  get options(): FideoResolvedOptions {
+    return this.player.options;
+  }
+
+  play(): Promise<void> {
+    return this.player.play();
+  }
+
+  pause(): Promise<void> {
+    return this.player.pause();
+  }
+
+  destroy(): void {
+    this.player.destroy();
+  }
+
   static init(options: FideoOptions = {}): FideoInitResult {
     return initFideo(options);
   }
@@ -13,6 +43,10 @@ export class Fideo {
   static mount(element: HTMLVideoElement | HTMLIFrameElement, options: FideoOptions = {}): FideoPlayerInstance {
     return mountFideo(element, options);
   }
+}
+
+export function createFideo(target: FideoTarget, options: FideoOptions = {}): FideoPlayerInstance {
+  return mountFideo(resolveTarget(target), options);
 }
 
 export function initFideo(options: FideoOptions = {}): FideoInitResult {
@@ -43,6 +77,16 @@ export function mountFideo(
   return player;
 }
 
+function resolveTarget(target: FideoTarget): HTMLVideoElement | HTMLIFrameElement {
+  const element = typeof target === 'string' ? document.querySelector(target) : target;
+
+  if (element instanceof HTMLVideoElement || element instanceof HTMLIFrameElement) {
+    return element;
+  }
+
+  throw new Error('Fideo target must resolve to a <video> or <iframe> element.');
+}
+
 export type {
   FideoAdapter,
   FideoBreakpoints,
@@ -56,11 +100,12 @@ export type {
   FideoResolvedOptions,
   FideoSources,
   FideoState,
+  FideoTarget,
   FideoViewportMode,
 } from './types';
 
 if (typeof window !== 'undefined') {
-  Object.assign(window, { Fideo, initFideo, mountFideo });
+  Object.assign(window, { Fideo, createFideo, initFideo, mountFideo });
   document.addEventListener('DOMContentLoaded', () => {
     initFideo();
   });

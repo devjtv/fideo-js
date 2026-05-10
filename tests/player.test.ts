@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { initFideo, mountFideo } from '../src';
+import { Fideo, createFideo, initFideo, mountFideo } from '../src';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -93,5 +93,43 @@ describe('Fideo player', () => {
 
     expect(first).toBe(second);
     expect(document.querySelectorAll('.fideo')).toHaveLength(1);
+  });
+
+  it('supports Plyr-style constructor initialization without data attributes', () => {
+    document.body.innerHTML = '<video id="player"></video>';
+
+    const player = new Fideo('#player', {
+      muted: true,
+      loop: true,
+      sources: {
+        desktop: '/object-init.mp4',
+      },
+      controlVisibility: {
+        settings: false,
+      },
+    });
+
+    expect(player.element).toBe(document.querySelector('#player'));
+    expect(player.wrapper.classList.contains('fideo')).toBe(true);
+    expect(player.options.muted).toBe(true);
+    expect(player.options.loop).toBe(true);
+    expect(player.options.sources.desktop).toBe('/object-init.mp4');
+    expect(player.wrapper.querySelector('.fideo__settings')).toBeNull();
+  });
+
+  it('supports helper object initialization with an element', () => {
+    document.body.innerHTML = '<video id="player"></video>';
+    const video = document.querySelector('video')!;
+
+    const player = createFideo(video, {
+      controls: false,
+      sources: {
+        desktop: '/helper-init.mp4',
+      },
+    });
+
+    expect(player.element).toBe(video);
+    expect(player.wrapper.querySelector('.fideo__controls')).toBeNull();
+    expect(player.options.sources.desktop).toBe('/helper-init.mp4');
   });
 });
