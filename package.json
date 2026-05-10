@@ -9,7 +9,7 @@
     "type": "git",
     "url": "git+ssh://git@github.com/devjtv/fideo-js.git"
   },
-  "homepage": "https://devjtv.github.io/fideo-js/",
+  "homepage": "https://github.com/devjtv/fideo-js#readme",
   "bugs": {
     "url": "https://github.com/devjtv/fideo-js/issues"
   },
@@ -36,12 +36,10 @@
   ],
   "scripts": {
     "build": "vite build && tsc -p tsconfig.types.json",
-    "build:demo": "vite build --config vite.demo.config.ts",
     "dev": "vite --host 127.0.0.1",
-    "preview:demo": "vite preview --config vite.demo.config.ts --host 127.0.0.1",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "check": "npm run typecheck && npm run test && npm run build && npm run build:demo"
+    "check": "npm run typecheck && npm run test && npm run build"
   },
   "keywords": [
     "video",

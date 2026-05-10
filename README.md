@@ -16,8 +16,6 @@
 </p>
 
 <p align="center">
-  <a href="https://devjtv.github.io/fideo-js/"><strong>Live Demo</strong></a>
-  ·
   <a href="./examples/index.html">Demo Source</a>
   ·
   <a href="#quick-start">Quick Start</a>
@@ -568,10 +566,7 @@ Individual commands:
 npm run typecheck
 npm run test
 npm run build
-npm run build:demo
 ```
-
-The hosted demo is published to GitHub Pages from `.github/workflows/demo.yml` whenever `main` changes: [https://devjtv.github.io/fideo-js/](https://devjtv.github.io/fideo-js/).
 
 ## Browser Notes
 

@@ -1,6 +1,5 @@
 node_modules/
 dist/
-demo-dist/
 .vite/
 coverage/
 *.log
