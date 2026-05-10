@@ -121,6 +121,32 @@
         min-height: 190px;
       }
 
+      .full-bleed-section {
+        width: 100vw;
+        margin-left: calc(50% - 50vw);
+      }
+
+      .full-bleed-section h2,
+      .full-bleed-section pre {
+        width: min(1080px, calc(100% - 32px));
+        margin-right: auto;
+        margin-left: auto;
+      }
+
+      .iframe-cover-hero {
+        width: 100vw;
+        height: 460px;
+        min-height: 0;
+        border-radius: 0;
+      }
+
+      .iframe-cover-hero .background-content {
+        box-sizing: border-box;
+        width: min(1080px, calc(100% - 32px));
+        max-width: none;
+        margin: 0 auto;
+      }
+
       .background-grid {
         display: grid;
         grid-template-columns: repeat(12, 1fr);
@@ -192,6 +218,10 @@
 
         .background-wide {
           aspect-ratio: 4 / 3;
+        }
+
+        .iframe-cover-hero {
+          height: 360px;
         }
 
         .background-grid {
@@ -414,6 +444,56 @@ new Fideo('#object-player', {
     src="https://vimeo.com/76979871"
   &gt;&lt;/iframe&gt;
 &lt;/div&gt;</code></pre>
+      </section>
+
+      <section class="full-bleed-section">
+        <h2>Full browser width Vimeo iframe hero</h2>
+        <div class="background-surface iframe-cover-hero">
+          <iframe
+            data-fideo
+            data-fideo-background="true"
+            data-fideo-background-aspect-ratio="1.777777778"
+            src="https://vimeo.com/76979871"
+            title="Full width Vimeo background hero"
+          ></iframe>
+          <div class="background-content">
+            <h3>Vimeo cover hero</h3>
+            <p>A fixed-height, full viewport-width hero using an iframe background with cover sizing.</p>
+          </div>
+        </div>
+        <pre><code>&lt;section class="hero"&gt;
+  &lt;iframe
+    data-fideo
+    data-fideo-background="true"
+    data-fideo-background-aspect-ratio="1.777777778"
+    src="https://vimeo.com/76979871"
+  &gt;&lt;/iframe&gt;
+&lt;/section&gt;</code></pre>
+      </section>
+
+      <section class="full-bleed-section">
+        <h2>Full browser width YouTube iframe hero</h2>
+        <div class="background-surface iframe-cover-hero">
+          <iframe
+            data-fideo
+            data-fideo-background="true"
+            data-fideo-background-aspect-ratio="1.777777778"
+            src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
+            title="Full width YouTube background hero"
+          ></iframe>
+          <div class="background-content">
+            <h3>YouTube cover hero</h3>
+            <p>The same background mode works with YouTube and normal watch URLs are converted automatically.</p>
+          </div>
+        </div>
+        <pre><code>&lt;section class="hero"&gt;
+  &lt;iframe
+    data-fideo
+    data-fideo-background="true"
+    data-fideo-background-aspect-ratio="1.777777778"
+    src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
+  &gt;&lt;/iframe&gt;
+&lt;/section&gt;</code></pre>
       </section>
 
       <section>
