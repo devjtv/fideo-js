@@ -52,13 +52,21 @@ export function splitRates(value: string | null | undefined, fallback: number[])
   return rates.length ? rates : fallback;
 }
 
-export function inferProvider(element: HTMLVideoElement | HTMLIFrameElement): FideoProviderName {
+export function inferProvider(
+  element: HTMLVideoElement | HTMLIFrameElement,
+  sources: FideoSources = {},
+): FideoProviderName {
   if (element instanceof HTMLVideoElement) return 'html5';
 
-  const src = element.src || '';
-  if (/youtube(?:-nocookie)?\.com|youtu\.be/i.test(src)) return 'youtube';
-  if (/vimeo\.com/i.test(src)) return 'vimeo';
-  if (/wistia\.(?:com|net)|fast\.wistia/i.test(src)) return 'wistia';
+  const candidates = [element.getAttribute('src') || element.src, sources.desktop, sources.tablet, sources.mobile].filter(
+    (src): src is string => Boolean(src),
+  );
+
+  for (const src of candidates) {
+    if (/youtube(?:-nocookie)?\.com|youtu\.be/i.test(src)) return 'youtube';
+    if (/vimeo\.com/i.test(src)) return 'vimeo';
+    if (/wistia\.(?:com|net)|fast\.wistia/i.test(src)) return 'wistia';
+  }
 
   return 'html5';
 }
@@ -101,7 +109,8 @@ export function resolveOptions(
   };
   const providerAttr = data.fideoProvider as FideoProviderName | 'auto' | undefined;
   const requestedProvider = options.provider ?? providerAttr ?? 'auto';
-  const provider = requestedProvider === 'auto' ? inferProvider(element) : requestedProvider;
+  const sources = { ...readSources(element), ...options.sources };
+  const provider = requestedProvider === 'auto' ? inferProvider(element, sources) : requestedProvider;
   const viewportFallback = options.viewport ?? false;
   const background = boolFromAttr(data.fideoBackground, options.background ?? false);
 
@@ -120,7 +129,7 @@ export function resolveOptions(
     volume: numberFromAttr(data.fideoVolume, options.volume ?? 1),
     playbackRates: splitRates(data.fideoPlaybackRates, options.playbackRates ?? [0.5, 1, 1.25, 1.5, 2]),
     backgroundAspectRatio: numberFromAttr(data.fideoBackgroundAspectRatio, options.backgroundAspectRatio ?? 16 / 9),
-    sources: { ...readSources(element), ...options.sources },
+    sources,
     posters: { ...readPosters(element), ...options.posters },
     breakpoints,
     icons: options.icons ?? {},

@@ -78,7 +78,6 @@ Use the same pattern for iframe providers:
 ```html
 <iframe
   data-fideo
-  data-fideo-provider="youtube"
   data-fideo-muted="true"
   src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
   title="Product video"
@@ -170,7 +169,6 @@ Native `<video>` uses CSS `object-fit: cover`. Iframe embeds cannot rely on `obj
 <div class="video-tile">
   <iframe
     data-fideo
-    data-fideo-provider="vimeo"
     data-fideo-background="true"
     data-fideo-background-aspect-ratio="1.777777778"
     src="https://vimeo.com/76979871"
@@ -185,7 +183,6 @@ Native `<video>` uses CSS `object-fit: cover`. Iframe embeds cannot rely on `obj
 <div class="video-tile">
   <iframe
     data-fideo
-    data-fideo-provider="youtube"
     data-fideo-background="true"
     data-fideo-background-aspect-ratio="1.777777778"
     src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
@@ -198,9 +195,11 @@ Set `data-fideo-background-aspect-ratio` or `backgroundAspectRatio` when the emb
 
 ```ts
 new Fideo('#background-player', {
-  provider: 'vimeo',
   background: true,
   backgroundAspectRatio: 4 / 3,
+  sources: {
+    desktop: 'https://vimeo.com/76979871',
+  },
 });
 ```
 
@@ -397,6 +396,8 @@ Supported icon keys:
 | Vimeo | `<iframe>` | Supports public, private, and unlisted URLs, including `vimeo.com/[id]/[hash]`. |
 | Wistia | `<iframe>` | Uses the Wistia external player API. |
 
+Provider detection is automatic for normal provider URLs in `src`, `data-fideo-src`, responsive source attributes, and JavaScript `sources`. Use `provider` or `data-fideo-provider` only when a URL is unusual enough that Fideo cannot infer it.
+
 ### YouTube No-Cookie URLs
 
 Fideo normalizes common YouTube URL formats:
@@ -404,7 +405,6 @@ Fideo normalizes common YouTube URL formats:
 ```html
 <iframe
   data-fideo
-  data-fideo-provider="youtube"
   src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
 ></iframe>
 ```
@@ -438,7 +438,7 @@ Existing Vimeo embed URLs with `?h=` are preserved.
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
 | `selector` | `string` | `[data-fideo]` | Selector used by `initFideo()`. |
-| `provider` | `auto`, `html5`, `youtube`, `vimeo`, `wistia` | `auto` | Provider to use for the element. |
+| `provider` | `auto`, `html5`, `youtube`, `vimeo`, `wistia` | `auto` | Optional provider override. Fideo infers providers from URLs by default. |
 | `autoplay` | `boolean` | `false` | Start playback after initialization. |
 | `muted` | `boolean` | `false` | Start muted. |
 | `loop` | `boolean` | `false` | Loop playback when supported. |
@@ -463,7 +463,7 @@ Existing Vimeo embed URLs with `?h=` are preserved.
 | Attribute | Purpose |
 | --- | --- |
 | `data-fideo` | Marks a `<video>` or `<iframe>` for auto initialization. |
-| `data-fideo-provider` | `auto`, `html5`, `youtube`, `vimeo`, or `wistia`. |
+| `data-fideo-provider` | Optional provider override: `auto`, `html5`, `youtube`, `vimeo`, or `wistia`. |
 | `data-fideo-autoplay` | Starts playback on init. Muted autoplay is the most reliable browser path. |
 | `data-fideo-muted` | Starts muted. |
 | `data-fideo-loop` | Loops playback when the provider supports it. |

@@ -87,7 +87,6 @@ describe('Fideo player', () => {
     document.body.innerHTML = `
       <iframe
         data-fideo
-        data-fideo-provider="vimeo"
         data-fideo-background="true"
         data-fideo-background-aspect-ratio="1.777777778"
         src="https://vimeo.com/123456789/privatehash"
@@ -113,7 +112,6 @@ describe('Fideo player', () => {
     document.body.innerHTML = `
       <iframe
         data-fideo
-        data-fideo-provider="youtube"
         data-fideo-background="true"
         data-fideo-background-aspect-ratio="1.777777778"
         src="https://www.youtube.com/watch?v=M7lc1UVf-VE"

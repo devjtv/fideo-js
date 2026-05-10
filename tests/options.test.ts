@@ -55,6 +55,37 @@ describe('data attribute options', () => {
     expect(getResponsiveValue(values, breakpoints, 1280)).toBe('/desktop.mp4');
   });
 
+  it('infers iframe providers from src urls without data-fideo-provider', () => {
+    document.body.innerHTML = `
+      <iframe data-fideo src="https://www.youtube.com/watch?v=M7lc1UVf-VE"></iframe>
+      <iframe data-fideo src="https://vimeo.com/123456789/privatehash"></iframe>
+      <iframe data-fideo src="https://fast.wistia.net/embed/iframe/abc123"></iframe>
+    `;
+    const [youtube, vimeo, wistia] = Array.from(document.querySelectorAll('iframe'));
+
+    expect(resolveOptions(youtube).provider).toBe('youtube');
+    expect(resolveOptions(vimeo).provider).toBe('vimeo');
+    expect(resolveOptions(wistia).provider).toBe('wistia');
+  });
+
+  it('infers iframe providers from data sources and JS sources', () => {
+    document.body.innerHTML = `
+      <iframe data-fideo data-fideo-src="https://vimeo.com/123456789/privatehash"></iframe>
+      <iframe id="object-source"></iframe>
+    `;
+    const dataSource = document.querySelector('[data-fideo]') as HTMLIFrameElement;
+    const objectSource = document.querySelector('#object-source') as HTMLIFrameElement;
+
+    expect(resolveOptions(dataSource).provider).toBe('vimeo');
+    expect(
+      resolveOptions(objectSource, {
+        sources: {
+          desktop: 'https://www.youtube.com/watch?v=M7lc1UVf-VE',
+        },
+      }).provider,
+    ).toBe('youtube');
+  });
+
   it('background mode implies autoplay, muted, loop, inline, no controls, and aspect ratio', () => {
     document.body.innerHTML = `
       <video
