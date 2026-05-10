@@ -215,6 +215,29 @@ export function normalizeYouTubeEmbedUrl(url: string): string {
   return normalized.toString();
 }
 
+export function normalizeVimeoEmbedUrl(url: string): string {
+  if (!url) return url;
+
+  const parsed = new URL(url, window.location.href);
+  const host = parsed.hostname.replace(/^www\./, '').toLowerCase();
+  const parts = parsed.pathname.split('/').filter(Boolean);
+
+  if (host === 'player.vimeo.com') {
+    return parsed.toString();
+  }
+
+  if (host !== 'vimeo.com' || !parts[0]) {
+    return parsed.toString();
+  }
+
+  const [videoId, hash] = parts;
+  const normalized = new URL(`https://player.vimeo.com/video/${videoId}`);
+  parsed.searchParams.forEach((value, key) => normalized.searchParams.set(key, value));
+  if (hash && !normalized.searchParams.has('h')) normalized.searchParams.set('h', hash);
+
+  return normalized.toString();
+}
+
 export function createElement<K extends keyof HTMLElementTagNameMap>(
   tag: K,
   className?: string,

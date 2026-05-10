@@ -192,7 +192,7 @@ initFideo({
 Fideo loads provider APIs only when needed:
 
 - YouTube uses the YouTube IFrame Player API and normalizes YouTube, youtu.be, and standard embed URLs to `youtube-nocookie.com/embed/...` while preserving player parameters.
-- Vimeo uses Vimeo `player.js`.
+- Vimeo uses Vimeo `player.js`. Fideo supports `vimeo.com/[video_id]`, `vimeo.com/[video_id]/[hash]`, and `player.vimeo.com/video/[video_id]?h=[hash]` formats. Private/unlisted page URLs with a hash are normalized to player embed URLs with the hash in the `h` parameter.
 - Wistia iframe embeds use Wistia's external player API.
 - HTML5 videos use the browser media APIs and can play any local format supported by the visitor's browser.
 

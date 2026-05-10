@@ -1,5 +1,5 @@
 import { BaseProvider } from './base';
-import { addUrlParams } from '../utils/dom';
+import { addUrlParams, normalizeVimeoEmbedUrl } from '../utils/dom';
 import { loadScript } from '../utils/script';
 
 interface VimeoPlayer {
@@ -35,7 +35,7 @@ export class VimeoProvider extends BaseProvider {
 
   constructor(readonly element: HTMLIFrameElement) {
     super();
-    this.element.src = addUrlParams(this.element.src, {
+    this.element.src = addUrlParams(normalizeVimeoEmbedUrl(this.element.src), {
       api: 1,
       controls: 0,
       playsinline: 1,
@@ -86,7 +86,7 @@ export class VimeoProvider extends BaseProvider {
 
   async setSource(source: string): Promise<void> {
     await this.ready;
-    await this.player?.loadVideo({ url: source });
+    await this.player?.loadVideo({ url: normalizeVimeoEmbedUrl(source) });
     await this.sync();
   }
 

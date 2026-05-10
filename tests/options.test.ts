@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { getResponsiveValue, normalizeYouTubeEmbedUrl, resolveOptions } from '../src/utils/dom';
+import {
+  addUrlParams,
+  getResponsiveValue,
+  normalizeVimeoEmbedUrl,
+  normalizeYouTubeEmbedUrl,
+  resolveOptions,
+} from '../src/utils/dom';
 
 describe('data attribute options', () => {
   it('reads provider, autoplay, viewport, responsive sources, posters, and css variables', () => {
@@ -55,6 +61,31 @@ describe('data attribute options', () => {
     );
     expect(normalizeYouTubeEmbedUrl('https://youtu.be/M7lc1UVf-VE?si=abc')).toBe(
       'https://www.youtube-nocookie.com/embed/M7lc1UVf-VE?si=abc',
+    );
+  });
+
+  it('preserves Vimeo private h params when adding player params', () => {
+    expect(
+      addUrlParams('https://player.vimeo.com/video/123456789?h=5e2d1c1e6d', {
+        api: 1,
+        controls: 0,
+        playsinline: 1,
+      }),
+    ).toBe('https://player.vimeo.com/video/123456789?h=5e2d1c1e6d&api=1&controls=0&playsinline=1');
+  });
+
+  it('normalizes Vimeo page URLs and private hash URLs to embed URLs', () => {
+    expect(normalizeVimeoEmbedUrl('https://vimeo.com/123456789')).toBe(
+      'https://player.vimeo.com/video/123456789',
+    );
+    expect(normalizeVimeoEmbedUrl('https://vimeo.com/123456789/5e2d1c1e6d')).toBe(
+      'https://player.vimeo.com/video/123456789?h=5e2d1c1e6d',
+    );
+    expect(normalizeVimeoEmbedUrl('https://vimeo.com/123456789/5e2d1c1e6d?autopause=0')).toBe(
+      'https://player.vimeo.com/video/123456789?autopause=0&h=5e2d1c1e6d',
+    );
+    expect(normalizeVimeoEmbedUrl('https://player.vimeo.com/video/123456789?h=existing')).toBe(
+      'https://player.vimeo.com/video/123456789?h=existing',
     );
   });
 });
