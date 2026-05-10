@@ -103,20 +103,23 @@ export function resolveOptions(
   const requestedProvider = options.provider ?? providerAttr ?? 'auto';
   const provider = requestedProvider === 'auto' ? inferProvider(element) : requestedProvider;
   const viewportFallback = options.viewport ?? false;
+  const background = boolFromAttr(data.fideoBackground, options.background ?? false);
 
   return {
     selector: options.selector ?? DEFAULT_SELECTOR,
     provider,
-    autoplay: boolFromAttr(data.fideoAutoplay, options.autoplay ?? false),
-    muted: boolFromAttr(data.fideoMuted, options.muted ?? false),
-    loop: boolFromAttr(data.fideoLoop, options.loop ?? false),
-    playsInline: boolFromAttr(data.fideoPlaysinline ?? data.fideoPlaysInline, options.playsInline ?? true),
-    controls: boolFromAttr(data.fideoControls, options.controls ?? true),
+    autoplay: background || boolFromAttr(data.fideoAutoplay, options.autoplay ?? false),
+    muted: background || boolFromAttr(data.fideoMuted, options.muted ?? false),
+    loop: background || boolFromAttr(data.fideoLoop, options.loop ?? false),
+    playsInline: background || boolFromAttr(data.fideoPlaysinline ?? data.fideoPlaysInline, options.playsInline ?? true),
+    controls: background ? false : boolFromAttr(data.fideoControls, options.controls ?? true),
+    background,
     controlVisibility: resolveControlVisibility(element, options.controlVisibility),
     viewport: parseViewportMode(data.fideoViewport, viewportFallback),
     viewportThreshold: numberFromAttr(data.fideoViewportThreshold, options.viewportThreshold ?? 0.35),
     volume: numberFromAttr(data.fideoVolume, options.volume ?? 1),
     playbackRates: splitRates(data.fideoPlaybackRates, options.playbackRates ?? [0.5, 1, 1.25, 1.5, 2]),
+    backgroundAspectRatio: numberFromAttr(data.fideoBackgroundAspectRatio, options.backgroundAspectRatio ?? 16 / 9),
     sources: { ...readSources(element), ...options.sources },
     posters: { ...readPosters(element), ...options.posters },
     breakpoints,

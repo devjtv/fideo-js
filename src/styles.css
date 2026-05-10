@@ -52,6 +52,34 @@
   object-fit: cover;
 }
 
+.fideo--background {
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  aspect-ratio: auto;
+  border-radius: inherit;
+}
+
+.fideo--background::after {
+  display: none;
+}
+
+.fideo--background .fideo__media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  object-fit: cover;
+}
+
+.fideo--background iframe.fideo__media {
+  inset: auto;
+  object-fit: initial;
+  pointer-events: none;
+}
+
 .fideo__click-target {
   position: absolute;
   inset: 0;

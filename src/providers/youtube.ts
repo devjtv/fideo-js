@@ -1,4 +1,5 @@
 import { BaseProvider } from './base';
+import type { FideoResolvedOptions } from '../types';
 import { addUrlParams, ensureElementId, normalizeYouTubeEmbedUrl } from '../utils/dom';
 
 type YouTubeState = -1 | 0 | 1 | 2 | 3 | 5;
@@ -53,15 +54,27 @@ export class YouTubeProvider extends BaseProvider {
   private readyResolver?: () => void;
   private timer?: number;
 
-  constructor(readonly element: HTMLIFrameElement) {
+  constructor(
+    readonly element: HTMLIFrameElement,
+    private options: FideoResolvedOptions,
+  ) {
     super();
-    this.element.src = addUrlParams(normalizeYouTubeEmbedUrl(this.element.src), {
+    const normalizedUrl = normalizeYouTubeEmbedUrl(this.element.src);
+    const params: Record<string, string | number | boolean> = {
       enablejsapi: 1,
       playsinline: 1,
       controls: 0,
       rel: 0,
       origin: window.location.origin,
-    });
+    };
+    if (this.options.autoplay) params.autoplay = 1;
+    if (this.options.muted) params.mute = 1;
+    if (this.options.loop) {
+      params.loop = 1;
+      const videoId = getYouTubeEmbedId(normalizedUrl);
+      if (videoId) params.playlist = videoId;
+    }
+    this.element.src = addUrlParams(normalizedUrl, params);
     const id = ensureElementId(this.element, 'fideo-youtube');
 
     this.ready = new Promise((resolve) => {
@@ -118,7 +131,10 @@ export class YouTubeProvider extends BaseProvider {
 
   async setSource(source: string): Promise<void> {
     await this.ready;
-    this.player?.loadVideoByUrl(normalizeYouTubeEmbedUrl(source));
+    const normalizedUrl = normalizeYouTubeEmbedUrl(source);
+    const videoId = getYouTubeEmbedId(normalizedUrl);
+    const url = this.options.loop && videoId ? addUrlParams(normalizedUrl, { loop: 1, playlist: videoId }) : normalizedUrl;
+    this.player?.loadVideoByUrl(url);
   }
 
   destroy(): void {
@@ -194,4 +210,11 @@ function loadYouTubeApi(): Promise<void> {
 
 function clamp(value: number): number {
   return Math.min(1, Math.max(0, value));
+}
+
+function getYouTubeEmbedId(url: string): string | undefined {
+  if (!url) return undefined;
+  const parsed = new URL(url, window.location.href);
+  const parts = parsed.pathname.split('/').filter(Boolean);
+  return parts[0] === 'embed' ? parts[1] : undefined;
 }

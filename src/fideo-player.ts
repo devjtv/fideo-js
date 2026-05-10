@@ -13,19 +13,21 @@ export class FideoPlayer implements FideoPlayerInstance {
   private currentSource?: string;
   private resizeController = new AbortController();
   private activityTimer?: number;
+  private resizeObserver?: ResizeObserver;
 
   constructor(element: HTMLVideoElement | HTMLIFrameElement, options: FideoResolvedOptions) {
     this.element = element;
     this.options = options;
     this.wrapper = this.wrapElement(element, options);
     this.configureElement();
-    this.adapter = createProvider(options.provider, element);
+    this.adapter = createProvider(options.provider, element, options);
     this.applyResponsiveMedia();
 
     if (options.controls) this.controls = new FideoControls(this.adapter, this.wrapper, options);
     this.bindAdapterEvents();
     this.bindClickToToggle();
     this.bindResponsiveMedia();
+    this.bindBackgroundCover();
     this.bindViewportPlayback();
 
     this.adapter.setVolume(options.volume);
@@ -46,6 +48,7 @@ export class FideoPlayer implements FideoPlayerInstance {
 
   destroy(): void {
     this.observer?.disconnect();
+    this.resizeObserver?.disconnect();
     this.resizeController.abort();
     this.controls?.destroy();
     this.adapter.destroy();
@@ -68,6 +71,7 @@ export class FideoPlayer implements FideoPlayerInstance {
 
   private configureElement(): void {
     this.wrapper.classList.add(`fideo--${this.options.provider}`);
+    if (this.options.background) this.wrapper.classList.add('fideo--background');
     this.wrapper.classList.add('is-ready');
     this.wrapper.classList.add('is-paused');
     this.element.classList.add('fideo__media');
@@ -157,6 +161,14 @@ export class FideoPlayer implements FideoPlayerInstance {
       passive: true,
       signal: this.resizeController.signal,
     });
+    window.addEventListener('resize', () => this.applyBackgroundCover(), {
+      passive: true,
+      signal: this.resizeController.signal,
+    });
+    window.addEventListener('orientationchange', () => this.applyBackgroundCover(), {
+      passive: true,
+      signal: this.resizeController.signal,
+    });
   }
 
   private applyResponsiveMedia(): void {
@@ -190,11 +202,46 @@ export class FideoPlayer implements FideoPlayerInstance {
 
     this.observer.observe(this.wrapper);
   }
+
+  private bindBackgroundCover(): void {
+    if (!this.options.background) return;
+
+    this.applyBackgroundCover();
+
+    if ('ResizeObserver' in window) {
+      this.resizeObserver = new ResizeObserver(() => this.applyBackgroundCover());
+      this.resizeObserver.observe(this.wrapper);
+    }
+  }
+
+  private applyBackgroundCover(): void {
+    if (!this.options.background || this.element instanceof HTMLVideoElement) return;
+
+    const width = this.wrapper.clientWidth;
+    const height = this.wrapper.clientHeight;
+    if (!width || !height) return;
+
+    const containerRatio = width / height;
+    const mediaRatio = this.options.backgroundAspectRatio;
+    let mediaWidth = width;
+    let mediaHeight = height;
+
+    if (containerRatio > mediaRatio) {
+      mediaHeight = width / mediaRatio;
+    } else {
+      mediaWidth = height * mediaRatio;
+    }
+
+    this.element.style.width = `${mediaWidth}px`;
+    this.element.style.height = `${mediaHeight}px`;
+    this.element.style.left = `${(width - mediaWidth) / 2}px`;
+    this.element.style.top = `${(height - mediaHeight) / 2}px`;
+  }
 }
 
-function mergeAllow(existing: string, additions: string[]): string {
+function mergeAllow(existing: string | undefined, additions: string[]): string {
   const parts = new Set(
-    existing
+    (existing ?? '')
       .split(';')
       .map((part) => part.trim())
       .filter(Boolean),

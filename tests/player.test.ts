@@ -68,6 +68,47 @@ describe('Fideo player', () => {
     expect(video.controls).toBe(false);
   });
 
+  it('uses background mode as muted looping autoplay with no controls', () => {
+    document.body.innerHTML = '<video data-fideo data-fideo-background="true" data-fideo-src="/one.mp4"></video>';
+    const video = document.querySelector('video')!;
+    const player = mountFideo(video);
+
+    expect(player.wrapper.classList.contains('fideo--background')).toBe(true);
+    expect(player.wrapper.querySelector('.fideo__controls')).toBeNull();
+    expect(player.options.autoplay).toBe(true);
+    expect(player.options.muted).toBe(true);
+    expect(player.options.loop).toBe(true);
+    expect(video.muted).toBe(true);
+    expect(video.loop).toBe(true);
+    expect(video.controls).toBe(false);
+  });
+
+  it('cover-sizes background iframe embeds from the configured aspect ratio', () => {
+    document.body.innerHTML = `
+      <iframe
+        data-fideo
+        data-fideo-provider="vimeo"
+        data-fideo-background="true"
+        data-fideo-background-aspect-ratio="1.777777778"
+        src="https://vimeo.com/123456789/privatehash"
+      ></iframe>
+    `;
+    const iframe = document.querySelector('iframe')!;
+    const player = mountFideo(iframe);
+
+    Object.defineProperty(player.wrapper, 'clientWidth', { configurable: true, value: 300 });
+    Object.defineProperty(player.wrapper, 'clientHeight', { configurable: true, value: 500 });
+    window.dispatchEvent(new Event('resize'));
+
+    const src = new URL(iframe.src);
+    expect(src.searchParams.get('h')).toBe('privatehash');
+    expect(src.searchParams.get('background')).toBe('1');
+    expect(parseFloat(iframe.style.width)).toBeCloseTo(888.89, 1);
+    expect(iframe.style.height).toBe('500px');
+    expect(parseFloat(iframe.style.left)).toBeCloseTo(-294.44, 1);
+    expect(iframe.style.top).toBe('0px');
+  });
+
   it('initializes all data-fideo elements and can destroy them together', () => {
     document.body.innerHTML = `
       <video data-fideo data-fideo-src="/one.mp4"></video>

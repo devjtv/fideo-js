@@ -72,8 +72,10 @@ Or use the browser global from the bundled UMD file:
 | `data-fideo-provider` | `auto`, `html5`, `youtube`, `vimeo`, or `wistia`. |
 | `data-fideo-autoplay` | Starts playback on init. Muted autoplay is the most reliable browser path. |
 | `data-fideo-muted` | Starts muted. |
-| `data-fideo-loop` | Loops HTML5 video. |
+| `data-fideo-loop` | Loops playback when the provider supports it. |
 | `data-fideo-controls` | `true` for Fideo controls, `false` for no custom or native controls. |
+| `data-fideo-background` | Background mode: autoplay, muted, looped, inline, no controls, and cover-filled in the parent container. |
+| `data-fideo-background-aspect-ratio` | Source aspect ratio for background iframes. Default: `1.777777778` (`16 / 9`). |
 | `data-fideo-viewport` | `play`, `pause`, `play-pause`, or `false`. |
 | `data-fideo-viewport-threshold` | Intersection ratio needed before viewport playback runs. Default: `0.35`. |
 | `data-fideo-src`, `data-fideo-src-tablet`, `data-fideo-src-mobile` | Responsive video/embed sources. |
@@ -162,6 +164,43 @@ pagePlayers.destroy();
 objectPlayer.destroy();
 ```
 
+## Background Video
+
+Use `background: true` or `data-fideo-background="true"` when a video should behave like a full-cover hero, banner, or tile background. Fideo automatically enables autoplay, mute, loop, inline playback, hides all controls, and sizes the media to cover its parent.
+
+```html
+<div class="hero-video">
+  <video
+    data-fideo
+    data-fideo-background="true"
+    data-fideo-src="/videos/hero.mp4"
+    data-fideo-poster="/posters/hero.jpg"
+  ></video>
+</div>
+```
+
+```ts
+new Fideo('#hero-player', {
+  background: true,
+  sources: {
+    desktop: '/videos/hero.mp4',
+    mobile: '/videos/hero-mobile.mp4',
+  },
+});
+```
+
+Native `<video>` uses CSS `object-fit: cover`. Iframe providers cannot use `object-fit` reliably, so Fideo calculates the iframe dimensions from the container size and source aspect ratio. Set `backgroundAspectRatio` or `data-fideo-background-aspect-ratio` if the source is not `16 / 9`.
+
+```html
+<iframe
+  data-fideo
+  data-fideo-provider="vimeo"
+  data-fideo-background="true"
+  data-fideo-background-aspect-ratio="1.777777778"
+  src="https://vimeo.com/76979871"
+></iframe>
+```
+
 ## Styling
 
 Every visible control is styled with CSS variables. Override them globally, per wrapper, through data attributes, or with the `cssVars` option.
@@ -191,7 +230,7 @@ initFideo({
 
 Fideo loads provider APIs only when needed:
 
-- YouTube uses the YouTube IFrame Player API and normalizes YouTube, youtu.be, and standard embed URLs to `youtube-nocookie.com/embed/...` while preserving player parameters.
+- YouTube uses the YouTube IFrame Player API and normalizes YouTube, youtu.be, and standard embed URLs to `youtube-nocookie.com/embed/...` while preserving player parameters. Looping YouTube embeds include the required `playlist` parameter automatically.
 - Vimeo uses Vimeo `player.js`. Fideo supports `vimeo.com/[video_id]`, `vimeo.com/[video_id]/[hash]`, and `player.vimeo.com/video/[video_id]?h=[hash]` formats. Private/unlisted page URLs with a hash are normalized to player embed URLs with the hash in the `h` parameter.
 - Wistia iframe embeds use Wistia's external player API.
 - HTML5 videos use the browser media APIs and can play any local format supported by the visitor's browser.

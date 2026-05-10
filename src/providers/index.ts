@@ -1,4 +1,4 @@
-import type { FideoAdapter, FideoProviderName } from '../types';
+import type { FideoAdapter, FideoProviderName, FideoResolvedOptions } from '../types';
 import { Html5Provider } from './html5';
 import { VimeoProvider } from './vimeo';
 import { WistiaProvider } from './wistia';
@@ -7,6 +7,7 @@ import { YouTubeProvider } from './youtube';
 export function createProvider(
   provider: FideoProviderName,
   element: HTMLVideoElement | HTMLIFrameElement,
+  options: FideoResolvedOptions,
 ): FideoAdapter {
   if (provider === 'html5') {
     if (!(element instanceof HTMLVideoElement)) {
@@ -19,7 +20,7 @@ export function createProvider(
     throw new Error(`Fideo ${provider} provider needs an <iframe> element.`);
   }
 
-  if (provider === 'youtube') return new YouTubeProvider(element);
-  if (provider === 'vimeo') return new VimeoProvider(element);
+  if (provider === 'youtube') return new YouTubeProvider(element, options);
+  if (provider === 'vimeo') return new VimeoProvider(element, options);
   return new WistiaProvider(element);
 }

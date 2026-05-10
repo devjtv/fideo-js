@@ -50,11 +50,13 @@ export interface FideoOptions {
   loop?: boolean;
   playsInline?: boolean;
   controls?: boolean;
+  background?: boolean;
   controlVisibility?: Partial<FideoControlVisibility>;
   viewport?: FideoViewportMode;
   viewportThreshold?: number;
   volume?: number;
   playbackRates?: number[];
+  backgroundAspectRatio?: number;
   sources?: FideoSources;
   posters?: FideoPosters;
   breakpoints?: Partial<FideoBreakpoints>;
@@ -71,11 +73,13 @@ export interface FideoResolvedOptions extends Omit<FideoOptions, 'provider' | 'b
   loop: boolean;
   playsInline: boolean;
   controls: boolean;
+  background: boolean;
   controlVisibility: FideoControlVisibility;
   viewport: FideoViewportMode;
   viewportThreshold: number;
   volume: number;
   playbackRates: number[];
+  backgroundAspectRatio: number;
   breakpoints: FideoBreakpoints;
   sources: FideoSources;
   posters: FideoPosters;

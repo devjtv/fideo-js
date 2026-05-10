@@ -55,6 +55,27 @@ describe('data attribute options', () => {
     expect(getResponsiveValue(values, breakpoints, 1280)).toBe('/desktop.mp4');
   });
 
+  it('background mode implies autoplay, muted, loop, inline, no controls, and aspect ratio', () => {
+    document.body.innerHTML = `
+      <video
+        data-fideo
+        data-fideo-background="true"
+        data-fideo-background-aspect-ratio="1.777"
+      ></video>
+    `;
+
+    const video = document.querySelector('video')!;
+    const options = resolveOptions(video);
+
+    expect(options.background).toBe(true);
+    expect(options.autoplay).toBe(true);
+    expect(options.muted).toBe(true);
+    expect(options.loop).toBe(true);
+    expect(options.playsInline).toBe(true);
+    expect(options.controls).toBe(false);
+    expect(options.backgroundAspectRatio).toBe(1.777);
+  });
+
   it('normalizes YouTube URLs to no-cookie embed URLs and preserves params', () => {
     expect(normalizeYouTubeEmbedUrl('https://www.youtube.com/watch?v=M7lc1UVf-VE&start=4')).toBe(
       'https://www.youtube-nocookie.com/embed/M7lc1UVf-VE?start=4',

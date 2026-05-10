@@ -1,4 +1,5 @@
 import { BaseProvider } from './base';
+import type { FideoResolvedOptions } from '../types';
 import { addUrlParams, normalizeVimeoEmbedUrl } from '../utils/dom';
 import { loadScript } from '../utils/script';
 
@@ -33,13 +34,21 @@ export class VimeoProvider extends BaseProvider {
   private player?: VimeoPlayer;
   private ready: Promise<void>;
 
-  constructor(readonly element: HTMLIFrameElement) {
+  constructor(
+    readonly element: HTMLIFrameElement,
+    private options: FideoResolvedOptions,
+  ) {
     super();
-    this.element.src = addUrlParams(normalizeVimeoEmbedUrl(this.element.src), {
+    const params: Record<string, string | number | boolean> = {
       api: 1,
       controls: 0,
       playsinline: 1,
-    });
+    };
+    if (this.options.autoplay) params.autoplay = 1;
+    if (this.options.muted) params.muted = 1;
+    if (this.options.loop) params.loop = 1;
+    if (this.options.background) params.background = 1;
+    this.element.src = addUrlParams(normalizeVimeoEmbedUrl(this.element.src), params);
 
     this.ready = loadScript('https://player.vimeo.com/api/player.js').then(() => {
       this.player = new window.Vimeo!.Player(this.element);
@@ -86,7 +95,7 @@ export class VimeoProvider extends BaseProvider {
 
   async setSource(source: string): Promise<void> {
     await this.ready;
-    await this.player?.loadVideo({ url: normalizeVimeoEmbedUrl(source) });
+    await this.player?.loadVideo({ url: addUrlParams(normalizeVimeoEmbedUrl(source), this.providerParams()) });
     await this.sync();
   }
 
@@ -131,6 +140,19 @@ export class VimeoProvider extends BaseProvider {
   private postMessage(method: string, value?: unknown): void {
     const targetOrigin = new URL(this.element.src, window.location.href).origin;
     this.element.contentWindow?.postMessage(JSON.stringify({ method, value }), targetOrigin);
+  }
+
+  private providerParams(): Record<string, string | number | boolean> {
+    const params: Record<string, string | number | boolean> = {
+      api: 1,
+      controls: 0,
+      playsinline: 1,
+    };
+    if (this.options.autoplay) params.autoplay = 1;
+    if (this.options.muted) params.muted = 1;
+    if (this.options.loop) params.loop = 1;
+    if (this.options.background) params.background = 1;
+    return params;
   }
 }
 
