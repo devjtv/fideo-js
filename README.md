@@ -63,6 +63,27 @@ Or use the browser bundle:
 </script>
 ```
 
+## Compiled Files
+
+The compiled browser files are committed in `dist/` for users who want to download Fideo JS directly from the repository without running a build.
+
+| File | Use |
+| --- | --- |
+| `dist/fideo.umd.cjs` | Browser global build. Adds `Fideo`, `initFideo`, `createFideo`, and `mountFideo` to `window`. |
+| `dist/fideo.js` | ES module build. |
+| `dist/styles.css` | Fideo control styles. |
+| `dist/index.d.ts` | TypeScript declarations. |
+
+For direct browser usage:
+
+```html
+<link rel="stylesheet" href="./dist/styles.css" />
+<script src="./dist/fideo.umd.cjs"></script>
+<script>
+  Fideo.init();
+</script>
+```
+
 ## Quick Start
 
 Add `data-fideo` to a normal video element:

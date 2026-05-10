@@ -1,0 +1,29 @@
+import type { FideoPlayerInstance, FideoResolvedOptions } from './types';
+export declare class FideoPlayer implements FideoPlayerInstance {
+    readonly element: HTMLVideoElement | HTMLIFrameElement;
+    readonly wrapper: HTMLElement;
+    readonly options: FideoResolvedOptions;
+    private adapter;
+    private controls?;
+    private observer?;
+    private currentSource?;
+    private resizeController;
+    private activityTimer?;
+    private resizeObserver?;
+    constructor(element: HTMLVideoElement | HTMLIFrameElement, options: FideoResolvedOptions);
+    play(): Promise<void>;
+    pause(): Promise<void>;
+    destroy(): void;
+    private wrapElement;
+    private configureElement;
+    private bindAdapterEvents;
+    private bindClickToToggle;
+    private syncPlaybackClasses;
+    private activateControls;
+    private clearActivity;
+    private bindResponsiveMedia;
+    private applyResponsiveMedia;
+    private bindViewportPlayback;
+    private bindBackgroundCover;
+    private applyBackgroundCover;
+}

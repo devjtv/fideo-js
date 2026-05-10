@@ -1,0 +1,32 @@
+import type { FideoAdapter, FideoResolvedOptions } from './types';
+export declare class FideoControls {
+    private adapter;
+    private wrapper;
+    readonly element: HTMLElement;
+    private playButton;
+    private muteButton;
+    private track;
+    private volume;
+    private currentTime;
+    private duration;
+    private fullscreenButton;
+    private speedMenu;
+    private volumeGroup;
+    private volumePanel;
+    private seeking;
+    private icons;
+    private handleFullscreenChange;
+    constructor(adapter: FideoAdapter, wrapper: HTMLElement, options: FideoResolvedOptions);
+    destroy(): void;
+    private button;
+    private range;
+    private createSpeedMenu;
+    private togglePlay;
+    private toggleMute;
+    private changeVolume;
+    private previewSeek;
+    private commitSeek;
+    private toggleFullscreen;
+    private render;
+}
+export declare function formatTime(seconds: number): string;
