@@ -57,9 +57,39 @@ Or use the browser bundle:
 
 ```html
 <link rel="stylesheet" href="./dist/styles.css" />
-<script src="./dist/fideo.umd.cjs"></script>
+<script src="./dist/fideo.global.js"></script>
 <script>
   Fideo.init();
+</script>
+```
+
+## CDN
+
+Because the compiled files are committed in `dist/`, Fideo JS can be loaded directly from jsDelivr.
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@main/dist/styles.css" />
+<script src="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@main/dist/fideo.global.js"></script>
+<script>
+  Fideo.init();
+</script>
+```
+
+For production sites, prefer pinning a tag or release instead of `main` once one exists:
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.1.0/dist/styles.css" />
+<script src="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.1.0/dist/fideo.global.js"></script>
+```
+
+ES module usage is also available:
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@main/dist/styles.css" />
+<script type="module">
+  import { initFideo } from 'https://cdn.jsdelivr.net/gh/devjtv/fideo-js@main/dist/fideo.js';
+
+  initFideo();
 </script>
 ```
 
@@ -69,8 +99,9 @@ The compiled browser files are committed in `dist/` for users who want to downlo
 
 | File | Use |
 | --- | --- |
-| `dist/fideo.umd.cjs` | Browser global build. Adds `Fideo`, `initFideo`, `createFideo`, and `mountFideo` to `window`. |
+| `dist/fideo.global.js` | Browser global build. Adds `Fideo`, `initFideo`, `createFideo`, and `mountFideo` to `window`. Best for CDN or direct `<script>` usage. |
 | `dist/fideo.js` | ES module build. |
+| `dist/fideo.umd.cjs` | UMD/CommonJS-compatible build used by package tooling. |
 | `dist/styles.css` | Fideo control styles. |
 | `dist/index.d.ts` | TypeScript declarations. |
 
@@ -78,7 +109,7 @@ For direct browser usage:
 
 ```html
 <link rel="stylesheet" href="./dist/styles.css" />
-<script src="./dist/fideo.umd.cjs"></script>
+<script src="./dist/fideo.global.js"></script>
 <script>
   Fideo.init();
 </script>
