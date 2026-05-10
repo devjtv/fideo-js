@@ -14,6 +14,8 @@ export class FideoPlayer implements FideoPlayerInstance {
   private resizeController = new AbortController();
   private activityTimer?: number;
   private resizeObserver?: ResizeObserver;
+  private posterImage?: HTMLImageElement;
+  private posterDismissed = false;
 
   constructor(element: HTMLVideoElement | HTMLIFrameElement, options: FideoResolvedOptions) {
     this.element = element;
@@ -54,7 +56,9 @@ export class FideoPlayer implements FideoPlayerInstance {
     this.adapter.destroy();
     if (this.activityTimer) window.clearTimeout(this.activityTimer);
     this.wrapper.classList.remove('is-ready');
+    this.wrapper.classList.remove('has-poster', 'is-poster-visible');
     this.element.removeAttribute('data-fideo-ready');
+    this.posterImage?.remove();
   }
 
   private wrapElement(element: HTMLVideoElement | HTMLIFrameElement, options: FideoResolvedOptions): HTMLElement {
@@ -97,6 +101,10 @@ export class FideoPlayer implements FideoPlayerInstance {
     const events = ['play', 'pause', 'ended', 'timeupdate', 'volumechange', 'change'];
     for (const eventName of events) {
       this.adapter.addEventListener(eventName, () => {
+        if (eventName === 'play') {
+          this.posterDismissed = true;
+          this.syncPosterVisibility();
+        }
         this.syncPlaybackClasses();
         this.element.dispatchEvent(
           new CustomEvent(`fideo:${eventName}`, {
@@ -174,10 +182,13 @@ export class FideoPlayer implements FideoPlayerInstance {
   private applyResponsiveMedia(): void {
     const poster = getResponsiveValue(this.options.posters, this.options.breakpoints);
     if (poster && this.adapter.setPoster) this.adapter.setPoster(poster);
+    else this.applyIframePoster(poster);
 
     const source = getResponsiveValue(this.options.sources, this.options.breakpoints);
     if (source && source !== this.currentSource) {
       this.currentSource = source;
+      this.posterDismissed = false;
+      this.syncPosterVisibility();
       this.adapter.setSource(source);
     }
   }
@@ -236,6 +247,41 @@ export class FideoPlayer implements FideoPlayerInstance {
     this.element.style.height = `${mediaHeight}px`;
     this.element.style.left = `${(width - mediaWidth) / 2}px`;
     this.element.style.top = `${(height - mediaHeight) / 2}px`;
+  }
+
+  private applyIframePoster(poster?: string): void {
+    if (this.element instanceof HTMLVideoElement) return;
+    if (!poster) {
+      this.posterImage?.remove();
+      this.posterImage = undefined;
+      this.wrapper.classList.remove('has-poster', 'is-poster-visible');
+      return;
+    }
+
+    const posterImage = this.ensurePosterImage();
+    if (posterImage.src !== poster) posterImage.src = poster;
+    this.wrapper.classList.add('has-poster');
+    this.syncPosterVisibility();
+  }
+
+  private ensurePosterImage(): HTMLImageElement {
+    if (this.posterImage) return this.posterImage;
+
+    const posterImage = document.createElement('img');
+    posterImage.className = 'fideo__poster';
+    posterImage.alt = '';
+    posterImage.setAttribute('aria-hidden', 'true');
+    posterImage.decoding = 'async';
+    this.wrapper.insertBefore(posterImage, this.element.nextSibling);
+    this.posterImage = posterImage;
+    return posterImage;
+  }
+
+  private syncPosterVisibility(): void {
+    const hasPoster = Boolean(this.posterImage?.getAttribute('src'));
+    const showPoster = hasPoster && !this.posterDismissed;
+    this.wrapper.classList.toggle('has-poster', hasPoster);
+    this.wrapper.classList.toggle('is-poster-visible', showPoster);
   }
 }
 

@@ -134,6 +134,36 @@ describe('Fideo player', () => {
     expect(iframe.allow).toContain('encrypted-media');
   });
 
+  it('renders responsive poster overlays for iframe providers', () => {
+    document.body.innerHTML = `
+      <iframe
+        data-fideo
+        data-fideo-poster="/desktop-poster.jpg"
+        data-fideo-poster-tablet="/tablet-poster.jpg"
+        data-fideo-poster-mobile="/mobile-poster.jpg"
+        src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
+      ></iframe>
+    `;
+    const iframe = document.querySelector('iframe')!;
+    const player = mountFideo(iframe);
+    const poster = player.wrapper.querySelector('.fideo__poster') as HTMLImageElement;
+
+    expect(poster).toBeTruthy();
+    expect(poster.src.endsWith('/desktop-poster.jpg')).toBe(true);
+    expect(player.wrapper.classList.contains('is-poster-visible')).toBe(true);
+
+    Object.defineProperty(window, 'innerWidth', { configurable: true, writable: true, value: 900 });
+    window.dispatchEvent(new Event('resize'));
+    expect(poster.src.endsWith('/tablet-poster.jpg')).toBe(true);
+
+    Object.defineProperty(window, 'innerWidth', { configurable: true, writable: true, value: 600 });
+    window.dispatchEvent(new Event('resize'));
+    expect(poster.src.endsWith('/mobile-poster.jpg')).toBe(true);
+
+    (player as any).adapter.dispatchEvent(new Event('play'));
+    expect(player.wrapper.classList.contains('is-poster-visible')).toBe(false);
+  });
+
   it('initializes all data-fideo elements and can destroy them together', () => {
     document.body.innerHTML = `
       <video data-fideo data-fideo-src="/one.mp4"></video>

@@ -137,12 +137,14 @@ Use the same pattern for iframe providers:
 <iframe
   data-fideo
   data-fideo-muted="true"
+  data-fideo-poster="/posters/desktop.jpg"
+  data-fideo-poster-mobile="/posters/mobile.jpg"
   src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
   title="Product video"
 ></iframe>
 ```
 
-Fideo will normalize that YouTube URL to a no-cookie embed URL and add the provider API parameters it needs.
+Fideo will normalize that YouTube URL to a no-cookie embed URL and add the provider API parameters it needs. When poster images are configured for an iframe player, Fideo renders them as an overlay image inside the wrapper until playback begins.
 
 ## JavaScript Initialization
 
@@ -297,6 +299,19 @@ Fideo lets you swap video source and poster assets by breakpoint. This is useful
   data-fideo-poster-tablet="/posters/tablet.jpg"
   data-fideo-poster-mobile="/posters/mobile.jpg"
 ></video>
+```
+
+The same poster attributes and `posters` object also work for iframe providers. In that case, Fideo creates an `<img>` inside the player wrapper and treats it like a poster overlay. The `desktop`, `tablet`, and `mobile` poster values should still describe the original poster assets you want shown for each breakpoint.
+
+```html
+<iframe
+  data-fideo
+  data-fideo-poster="/posters/youtube-desktop.jpg"
+  data-fideo-poster-tablet="/posters/youtube-tablet.jpg"
+  data-fideo-poster-mobile="/posters/youtube-mobile.jpg"
+  src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
+  title="YouTube video with responsive poster"
+></iframe>
 ```
 
 Default breakpoints:
@@ -532,7 +547,7 @@ Existing Vimeo embed URLs with `?h=` are preserved.
 | `volume` | `number` | `1` | Initial volume from `0` to `1`. |
 | `playbackRates` | `number[]` | `[0.5, 1, 1.25, 1.5, 2]` | Playback speed options. |
 | `sources` | `FideoSources` | `{}` | Responsive media sources. |
-| `posters` | `FideoPosters` | `{}` | Responsive HTML5 posters. |
+| `posters` | `FideoPosters` | `{}` | Responsive poster images. For iframe providers, Fideo renders them as an overlay image inside the wrapper until playback starts. |
 | `breakpoints` | `Partial<FideoBreakpoints>` | `{ mobile: 767, tablet: 1024 }` | Responsive cutoffs. |
 | `icons` | `FideoIcons` | `{}` | Custom SVG icons. |
 | `className` | `string` | `''` | Additional wrapper class. |
@@ -556,7 +571,7 @@ Existing Vimeo embed URLs with `?h=` are preserved.
 | `data-fideo-volume` | Initial volume from `0` to `1`. |
 | `data-fideo-playback-rates` | Comma-separated playback speeds, e.g. `0.5,1,1.5,2`. |
 | `data-fideo-src`, `data-fideo-src-tablet`, `data-fideo-src-mobile` | Responsive video/embed sources. |
-| `data-fideo-poster`, `data-fideo-poster-tablet`, `data-fideo-poster-mobile` | Responsive HTML5 posters. |
+| `data-fideo-poster`, `data-fideo-poster-tablet`, `data-fideo-poster-mobile` | Responsive poster images for both native video and iframe providers. |
 | `data-fideo-breakpoint-mobile`, `data-fideo-breakpoint-tablet` | Responsive cutoffs in pixels. |
 | `data-fideo-show-play` | Show or hide the play/pause button. |
 | `data-fideo-show-timeline` | Show or hide the seek bar. |

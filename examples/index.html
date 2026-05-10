@@ -367,6 +367,25 @@
       </section>
 
       <section>
+        <h2>Iframe poster overlays with responsive posters</h2>
+        <iframe
+          data-fideo
+          data-fideo-poster="https://interactive-examples.mdn.mozilla.net/media/examples/flower.jpg"
+          data-fideo-poster-tablet="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1280&q=80"
+          data-fideo-poster-mobile="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=960&q=80"
+          src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
+          title="YouTube video with responsive poster overlay"
+        ></iframe>
+        <pre><code>&lt;iframe
+  data-fideo
+  data-fideo-poster="/posters/youtube-desktop.jpg"
+  data-fideo-poster-tablet="/posters/youtube-tablet.jpg"
+  data-fideo-poster-mobile="/posters/youtube-mobile.jpg"
+  src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
+&gt;&lt;/iframe&gt;</code></pre>
+      </section>
+
+      <section>
         <h2>No controls</h2>
         <video
           data-fideo
