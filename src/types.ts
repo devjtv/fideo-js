@@ -56,7 +56,7 @@ export interface FideoOptions {
   viewportThreshold?: number;
   volume?: number;
   playbackRates?: number[];
-  backgroundAspectRatio?: number;
+  backgroundAspectRatio?: number | string;
   sources?: FideoSources;
   posters?: FideoPosters;
   breakpoints?: Partial<FideoBreakpoints>;
@@ -65,7 +65,8 @@ export interface FideoOptions {
   cssVars?: Record<string, string>;
 }
 
-export interface FideoResolvedOptions extends Omit<FideoOptions, 'provider' | 'breakpoints' | 'controlVisibility'> {
+export interface FideoResolvedOptions
+  extends Omit<FideoOptions, 'provider' | 'breakpoints' | 'controlVisibility' | 'backgroundAspectRatio'> {
   provider: FideoProviderName;
   selector: string;
   autoplay: boolean;

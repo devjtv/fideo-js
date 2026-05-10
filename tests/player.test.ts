@@ -88,7 +88,7 @@ describe('Fideo player', () => {
       <iframe
         data-fideo
         data-fideo-background="true"
-        data-fideo-background-aspect-ratio="1.777777778"
+        data-fideo-background-aspect-ratio="16:9"
         src="https://vimeo.com/123456789/privatehash"
       ></iframe>
     `;
@@ -113,7 +113,7 @@ describe('Fideo player', () => {
       <iframe
         data-fideo
         data-fideo-background="true"
-        data-fideo-background-aspect-ratio="1.777777778"
+        data-fideo-background-aspect-ratio="16/9"
         src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
       ></iframe>
     `;

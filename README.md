@@ -149,6 +149,10 @@ Background mode is designed for full-width heroes, editorial banners, cards, and
 
 Native `<video>` uses CSS `object-fit: cover`. Iframe embeds cannot rely on `object-fit`, so Fideo measures the parent container and resizes the iframe with cover-style math.
 
+For iframe backgrounds, `data-fideo-background-aspect-ratio` and `backgroundAspectRatio` describe the original video's own aspect ratio, not the container's aspect ratio. Fideo uses that source ratio to decide whether the iframe should be wider or taller than the container, then centers the overflow so the background fills the space without black bars.
+
+You do not need to set this for normal `16:9` YouTube or Vimeo videos because `16 / 9` is the default. Set it only when the source video itself is a different shape, such as square, portrait, ultrawide, or `4:3`.
+
 ### MP4 Background
 
 ```html
@@ -170,7 +174,7 @@ Native `<video>` uses CSS `object-fit: cover`. Iframe embeds cannot rely on `obj
   <iframe
     data-fideo
     data-fideo-background="true"
-    data-fideo-background-aspect-ratio="1.777777778"
+    data-fideo-background-aspect-ratio="16:9"
     src="https://vimeo.com/76979871"
     title="Vimeo background video"
   ></iframe>
@@ -184,24 +188,42 @@ Native `<video>` uses CSS `object-fit: cover`. Iframe embeds cannot rely on `obj
   <iframe
     data-fideo
     data-fideo-background="true"
-    data-fideo-background-aspect-ratio="1.777777778"
+    data-fideo-background-aspect-ratio="16:9"
     src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
     title="YouTube background video"
   ></iframe>
 </div>
 ```
 
-Set `data-fideo-background-aspect-ratio` or `backgroundAspectRatio` when the embedded source is not `16 / 9`.
+Supported ratio formats:
+
+```html
+data-fideo-background-aspect-ratio="16:9"
+data-fideo-background-aspect-ratio="16/9"
+data-fideo-background-aspect-ratio="1.777777778"
+```
+
+JavaScript supports the same string formats or a number:
 
 ```ts
 new Fideo('#background-player', {
   background: true,
-  backgroundAspectRatio: 4 / 3,
+  backgroundAspectRatio: '4:3',
   sources: {
     desktop: 'https://vimeo.com/76979871',
   },
 });
 ```
+
+Common values:
+
+| Original video shape | Ratio value |
+| --- | --- |
+| Widescreen | `16:9` |
+| Classic | `4:3` |
+| Square | `1:1` or `1` |
+| Portrait / Shorts | `9:16` |
+| Ultrawide | `21:9` |
 
 ## Responsive Sources And Posters
 
@@ -445,7 +467,7 @@ Existing Vimeo embed URLs with `?h=` are preserved.
 | `playsInline` | `boolean` | `true` | Prefer inline playback on mobile. |
 | `controls` | `boolean` | `true` | Show Fideo controls. |
 | `background` | `boolean` | `false` | Enable background-video mode. |
-| `backgroundAspectRatio` | `number` | `16 / 9` | Source ratio used for iframe cover sizing. |
+| `backgroundAspectRatio` | `number` or ratio `string` | `16 / 9` | Original source video ratio used for iframe cover sizing, e.g. `16 / 9`, `16:9`, or `16/9`. |
 | `controlVisibility` | `Partial<FideoControlVisibility>` | all visible | Show or hide individual controls. |
 | `viewport` | `false`, `play`, `pause`, `play-pause` | `false` | Viewport playback behavior. |
 | `viewportThreshold` | `number` | `0.35` | Intersection ratio required for viewport playback. |
@@ -470,7 +492,7 @@ Existing Vimeo embed URLs with `?h=` are preserved.
 | `data-fideo-playsinline` | Enables inline playback. |
 | `data-fideo-controls` | `true` for Fideo controls, `false` for no custom or native controls. |
 | `data-fideo-background` | Enables background-video mode. |
-| `data-fideo-background-aspect-ratio` | Source aspect ratio for background iframes. |
+| `data-fideo-background-aspect-ratio` | Original source video ratio for background iframes, e.g. `16:9`, `16/9`, or `1.777777778`. |
 | `data-fideo-viewport` | `play`, `pause`, `play-pause`, or `false`. |
 | `data-fideo-viewport-threshold` | Intersection ratio needed before viewport playback runs. |
 | `data-fideo-volume` | Initial volume from `0` to `1`. |

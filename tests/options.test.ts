@@ -91,7 +91,7 @@ describe('data attribute options', () => {
       <video
         data-fideo
         data-fideo-background="true"
-        data-fideo-background-aspect-ratio="1.777"
+        data-fideo-background-aspect-ratio="16:9"
       ></video>
     `;
 
@@ -104,7 +104,22 @@ describe('data attribute options', () => {
     expect(options.loop).toBe(true);
     expect(options.playsInline).toBe(true);
     expect(options.controls).toBe(false);
-    expect(options.backgroundAspectRatio).toBe(1.777);
+    expect(options.backgroundAspectRatio).toBeCloseTo(16 / 9);
+  });
+
+  it('accepts slash, colon, and numeric background aspect ratios', () => {
+    document.body.innerHTML = `
+      <iframe data-fideo data-fideo-background-aspect-ratio="4/3"></iframe>
+      <iframe data-fideo data-fideo-background-aspect-ratio="9:16"></iframe>
+      <iframe id="object-ratio"></iframe>
+    `;
+    const [slashRatio, colonRatio] = Array.from(document.querySelectorAll('[data-fideo]')) as HTMLIFrameElement[];
+    const objectRatio = document.querySelector('#object-ratio') as HTMLIFrameElement;
+
+    expect(resolveOptions(slashRatio).backgroundAspectRatio).toBeCloseTo(4 / 3);
+    expect(resolveOptions(colonRatio).backgroundAspectRatio).toBeCloseTo(9 / 16);
+    expect(resolveOptions(objectRatio, { backgroundAspectRatio: '21/9' }).backgroundAspectRatio).toBeCloseTo(21 / 9);
+    expect(resolveOptions(objectRatio, { backgroundAspectRatio: 1 }).backgroundAspectRatio).toBe(1);
   });
 
   it('normalizes YouTube URLs to no-cookie embed URLs and preserves params', () => {

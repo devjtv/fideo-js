@@ -43,6 +43,21 @@ export function numberFromAttr(value: string | null | undefined, fallback: numbe
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
+export function ratioFromValue(value: string | number | null | undefined, fallback: number): number {
+  if (typeof value === 'number') return Number.isFinite(value) && value > 0 ? value : fallback;
+  if (value == null || value.trim() === '') return fallback;
+
+  const normalized = value.trim();
+  const parts = normalized.split(/[:/]/).map((part) => Number(part.trim()));
+
+  if (parts.length === 2 && parts.every((part) => Number.isFinite(part) && part > 0)) {
+    return parts[0] / parts[1];
+  }
+
+  const parsed = Number(normalized);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
 export function splitRates(value: string | null | undefined, fallback: number[]): number[] {
   if (!value) return fallback;
   const rates = value
@@ -128,7 +143,7 @@ export function resolveOptions(
     viewportThreshold: numberFromAttr(data.fideoViewportThreshold, options.viewportThreshold ?? 0.35),
     volume: numberFromAttr(data.fideoVolume, options.volume ?? 1),
     playbackRates: splitRates(data.fideoPlaybackRates, options.playbackRates ?? [0.5, 1, 1.25, 1.5, 2]),
-    backgroundAspectRatio: numberFromAttr(data.fideoBackgroundAspectRatio, options.backgroundAspectRatio ?? 16 / 9),
+    backgroundAspectRatio: ratioFromValue(data.fideoBackgroundAspectRatio ?? options.backgroundAspectRatio, 16 / 9),
     sources,
     posters: { ...readPosters(element), ...options.posters },
     breakpoints,
