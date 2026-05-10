@@ -127,6 +127,37 @@
         gap: 16px;
       }
 
+      .provider-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .provider-demo {
+        display: grid;
+        gap: 10px;
+        min-width: 0;
+      }
+
+      .provider-demo .background-surface {
+        min-height: 0;
+        aspect-ratio: 16 / 9;
+      }
+
+      .provider-demo .background-content {
+        padding: 16px;
+      }
+
+      .provider-demo h3 {
+        margin: 0;
+        font-size: 20px;
+      }
+
+      .provider-demo pre {
+        min-height: 184px;
+        font-size: 12px;
+      }
+
       .background-tile {
         min-height: 0;
       }
@@ -164,6 +195,10 @@
         }
 
         .background-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .provider-grid {
           grid-template-columns: 1fr;
         }
 
@@ -385,6 +420,77 @@ new Fideo('#object-player', {
     src="https://vimeo.com/76979871"
   &gt;&lt;/iframe&gt;
 &lt;/div&gt;</code></pre>
+      </section>
+
+      <section>
+        <h2>Background provider matrix</h2>
+        <div class="provider-grid">
+          <div class="provider-demo">
+            <div class="background-surface">
+              <video
+                data-fideo
+                data-fideo-background="true"
+                data-fideo-src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+                data-fideo-poster="https://interactive-examples.mdn.mozilla.net/media/examples/flower.jpg"
+              ></video>
+              <div class="background-content">
+                <h3>MP4</h3>
+              </div>
+            </div>
+            <pre><code>&lt;video
+  data-fideo
+  data-fideo-background="true"
+  data-fideo-src="/videos/clip.mp4"
+  data-fideo-poster="/posters/clip.jpg"
+&gt;&lt;/video&gt;</code></pre>
+          </div>
+
+          <div class="provider-demo">
+            <div class="background-surface">
+              <iframe
+                data-fideo
+                data-fideo-provider="vimeo"
+                data-fideo-background="true"
+                data-fideo-background-aspect-ratio="1.777777778"
+                src="https://vimeo.com/76979871"
+                title="Vimeo provider background"
+              ></iframe>
+              <div class="background-content">
+                <h3>Vimeo</h3>
+              </div>
+            </div>
+            <pre><code>&lt;iframe
+  data-fideo
+  data-fideo-provider="vimeo"
+  data-fideo-background="true"
+  data-fideo-background-aspect-ratio="1.777777778"
+  src="https://vimeo.com/76979871"
+&gt;&lt;/iframe&gt;</code></pre>
+          </div>
+
+          <div class="provider-demo">
+            <div class="background-surface">
+              <iframe
+                data-fideo
+                data-fideo-provider="youtube"
+                data-fideo-background="true"
+                data-fideo-background-aspect-ratio="1.777777778"
+                src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
+                title="YouTube provider background"
+              ></iframe>
+              <div class="background-content">
+                <h3>YouTube</h3>
+              </div>
+            </div>
+            <pre><code>&lt;iframe
+  data-fideo
+  data-fideo-provider="youtube"
+  data-fideo-background="true"
+  data-fideo-background-aspect-ratio="1.777777778"
+  src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
+&gt;&lt;/iframe&gt;</code></pre>
+          </div>
+        </div>
       </section>
 
       <section>

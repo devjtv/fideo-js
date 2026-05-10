@@ -201,6 +201,26 @@ Native `<video>` uses CSS `object-fit: cover`. Iframe providers cannot use `obje
 ></iframe>
 ```
 
+The same background API works across MP4, Vimeo, and YouTube:
+
+```html
+<video data-fideo data-fideo-background="true" data-fideo-src="/videos/clip.mp4"></video>
+
+<iframe
+  data-fideo
+  data-fideo-provider="vimeo"
+  data-fideo-background="true"
+  src="https://vimeo.com/76979871"
+></iframe>
+
+<iframe
+  data-fideo
+  data-fideo-provider="youtube"
+  data-fideo-background="true"
+  src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
+></iframe>
+```
+
 ## Styling
 
 Every visible control is styled with CSS variables. Override them globally, per wrapper, through data attributes, or with the `cssVars` option.

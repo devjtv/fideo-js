@@ -88,7 +88,7 @@ export class FideoPlayer implements FideoPlayerInstance {
       this.element.playsInline = this.options.playsInline;
       this.element.setAttribute('playsinline', '');
     } else {
-      this.element.allow = mergeAllow(this.element.allow, ['autoplay', 'fullscreen', 'picture-in-picture']);
+      this.element.allow = mergeAllow(this.element.allow, ['autoplay', 'fullscreen', 'picture-in-picture', 'encrypted-media']);
       this.element.setAttribute('allowfullscreen', '');
     }
   }

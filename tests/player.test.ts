@@ -109,6 +109,33 @@ describe('Fideo player', () => {
     expect(iframe.style.top).toBe('0px');
   });
 
+  it('normalizes YouTube background embeds with no-cookie autoplay and loop params', () => {
+    document.body.innerHTML = `
+      <iframe
+        data-fideo
+        data-fideo-provider="youtube"
+        data-fideo-background="true"
+        data-fideo-background-aspect-ratio="1.777777778"
+        src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
+      ></iframe>
+    `;
+    const iframe = document.querySelector('iframe')!;
+    const player = mountFideo(iframe);
+    const src = new URL(iframe.src);
+
+    expect(player.wrapper.classList.contains('fideo--background')).toBe(true);
+    expect(player.wrapper.querySelector('.fideo__controls')).toBeNull();
+    expect(src.hostname).toBe('www.youtube-nocookie.com');
+    expect(src.pathname).toBe('/embed/M7lc1UVf-VE');
+    expect(src.searchParams.get('autoplay')).toBe('1');
+    expect(src.searchParams.get('mute')).toBe('1');
+    expect(src.searchParams.get('loop')).toBe('1');
+    expect(src.searchParams.get('playlist')).toBe('M7lc1UVf-VE');
+    expect(src.searchParams.get('controls')).toBe('0');
+    expect(iframe.allow).toContain('autoplay');
+    expect(iframe.allow).toContain('encrypted-media');
+  });
+
   it('initializes all data-fideo elements and can destroy them together', () => {
     document.body.innerHTML = `
       <video data-fideo data-fideo-src="/one.mp4"></video>
