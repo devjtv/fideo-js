@@ -92,7 +92,8 @@
   object-fit: cover;
 }
 
-.fideo--background iframe.fideo__media {
+.fideo--background iframe.fideo__media,
+.fideo--background wistia-player.fideo__media {
   inset: auto;
   object-fit: initial;
   pointer-events: none;
@@ -125,7 +126,8 @@
   object-fit: contain;
 }
 
-.fideo--background.is-fullscreen iframe.fideo__media {
+.fideo--background.is-fullscreen iframe.fideo__media,
+.fideo--background.is-fullscreen wistia-player.fideo__media {
   inset: auto;
   object-fit: initial;
   pointer-events: auto;

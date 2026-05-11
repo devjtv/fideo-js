@@ -1,138 +1,178 @@
 import { BaseProvider } from './base';
+import type { FideoResolvedOptions } from '../types';
 import { loadScript } from '../utils/script';
 
-interface WistiaVideo {
-  play(): void;
-  pause(): void;
-  time(seconds?: number): number;
-  duration(): number;
-  volume(value?: number): number;
-  muted(): boolean;
-  mute(): void;
-  unmute(): void;
-  playbackRate?(rate?: number): number;
-  bind(eventName: string, callback: () => void): void;
-  unbind(eventName: string): void;
-}
-
 declare global {
-  interface Window {
-    _wq?: Array<Record<string, unknown>>;
+  interface HTMLElementTagNameMap {
+    'wistia-player': HTMLElement & {
+      mediaId: string;
+      play(): void;
+      pause(): void;
+      currentTime: number;
+      duration: number;
+      volume: number;
+      muted: boolean;
+      playbackRate: number;
+      state: string;
+    };
   }
 }
 
 export class WistiaProvider extends BaseProvider {
   readonly provider = 'wistia' as const;
-  private video?: WistiaVideo;
+  readonly element: HTMLIFrameElement;
+  private player?: HTMLElement;
   private ready: Promise<void>;
-  private timer?: number;
+  private mediaId: string;
 
-  constructor(readonly element: HTMLIFrameElement) {
+  constructor(iframe: HTMLIFrameElement, private options: FideoResolvedOptions) {
     super();
-    const mediaId = getWistiaMediaId(element.src);
-    this.ready = new Promise((resolve) => {
-      window._wq = window._wq || [];
-      window._wq.push({
-        id: mediaId || '_all',
-        onReady: (video: WistiaVideo) => {
-          this.video = video;
-          this.bind();
-          this.sync();
-          resolve();
-        },
-      });
+    this.element = iframe;
+    if (this.options.muted) this.state.muted = true;
+
+    this.mediaId = getWistiaMediaId(iframe.src);
+
+    const player = document.createElement('wistia-player');
+    player.setAttribute('media-id', this.mediaId);
+    player.setAttribute('aspect', '1.7777777777777777');
+
+    if (this.options.controls !== false) {
+      player.setAttribute('controls-visible-on-load', 'false');
+    }
+    if (this.options.autoplay) {
+      player.setAttribute('auto-play', '');
+    }
+    if (this.options.muted) {
+      player.setAttribute('muted', '');
+    }
+    if (this.options.loop) {
+      player.setAttribute('end-video-behavior', 'loop');
+    }
+    if (this.options.background) {
+      player.setAttribute('fit-strategy', 'cover');
+    }
+
+    player.classList.add('fideo__media');
+    player.setAttribute('data-fideo-ready', 'true');
+    player.style.position = 'relative';
+    player.style.zIndex = '0';
+    player.style.display = 'block';
+    player.style.width = '100%';
+    player.style.height = '100%';
+    player.style.border = '0';
+
+    iframe.before(player);
+    iframe.remove();
+
+    this.player = player;
+
+    const embedScript = document.createElement('script');
+    embedScript.src = `https://fast.wistia.com/embed/${this.mediaId}.js`;
+    embedScript.type = 'module';
+    embedScript.async = true;
+    const loadEmbed = new Promise<void>((resolve) => {
+      embedScript.addEventListener('load', () => resolve());
     });
-    loadScript('https://fast.wistia.com/assets/external/E-v1.js').catch(() => undefined);
+    document.head.appendChild(embedScript);
+
+    this.ready = Promise.all([loadScript('https://fast.wistia.com/player.js'), loadEmbed]).then(
+      () =>
+        new Promise<void>((resolve) => {
+          player.addEventListener('api-ready', () => {
+            this.bind();
+            this.sync();
+            resolve();
+          }, { once: true });
+        }),
+    );
   }
 
   async play(): Promise<void> {
     await this.ready;
-    this.video?.play();
+    (this.player as any)?.play();
   }
 
   async pause(): Promise<void> {
     await this.ready;
-    this.video?.pause();
+    (this.player as any)?.pause();
   }
 
   async seek(time: number): Promise<void> {
     await this.ready;
-    this.video?.time(time);
+    if (this.player) (this.player as any).currentTime = time;
     this.sync();
   }
 
   async setVolume(volume: number): Promise<void> {
     await this.ready;
-    this.video?.volume(clamp(volume));
+    if (this.player) (this.player as any).volume = clamp(volume);
     this.sync();
   }
 
   async setMuted(muted: boolean): Promise<void> {
     await this.ready;
-    if (muted) this.video?.mute();
-    else this.video?.unmute();
+    if (this.player) (this.player as any).muted = muted;
     this.sync();
   }
 
   async setPlaybackRate(rate: number): Promise<void> {
     await this.ready;
-    this.video?.playbackRate?.(rate);
+    if (this.player) (this.player as any).playbackRate = rate;
     this.sync();
   }
 
   async setSource(source: string): Promise<void> {
-    this.element.src = source;
+    const newId = getWistiaMediaId(source);
+    if (newId && this.player) {
+      (this.player as any).mediaId = newId;
+    }
   }
 
   destroy(): void {
-    if (this.timer) window.clearInterval(this.timer);
-    this.video?.unbind('play');
-    this.video?.unbind('pause');
-    this.video?.unbind('end');
-    this.video?.pause();
+    this.player?.remove();
   }
 
   private bind(): void {
-    this.video?.bind('play', () => {
-      this.startTimer();
-      this.dispatchEvent(new CustomEvent('play', { detail: this.getState() }));
+    const p = this.player;
+    if (!p) return;
+
+    p.addEventListener('play', () => {
+      this.update({ paused: false }, 'play');
     });
-    this.video?.bind('pause', () => {
-      this.stopTimer();
-      this.dispatchEvent(new CustomEvent('pause', { detail: this.getState() }));
+    p.addEventListener('pause', () => {
+      this.update({ paused: true }, 'pause');
     });
-    this.video?.bind('end', () => {
-      this.stopTimer();
-      this.dispatchEvent(new CustomEvent('ended', { detail: this.getState() }));
+    p.addEventListener('ended', () => {
+      this.update({ paused: true }, 'ended');
+    });
+    p.addEventListener('time-update', () => {
+      if (!this.player) return;
+      const ct = (this.player as any).currentTime ?? 0;
+      this.update({ currentTime: ct }, 'timeupdate');
+    });
+    p.addEventListener('volume-change', () => {
+      this.sync();
+    });
+    p.addEventListener('mute-change', () => {
+      this.sync();
     });
   }
 
   private sync(): void {
-    if (!this.video) return;
+    if (!this.player) return;
+    const p = this.player as any;
     this.update({
-      currentTime: this.video.time() || 0,
-      duration: this.video.duration() || 0,
-      volume: this.video.volume(),
-      muted: this.video.muted(),
-      playbackRate: this.video.playbackRate?.() || 1,
+      currentTime: p.currentTime ?? 0,
+      duration: p.duration ?? 0,
+      volume: p.volume ?? 1,
+      muted: p.muted ?? false,
+      playbackRate: p.playbackRate ?? 1,
     });
-  }
-
-  private startTimer(): void {
-    this.state.paused = false;
-    if (this.timer) return;
-    this.timer = window.setInterval(() => this.sync(), 500);
-  }
-
-  private stopTimer(): void {
-    this.state.paused = true;
-    if (this.timer) window.clearInterval(this.timer);
-    this.timer = undefined;
   }
 }
 
-function getWistiaMediaId(src: string): string | undefined {
-  return src.match(/(?:medias|iframe)\/([a-zA-Z0-9]+)/)?.[1];
+function getWistiaMediaId(src: string): string {
+  return src.match(/(?:medias|iframe)\/([a-zA-Z0-9]+)/)?.[1] ?? '';
 }
 
 function clamp(value: number): number {

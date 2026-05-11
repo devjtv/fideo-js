@@ -22,5 +22,5 @@ export function createProvider(
 
   if (provider === 'youtube') return new YouTubeProvider(element, options);
   if (provider === 'vimeo') return new VimeoProvider(element, options);
-  return new WistiaProvider(element);
+  return new WistiaProvider(element, options);
 }

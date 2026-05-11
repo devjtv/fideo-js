@@ -182,10 +182,10 @@ export class FideoControls {
 
   private closeMenus(event: MouseEvent): void {
     const path = event.composedPath();
-    if (!path.some((el) => this.settingsGroup === el || this.settingsGroup.contains(el as Node))) {
+    if (!path.some((el) => el instanceof Node && (this.settingsGroup === el || this.settingsGroup.contains(el)))) {
       this.settingsGroup.classList.remove('is-open');
     }
-    if (!path.some((el) => this.volumeGroup === el || this.volumeGroup.contains(el as Node))) {
+    if (!path.some((el) => el instanceof Node && (this.volumeGroup === el || this.volumeGroup.contains(el)))) {
       this.volumeGroup.classList.remove('is-open');
     }
   }

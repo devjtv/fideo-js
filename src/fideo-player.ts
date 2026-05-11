@@ -238,7 +238,7 @@ export class FideoPlayer implements FideoPlayerInstance {
       this.element.style.top = '';
       return;
     }
-    if (!this.options.background || this.element instanceof HTMLVideoElement) return;
+    if (!this.options.background || this.element instanceof HTMLVideoElement || this.options.provider === 'wistia') return;
 
     const width = this.wrapper.clientWidth;
     const height = this.wrapper.clientHeight;

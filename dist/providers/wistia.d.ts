@@ -1,16 +1,28 @@
 import { BaseProvider } from './base';
+import type { FideoResolvedOptions } from '../types';
 declare global {
-    interface Window {
-        _wq?: Array<Record<string, unknown>>;
+    interface HTMLElementTagNameMap {
+        'wistia-player': HTMLElement & {
+            mediaId: string;
+            play(): void;
+            pause(): void;
+            currentTime: number;
+            duration: number;
+            volume: number;
+            muted: boolean;
+            playbackRate: number;
+            state: string;
+        };
     }
 }
 export declare class WistiaProvider extends BaseProvider {
-    readonly element: HTMLIFrameElement;
+    private options;
     readonly provider: "wistia";
-    private video?;
+    readonly element: HTMLIFrameElement;
+    private player?;
     private ready;
-    private timer?;
-    constructor(element: HTMLIFrameElement);
+    private mediaId;
+    constructor(iframe: HTMLIFrameElement, options: FideoResolvedOptions);
     play(): Promise<void>;
     pause(): Promise<void>;
     seek(time: number): Promise<void>;
@@ -21,6 +33,4 @@ export declare class WistiaProvider extends BaseProvider {
     destroy(): void;
     private bind;
     private sync;
-    private startTimer;
-    private stopTimer;
 }
