@@ -136,7 +136,7 @@ export function resolveOptions(
     muted: background || boolFromAttr(data.fideoMuted, options.muted ?? false),
     loop: background || boolFromAttr(data.fideoLoop, options.loop ?? false),
     playsInline: background || boolFromAttr(data.fideoPlaysinline ?? data.fideoPlaysInline, options.playsInline ?? true),
-    controls: background ? false : boolFromAttr(data.fideoControls, options.controls ?? true),
+    controls: boolFromAttr(data.fideoControls, options.controls ?? !background),
     background,
     controlVisibility: resolveControlVisibility(element, options.controlVisibility),
     viewport: parseViewportMode(data.fideoViewport, viewportFallback),

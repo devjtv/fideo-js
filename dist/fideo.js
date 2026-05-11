@@ -162,7 +162,7 @@ function q(s, t = {}) {
     muted: d || c(e.fideoMuted, t.muted ?? !1),
     loop: d || c(e.fideoLoop, t.loop ?? !1),
     playsInline: d || c(e.fideoPlaysinline ?? e.fideoPlaysInline, t.playsInline ?? !0),
-    controls: d ? !1 : c(e.fideoControls, t.controls ?? !0),
+    controls: c(e.fideoControls, t.controls ?? !d),
     background: d,
     controlVisibility: G(s, t.controlVisibility),
     viewport: j(e.fideoViewport, h),
