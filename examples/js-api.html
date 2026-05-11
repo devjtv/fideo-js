@@ -21,7 +21,7 @@
         margin: 0 auto;
       }
 
-      h1 {
+      main h1 {
         margin: 0 0 8px;
         font-size: 32px;
         font-weight: 700;
@@ -69,7 +69,7 @@
         min-width: 80px;
       }
 
-      button {
+      .controls-card button {
         padding: 9px 14px;
         font-size: 14px;
         font-weight: 600;
@@ -81,25 +81,25 @@
         transition: background 140ms ease, transform 100ms ease;
       }
 
-      button:hover {
+      .controls-card button:hover {
         background: rgba(255, 255, 255, 0.14);
       }
 
-      button:active {
+      .controls-card button:active {
         transform: scale(0.97);
       }
 
-      button.primary {
+      .controls-card button.primary {
         background: #46d9a7;
         color: #07100d;
         border-color: #46d9a7;
       }
 
-      button.primary:hover {
+      .controls-card button.primary:hover {
         background: #3bc594;
       }
 
-      input[type="range"] {
+      .controls-card input[type="range"] {
         width: 160px;
         accent-color: #46d9a7;
       }
@@ -135,7 +135,7 @@
       </p>
 
       <div class="demo-player">
-        <video id="api-player"></video>
+        <iframe id="api-player" src="https://vimeo.com/347119375"></iframe>
       </div>
 
       <div class="controls-card">
@@ -180,10 +180,10 @@
       const player = new Fideo('#api-player', {
         controls: true,
         sources: {
-          desktop: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+          desktop: 'https://vimeo.com/347119375',
         },
         posters: {
-          desktop: 'https://interactive-examples.mdn.mozilla.net/media/examples/flower.jpg',
+          desktop: 'https://vumbnail.com/347119375.jpg',
         },
       });
 
