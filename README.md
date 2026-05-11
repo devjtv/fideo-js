@@ -68,8 +68,8 @@ Or use the browser bundle:
 Because the compiled files are committed in `dist/`, Fideo JS can be loaded directly from jsDelivr.
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@main/dist/styles.css" />
-<script src="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@main/dist/fideo.global.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.1.1/dist/styles.css" />
+<script src="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.1.1/dist/fideo.global.js"></script>
 <script>
   Fideo.init();
 </script>
@@ -78,16 +78,16 @@ Because the compiled files are committed in `dist/`, Fideo JS can be loaded dire
 For production sites, prefer pinning a tag or release instead of `main` once one exists:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.1.0/dist/styles.css" />
-<script src="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.1.0/dist/fideo.global.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.1.1/dist/styles.css" />
+<script src="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.1.1/dist/fideo.global.js"></script>
 ```
 
 ES module usage is also available:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@main/dist/styles.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.1.1/dist/styles.css" />
 <script type="module">
-  import { initFideo } from 'https://cdn.jsdelivr.net/gh/devjtv/fideo-js@main/dist/fideo.js';
+  import { initFideo } from 'https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.1.1/dist/fideo.js';
 
   initFideo();
 </script>
