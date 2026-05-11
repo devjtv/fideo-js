@@ -11,6 +11,7 @@ export declare class FideoPlayer implements FideoPlayerInstance {
     private activityTimer?;
     private resizeObserver?;
     private posterImage?;
+    private handleFullscreenChange;
     constructor(element: HTMLVideoElement | HTMLIFrameElement, options: FideoResolvedOptions);
     play(): Promise<void>;
     pause(): Promise<void>;

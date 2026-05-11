@@ -83,7 +83,7 @@ function $(s) {
 const T = {
   mobile: 767,
   tablet: 1024
-}, R = /* @__PURE__ */ new Set(["", "true", "1", "yes", "on"]), I = /* @__PURE__ */ new Set(["false", "0", "no", "off"]), x = "[data-fideo]", y = {
+}, R = /* @__PURE__ */ new Set(["", "true", "1", "yes", "on"]), F = /* @__PURE__ */ new Set(["false", "0", "no", "off"]), I = "[data-fideo]", f = {
   play: !0,
   timeline: !0,
   currentTime: !0,
@@ -95,7 +95,7 @@ const T = {
 function c(s, t) {
   if (s == null) return t;
   const e = s.trim().toLowerCase();
-  return R.has(e) ? !0 : I.has(e) ? !1 : t;
+  return R.has(e) ? !0 : F.has(e) ? !1 : t;
 }
 function v(s, t) {
   if (s == null || s.trim() === "") return t;
@@ -131,7 +131,7 @@ function j(s, t = {}) {
 function Y(s, t) {
   if (!s) return t;
   const e = s.trim().toLowerCase();
-  return I.has(e) || e === "none" ? !1 : e === "play" || e === "pause" || e === "play-pause" ? e : R.has(e) ? "play-pause" : t;
+  return F.has(e) || e === "none" ? !1 : e === "play" || e === "pause" || e === "play-pause" ? e : R.has(e) ? "play-pause" : t;
 }
 function D(s) {
   const t = s.dataset;
@@ -156,7 +156,7 @@ function W(s, t = {}) {
     tablet: v(e.fideoBreakpointTablet, ((p = t.breakpoints) == null ? void 0 : p.tablet) ?? T.tablet)
   }, a = e.fideoProvider, r = t.provider ?? a ?? "auto", o = { ...D(s), ...t.sources }, l = r === "auto" ? j(s, o) : r, u = t.viewport ?? !1, d = c(e.fideoBackground, t.background ?? !1);
   return {
-    selector: t.selector ?? x,
+    selector: t.selector ?? I,
     provider: l,
     autoplay: d || c(e.fideoAutoplay, t.autoplay ?? !1),
     muted: d || c(e.fideoMuted, t.muted ?? !1),
@@ -184,16 +184,16 @@ function W(s, t = {}) {
 function G(s, t = {}) {
   const e = s.dataset, i = c(e.fideoShowTime, !0);
   return {
-    play: c(e.fideoShowPlay, t.play ?? y.play),
-    timeline: c(e.fideoShowTimeline, t.timeline ?? y.timeline),
+    play: c(e.fideoShowPlay, t.play ?? f.play),
+    timeline: c(e.fideoShowTimeline, t.timeline ?? f.timeline),
     currentTime: c(
       e.fideoShowCurrentTime,
-      t.currentTime ?? i ?? y.currentTime
+      t.currentTime ?? i ?? f.currentTime
     ),
-    duration: c(e.fideoShowDuration, t.duration ?? i ?? y.duration),
-    volume: c(e.fideoShowVolume, t.volume ?? y.volume),
-    settings: c(e.fideoShowSettings, t.settings ?? y.settings),
-    fullscreen: c(e.fideoShowFullscreen, t.fullscreen ?? y.fullscreen)
+    duration: c(e.fideoShowDuration, t.duration ?? i ?? f.duration),
+    volume: c(e.fideoShowVolume, t.volume ?? f.volume),
+    settings: c(e.fideoShowSettings, t.settings ?? f.settings),
+    fullscreen: c(e.fideoShowFullscreen, t.fullscreen ?? f.fullscreen)
   };
 }
 function J(s) {
@@ -252,7 +252,7 @@ function K(s, t = "fideo") {
   return s.id || (s.id = `${t}-${Math.random().toString(36).slice(2, 10)}`), s.id;
 }
 const V = /* @__PURE__ */ new Map();
-function F(s) {
+function x(s) {
   const t = V.get(s);
   if (t) return t;
   const e = new Promise((i, a) => {
@@ -280,7 +280,7 @@ class Z extends b {
       controls: 0,
       playsinline: 1
     };
-    this.options.autoplay && (a.autoplay = 1), this.options.muted && (a.muted = 1), this.options.loop && (a.loop = 1), this.options.background && (a.background = 1), this.element.src = g(C(this.element.src), a), this.ready = F("https://player.vimeo.com/api/player.js").then(() => (this.player = new window.Vimeo.Player(this.element), this.bind(), this.sync()));
+    this.options.autoplay && (a.autoplay = 1), this.options.muted && (a.muted = 1), this.options.loop && (a.loop = 1), this.options.background && (a.background = 1), this.element.src = g(C(this.element.src), a), this.ready = x("https://player.vimeo.com/api/player.js").then(() => (this.player = new window.Vimeo.Player(this.element), this.bind(), this.sync()));
   }
   async play() {
     var e;
@@ -377,7 +377,7 @@ class X extends b {
           this.video = r, this.bind(), this.sync(), a();
         }
       });
-    }), F("https://fast.wistia.com/assets/external/E-v1.js").catch(() => {
+    }), x("https://fast.wistia.com/assets/external/E-v1.js").catch(() => {
     });
   }
   async play() {
@@ -464,7 +464,7 @@ class ie extends b {
     };
     if (this.options.autoplay && (r.autoplay = 1), this.options.muted && (r.mute = 1), this.options.loop) {
       r.loop = 1;
-      const l = _(a);
+      const l = B(a);
       l && (r.playlist = l);
     }
     this.element.src = g(a, r);
@@ -510,7 +510,7 @@ class ie extends b {
   async setSource(e) {
     var o;
     await this.ready;
-    const i = M(e), a = _(i), r = this.options.loop && a ? g(i, { loop: 1, playlist: a }) : i;
+    const i = M(e), a = B(i), r = this.options.loop && a ? g(i, { loop: 1, playlist: a }) : i;
     (o = this.player) == null || o.loadVideoByUrl(r);
   }
   destroy() {
@@ -521,7 +521,7 @@ class ie extends b {
     this.sync(), e === 1 && (this.startTimer(), this.dispatchEvent(new CustomEvent("play", { detail: this.getState() }))), e === 2 && (this.stopTimer(), this.dispatchEvent(new CustomEvent("pause", { detail: this.getState() }))), e === 0 && (this.stopTimer(), this.dispatchEvent(new CustomEvent("ended", { detail: this.getState() })));
   }
   sync() {
-    var a, r, o, l, u, d, m, p, S, L;
+    var a, r, o, l, u, d, m, p, L, S;
     if (!this.player) return;
     const e = ((r = (a = this.player).getDuration) == null ? void 0 : r.call(a)) || 0, i = this.state.paused;
     this.state = {
@@ -530,7 +530,7 @@ class ie extends b {
       volume: (((d = (u = this.player).getVolume) == null ? void 0 : d.call(u)) ?? 100) / 100,
       muted: ((p = (m = this.player).isMuted) == null ? void 0 : p.call(m)) ?? !1,
       paused: i,
-      playbackRate: ((L = (S = this.player).getPlaybackRate) == null ? void 0 : L.call(S)) || 1,
+      playbackRate: ((S = (L = this.player).getPlaybackRate) == null ? void 0 : S.call(L)) || 1,
       buffered: 0
     };
   }
@@ -555,7 +555,7 @@ function se() {
 function ae(s) {
   return Math.min(1, Math.max(0, s));
 }
-function _(s) {
+function B(s) {
   if (!s) return;
   const e = new URL(s, window.location.href).pathname.split("/").filter(Boolean);
   return e[0] === "embed" ? e[1] : void 0;
@@ -713,7 +713,11 @@ class le {
     n(this, "activityTimer");
     n(this, "resizeObserver");
     n(this, "posterImage");
-    this.element = t, this.options = e, this.wrapper = this.wrapElement(t, e), this.configureElement(), this.adapter = re(e.provider, t, e), this.applyResponsiveMedia(), e.controls && (this.controls = new oe(this.adapter, this.wrapper, e)), this.bindAdapterEvents(), this.bindClickToToggle(), this.bindResponsiveMedia(), this.bindBackgroundCover(), this.bindViewportPlayback(), this.adapter.setVolume(e.volume), this.adapter.setMuted(e.muted), e.autoplay && this.play().catch(() => {
+    n(this, "handleFullscreenChange", () => {
+      const t = document.fullscreenElement === this.wrapper;
+      this.wrapper.classList.toggle("is-fullscreen", t), this.options.background && this.applyBackgroundCover();
+    });
+    this.element = t, this.options = e, this.wrapper = this.wrapElement(t, e), this.configureElement(), this.adapter = re(e.provider, t, e), this.applyResponsiveMedia(), e.controls && (this.controls = new oe(this.adapter, this.wrapper, e)), this.bindAdapterEvents(), this.bindClickToToggle(), this.bindResponsiveMedia(), this.bindBackgroundCover(), this.bindViewportPlayback(), document.addEventListener("fullscreenchange", this.handleFullscreenChange), this.adapter.setVolume(e.volume), this.adapter.setMuted(e.muted), e.autoplay && this.play().catch(() => {
     });
   }
   play() {
@@ -724,7 +728,7 @@ class le {
   }
   destroy() {
     var t, e, i, a;
-    (t = this.observer) == null || t.disconnect(), (e = this.resizeObserver) == null || e.disconnect(), this.resizeController.abort(), (i = this.controls) == null || i.destroy(), this.adapter.destroy(), this.activityTimer && window.clearTimeout(this.activityTimer), this.wrapper.classList.remove("is-ready"), this.wrapper.classList.remove("has-poster", "is-poster-visible"), this.element.removeAttribute("data-fideo-ready"), (a = this.posterImage) == null || a.remove();
+    (t = this.observer) == null || t.disconnect(), (e = this.resizeObserver) == null || e.disconnect(), this.resizeController.abort(), (i = this.controls) == null || i.destroy(), this.adapter.destroy(), document.removeEventListener("fullscreenchange", this.handleFullscreenChange), this.activityTimer && window.clearTimeout(this.activityTimer), this.wrapper.classList.remove("is-ready"), this.wrapper.classList.remove("has-poster", "is-poster-visible"), this.element.removeAttribute("data-fideo-ready"), (a = this.posterImage) == null || a.remove();
   }
   wrapElement(t, e) {
     var a;
@@ -814,12 +818,16 @@ class le {
     this.options.background && (this.applyBackgroundCover(), "ResizeObserver" in window && (this.resizeObserver = new ResizeObserver(() => this.applyBackgroundCover()), this.resizeObserver.observe(this.wrapper)));
   }
   applyBackgroundCover() {
+    if (document.fullscreenElement === this.wrapper) {
+      this.element.style.width = "", this.element.style.height = "", this.element.style.left = "", this.element.style.top = "";
+      return;
+    }
     if (!this.options.background || this.element instanceof HTMLVideoElement) return;
-    const t = this.wrapper.clientWidth, e = this.wrapper.clientHeight;
-    if (!t || !e) return;
-    const i = t / e, a = this.options.backgroundAspectRatio;
-    let r = t, o = e;
-    i > a ? o = t / a : r = e * a, this.element.style.width = `${r}px`, this.element.style.height = `${o}px`, this.element.style.left = `${(t - r) / 2}px`, this.element.style.top = `${(e - o) / 2}px`;
+    const e = this.wrapper.clientWidth, i = this.wrapper.clientHeight;
+    if (!e || !i) return;
+    const a = e / i, r = this.options.backgroundAspectRatio;
+    let o = e, l = i;
+    a > r ? l = e / r : o = i * r, this.element.style.width = `${o}px`, this.element.style.height = `${l}px`, this.element.style.left = `${(e - o) / 2}px`, this.element.style.top = `${(i - l) / 2}px`;
   }
   applyPosterOverlay(t) {
     var i;
@@ -847,11 +855,11 @@ function de(s, t) {
   );
   return t.forEach((i) => e.add(i)), Array.from(e).join("; ");
 }
-const B = /* @__PURE__ */ new WeakMap();
+const _ = /* @__PURE__ */ new WeakMap();
 class ce {
   constructor(t, e = {}) {
     n(this, "player");
-    this.player = f(A(t), e);
+    this.player = y(A(t), e);
   }
   get element() {
     return this.player.element;
@@ -875,16 +883,16 @@ class ce {
     return E(t);
   }
   static mount(t, e = {}) {
-    return f(t, e);
+    return y(t, e);
   }
 }
 function he(s, t = {}) {
-  return f(A(s), t);
+  return y(A(s), t);
 }
 function E(s = {}) {
-  const t = s.selector ?? x, i = Array.from(document.querySelectorAll(t)).filter(
+  const t = s.selector ?? I, i = Array.from(document.querySelectorAll(t)).filter(
     (a) => a instanceof HTMLVideoElement || a instanceof HTMLIFrameElement
-  ).map((a) => f(a, s));
+  ).map((a) => y(a, s));
   return {
     players: i,
     destroy() {
@@ -892,11 +900,11 @@ function E(s = {}) {
     }
   };
 }
-function f(s, t = {}) {
-  const e = B.get(s);
+function y(s, t = {}) {
+  const e = _.get(s);
   if (e) return e;
   const i = W(s, t), a = new le(s, i);
-  return B.set(s, a), a;
+  return _.set(s, a), a;
 }
 function A(s) {
   const t = typeof s == "string" ? document.querySelector(s) : s;
@@ -904,13 +912,13 @@ function A(s) {
     return t;
   throw new Error("Fideo target must resolve to a <video> or <iframe> element.");
 }
-typeof window < "u" && (Object.assign(window, { Fideo: ce, createFideo: he, initFideo: E, mountFideo: f }), document.addEventListener("DOMContentLoaded", () => {
+typeof window < "u" && (Object.assign(window, { Fideo: ce, createFideo: he, initFideo: E, mountFideo: y }), document.addEventListener("DOMContentLoaded", () => {
   E();
 }));
 export {
   ce as Fideo,
   he as createFideo,
   E as initFideo,
-  f as mountFideo
+  y as mountFideo
 };
 //# sourceMappingURL=fideo.js.map

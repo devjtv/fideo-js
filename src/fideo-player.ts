@@ -15,6 +15,13 @@ export class FideoPlayer implements FideoPlayerInstance {
   private activityTimer?: number;
   private resizeObserver?: ResizeObserver;
   private posterImage?: HTMLImageElement;
+  private handleFullscreenChange = () => {
+    const isFullscreen = document.fullscreenElement === this.wrapper;
+    this.wrapper.classList.toggle('is-fullscreen', isFullscreen);
+    if (this.options.background) {
+      this.applyBackgroundCover();
+    }
+  };
 
   constructor(element: HTMLVideoElement | HTMLIFrameElement, options: FideoResolvedOptions) {
     this.element = element;
@@ -30,6 +37,7 @@ export class FideoPlayer implements FideoPlayerInstance {
     this.bindResponsiveMedia();
     this.bindBackgroundCover();
     this.bindViewportPlayback();
+    document.addEventListener('fullscreenchange', this.handleFullscreenChange);
 
     this.adapter.setVolume(options.volume);
     this.adapter.setMuted(options.muted);
@@ -53,6 +61,7 @@ export class FideoPlayer implements FideoPlayerInstance {
     this.resizeController.abort();
     this.controls?.destroy();
     this.adapter.destroy();
+    document.removeEventListener('fullscreenchange', this.handleFullscreenChange);
     if (this.activityTimer) window.clearTimeout(this.activityTimer);
     this.wrapper.classList.remove('is-ready');
     this.wrapper.classList.remove('has-poster', 'is-poster-visible');
@@ -222,6 +231,14 @@ export class FideoPlayer implements FideoPlayerInstance {
   }
 
   private applyBackgroundCover(): void {
+    const isFullscreen = document.fullscreenElement === this.wrapper;
+    if (isFullscreen) {
+      this.element.style.width = '';
+      this.element.style.height = '';
+      this.element.style.left = '';
+      this.element.style.top = '';
+      return;
+    }
     if (!this.options.background || this.element instanceof HTMLVideoElement) return;
 
     const width = this.wrapper.clientWidth;
