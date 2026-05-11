@@ -89,7 +89,7 @@ function $(s) {
 const x = {
   mobile: 767,
   tablet: 1024
-}, V = /* @__PURE__ */ new Set(["", "true", "1", "yes", "on"]), B = /* @__PURE__ */ new Set(["false", "0", "no", "off"]), F = "[data-fideo]", f = {
+}, V = /* @__PURE__ */ new Set(["", "true", "1", "yes", "on"]), B = /* @__PURE__ */ new Set(["false", "0", "no", "off"]), I = "[data-fideo]", f = {
   play: !0,
   timeline: !0,
   currentTime: !0,
@@ -162,7 +162,7 @@ function q(s, t = {}) {
     tablet: b(e.fideoBreakpointTablet, ((m = t.breakpoints) == null ? void 0 : m.tablet) ?? x.tablet)
   }, r = e.fideoProvider, a = t.provider ?? r ?? "auto", n = { ...Y(s), ...t.sources }, d = a === "auto" ? G(s, n) : a, h = t.viewport ?? !1, c = l(e.fideoBackground, t.background ?? !1);
   return {
-    selector: t.selector ?? F,
+    selector: t.selector ?? I,
     provider: d,
     autoplay: c || l(e.fideoAutoplay, t.autoplay ?? !1),
     muted: c || l(e.fideoMuted, t.muted ?? !1),
@@ -259,7 +259,7 @@ function Z(s, t = "fideo") {
   return s.id || (s.id = `${t}-${Math.random().toString(36).slice(2, 10)}`), s.id;
 }
 const M = /* @__PURE__ */ new Map();
-function I(s) {
+function F(s) {
   const t = M.get(s);
   if (t) return t;
   const e = new Promise((i, r) => {
@@ -287,7 +287,7 @@ class Q extends _ {
       controls: 0,
       playsinline: 1
     };
-    this.options.autoplay && (r.autoplay = 1), this.options.muted && (r.muted = 1), this.options.loop && (r.loop = 1), this.options.background && (r.background = 1), this.element.src = k(T(this.element.src), r), this.ready = I("https://player.vimeo.com/api/player.js").then(() => (this.player = new window.Vimeo.Player(this.element), this.bind(), this.sync()));
+    this.options.autoplay && (r.autoplay = 1), this.options.muted && (r.muted = 1), this.options.loop && (r.loop = 1), this.options.background && (r.background = 1), this.element.src = k(T(this.element.src), r), this.ready = F("https://player.vimeo.com/api/player.js").then(() => (this.player = new window.Vimeo.Player(this.element), this.bind(), this.sync()));
   }
   async play() {
     var e;
@@ -384,7 +384,7 @@ class ee extends _ {
     const n = new Promise((d) => {
       a.addEventListener("load", () => d());
     });
-    document.head.appendChild(a), this.ready = Promise.all([I("https://fast.wistia.com/player.js"), n]).then(
+    document.head.appendChild(a), this.ready = Promise.all([F("https://fast.wistia.com/player.js"), n]).then(
       () => new Promise((d) => {
         r.addEventListener("api-ready", () => {
           this.bind(), this.sync(), d();
@@ -924,7 +924,7 @@ function pe(s, t = {}) {
   return g(R(s), t);
 }
 function L(s = {}) {
-  const t = s.selector ?? F, i = Array.from(document.querySelectorAll(t)).filter(
+  const t = s.selector ?? I, i = Array.from(document.querySelectorAll(t)).filter(
     (r) => r instanceof HTMLVideoElement || r instanceof HTMLIFrameElement
   ).map((r) => g(r, s));
   return {
@@ -947,7 +947,8 @@ function R(s) {
   throw new Error("Fideo target must resolve to a <video> or <iframe> element.");
 }
 typeof window < "u" && (Object.assign(window, { Fideo: ue, createFideo: pe, initFideo: L, mountFideo: g }), document.addEventListener("DOMContentLoaded", () => {
-  L();
+  const s = window.__fideoAutoInit || {};
+  L(s);
 }));
 export {
   ue as Fideo,

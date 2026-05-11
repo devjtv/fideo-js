@@ -5,13 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fideo JS Demo</title>
     <link rel="stylesheet" href="../dist/styles.css" />
+    <script>
+      window.__fideoAutoInit = { disabledProviders: ['youtube'] };
+    </script>
     <script src="../dist/fideo.global.js"></script>
     <script>
-      const _originalInitFideo = window.initFideo;
-      window.initFideo = function (opts) {
-        return _originalInitFideo({ disabledProviders: ['youtube'], ...(opts || {}) });
-      };
-
       document.addEventListener('DOMContentLoaded', () => {
         new Fideo('#object-player-playing', {
           muted: true,

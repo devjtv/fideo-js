@@ -111,6 +111,7 @@ export type {
 if (typeof window !== 'undefined') {
   Object.assign(window, { Fideo, createFideo, initFideo, mountFideo });
   document.addEventListener('DOMContentLoaded', () => {
-    initFideo();
+    const opts = (window as any).__fideoAutoInit || {};
+    initFideo(opts);
   });
 }
