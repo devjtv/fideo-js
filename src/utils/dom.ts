@@ -153,6 +153,7 @@ export function resolveOptions(
       ...readCssVars(element),
       ...(options.cssVars ?? {}),
     },
+    disabledProviders: options.disabledProviders ?? [],
   };
 }
 

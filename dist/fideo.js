@@ -89,7 +89,7 @@ function $(s) {
 const x = {
   mobile: 767,
   tablet: 1024
-}, V = /* @__PURE__ */ new Set(["", "true", "1", "yes", "on"]), B = /* @__PURE__ */ new Set(["false", "0", "no", "off"]), I = "[data-fideo]", f = {
+}, V = /* @__PURE__ */ new Set(["", "true", "1", "yes", "on"]), B = /* @__PURE__ */ new Set(["false", "0", "no", "off"]), F = "[data-fideo]", f = {
   play: !0,
   timeline: !0,
   currentTime: !0,
@@ -162,7 +162,7 @@ function q(s, t = {}) {
     tablet: b(e.fideoBreakpointTablet, ((m = t.breakpoints) == null ? void 0 : m.tablet) ?? x.tablet)
   }, r = e.fideoProvider, a = t.provider ?? r ?? "auto", n = { ...Y(s), ...t.sources }, d = a === "auto" ? G(s, n) : a, h = t.viewport ?? !1, c = l(e.fideoBackground, t.background ?? !1);
   return {
-    selector: t.selector ?? I,
+    selector: t.selector ?? F,
     provider: d,
     autoplay: c || l(e.fideoAutoplay, t.autoplay ?? !1),
     muted: c || l(e.fideoMuted, t.muted ?? !1),
@@ -184,7 +184,8 @@ function q(s, t = {}) {
     cssVars: {
       ...K(s),
       ...t.cssVars ?? {}
-    }
+    },
+    disabledProviders: t.disabledProviders ?? []
   };
 }
 function J(s, t = {}) {
@@ -225,7 +226,7 @@ function k(s, t) {
     e.searchParams.set(i, String(r));
   return e.toString();
 }
-function T(s) {
+function P(s) {
   if (!s) return s;
   const t = new URL(s, window.location.href), e = t.hostname.replace(/^www\./, "").toLowerCase();
   let i;
@@ -242,7 +243,7 @@ function T(s) {
     n !== "v" && r.searchParams.set(n, a);
   }), r.toString();
 }
-function P(s) {
+function T(s) {
   if (!s) return s;
   const t = new URL(s, window.location.href), e = t.hostname.replace(/^www\./, "").toLowerCase(), i = t.pathname.split("/").filter(Boolean);
   if (e === "player.vimeo.com" || e !== "vimeo.com" || !i[0])
@@ -258,7 +259,7 @@ function Z(s, t = "fideo") {
   return s.id || (s.id = `${t}-${Math.random().toString(36).slice(2, 10)}`), s.id;
 }
 const M = /* @__PURE__ */ new Map();
-function R(s) {
+function I(s) {
   const t = M.get(s);
   if (t) return t;
   const e = new Promise((i, r) => {
@@ -286,7 +287,7 @@ class Q extends _ {
       controls: 0,
       playsinline: 1
     };
-    this.options.autoplay && (r.autoplay = 1), this.options.muted && (r.muted = 1), this.options.loop && (r.loop = 1), this.options.background && (r.background = 1), this.element.src = k(P(this.element.src), r), this.ready = R("https://player.vimeo.com/api/player.js").then(() => (this.player = new window.Vimeo.Player(this.element), this.bind(), this.sync()));
+    this.options.autoplay && (r.autoplay = 1), this.options.muted && (r.muted = 1), this.options.loop && (r.loop = 1), this.options.background && (r.background = 1), this.element.src = k(T(this.element.src), r), this.ready = I("https://player.vimeo.com/api/player.js").then(() => (this.player = new window.Vimeo.Player(this.element), this.bind(), this.sync()));
   }
   async play() {
     var e;
@@ -315,7 +316,7 @@ class Q extends _ {
   }
   async setSource(e) {
     var i;
-    await this.ready, await ((i = this.player) == null ? void 0 : i.loadVideo({ url: k(P(e), this.providerParams()) })), await this.sync();
+    await this.ready, await ((i = this.player) == null ? void 0 : i.loadVideo({ url: k(T(e), this.providerParams()) })), await this.sync();
   }
   destroy() {
     var e;
@@ -383,7 +384,7 @@ class ee extends _ {
     const n = new Promise((d) => {
       a.addEventListener("load", () => d());
     });
-    document.head.appendChild(a), this.ready = Promise.all([R("https://fast.wistia.com/player.js"), n]).then(
+    document.head.appendChild(a), this.ready = Promise.all([I("https://fast.wistia.com/player.js"), n]).then(
       () => new Promise((d) => {
         r.addEventListener("api-ready", () => {
           this.bind(), this.sync(), d();
@@ -466,7 +467,7 @@ class ie extends _ {
     o(this, "readyResolver");
     o(this, "timer");
     this.element = e, this.options = i, this.options.muted && (this.state.muted = !0);
-    const r = T(this.element.src), a = {
+    const r = P(this.element.src), a = {
       enablejsapi: 1,
       playsinline: 1,
       controls: 0,
@@ -521,7 +522,7 @@ class ie extends _ {
   async setSource(e) {
     var n;
     await this.ready;
-    const i = T(e), r = A(i), a = this.options.loop && r ? k(i, { loop: 1, playlist: r }) : i;
+    const i = P(e), r = A(i), a = this.options.loop && r ? k(i, { loop: 1, playlist: r }) : i;
     (n = this.player) == null || n.loadVideoByUrl(a);
   }
   destroy() {
@@ -572,6 +573,8 @@ function A(s) {
   return e[0] === "embed" ? e[1] : void 0;
 }
 function ae(s, t, e) {
+  if (e.disabledProviders.includes(s))
+    throw new Error(`Fideo provider "${s}" is disabled via disabledProviders.`);
   if (s === "html5") {
     if (!(t instanceof HTMLVideoElement))
       throw new Error("Fideo html5 provider needs a <video> element.");
@@ -887,7 +890,7 @@ const z = /* @__PURE__ */ new WeakMap();
 class ue {
   constructor(t, e = {}) {
     o(this, "player");
-    this.player = g(F(t), e);
+    this.player = g(R(t), e);
   }
   get element() {
     return this.player.element;
@@ -918,10 +921,10 @@ class ue {
   }
 }
 function pe(s, t = {}) {
-  return g(F(s), t);
+  return g(R(s), t);
 }
 function L(s = {}) {
-  const t = s.selector ?? I, i = Array.from(document.querySelectorAll(t)).filter(
+  const t = s.selector ?? F, i = Array.from(document.querySelectorAll(t)).filter(
     (r) => r instanceof HTMLVideoElement || r instanceof HTMLIFrameElement
   ).map((r) => g(r, s));
   return {
@@ -937,7 +940,7 @@ function g(s, t = {}) {
   const i = q(s, t), r = new le(s, i);
   return z.set(s, r), r;
 }
-function F(s) {
+function R(s) {
   const t = typeof s == "string" ? document.querySelector(s) : s;
   if (t instanceof HTMLVideoElement || t instanceof HTMLIFrameElement)
     return t;

@@ -9,6 +9,10 @@ export function createProvider(
   element: HTMLVideoElement | HTMLIFrameElement,
   options: FideoResolvedOptions,
 ): FideoAdapter {
+  if (options.disabledProviders.includes(provider)) {
+    throw new Error(`Fideo provider "${provider}" is disabled via disabledProviders.`);
+  }
+
   if (provider === 'html5') {
     if (!(element instanceof HTMLVideoElement)) {
       throw new Error('Fideo html5 provider needs a <video> element.');

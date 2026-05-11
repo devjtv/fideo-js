@@ -63,6 +63,7 @@ export interface FideoOptions {
   icons?: FideoIcons;
   className?: string;
   cssVars?: Record<string, string>;
+  disabledProviders?: FideoProviderName[];
 }
 
 export interface FideoResolvedOptions
@@ -87,6 +88,7 @@ export interface FideoResolvedOptions
   icons: FideoIcons;
   className: string;
   cssVars: Record<string, string>;
+  disabledProviders: FideoProviderName[];
 }
 
 export interface FideoState {

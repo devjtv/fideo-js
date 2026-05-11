@@ -55,6 +55,7 @@ export interface FideoOptions {
     icons?: FideoIcons;
     className?: string;
     cssVars?: Record<string, string>;
+    disabledProviders?: FideoProviderName[];
 }
 export interface FideoResolvedOptions extends Omit<FideoOptions, 'provider' | 'breakpoints' | 'controlVisibility' | 'backgroundAspectRatio'> {
     provider: FideoProviderName;
@@ -77,6 +78,7 @@ export interface FideoResolvedOptions extends Omit<FideoOptions, 'provider' | 'b
     icons: FideoIcons;
     className: string;
     cssVars: Record<string, string>;
+    disabledProviders: FideoProviderName[];
 }
 export interface FideoState {
     currentTime: number;
