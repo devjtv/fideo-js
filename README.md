@@ -555,6 +555,27 @@ https://player.vimeo.com/video/123456789?h=5e2d1c1e6d
 
 Existing Vimeo embed URLs with `?h=` are preserved.
 
+### Opting out of provider SDKs
+
+If your page only uses certain providers, you can prevent the unused provider JavaScript SDKs from loading:
+
+```ts
+initFideo({
+  disabledProviders: ['wistia', 'vimeo'],
+});
+```
+
+Per-player:
+
+```ts
+new Fideo('#player', {
+  disabledProviders: ['wistia'],
+  sources: { desktop: '/video.mp4' },
+});
+```
+
+When a disabled provider is requested, Fideo throws an error. Supported provider names: `html5`, `youtube`, `vimeo`, `wistia`.
+
 ## Options
 
 | Option | Type | Default | Description |
@@ -579,6 +600,7 @@ Existing Vimeo embed URLs with `?h=` are preserved.
 | `icons` | `FideoIcons` | `{}` | Custom SVG icons. |
 | `className` | `string` | `''` | Additional wrapper class. |
 | `cssVars` | `Record<string, string>` | `{}` | CSS variable overrides. |
+| `disabledProviders` | `FideoProviderName[]` | `[]` | Prevent loading provider SDKs for providers you do not use. |
 
 ## Data Attributes
 
