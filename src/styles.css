@@ -371,11 +371,10 @@
 .fideo__volume-panel::after {
   position: absolute;
   right: -10px;
-  bottom: -8px;
+  bottom: -14px;
   left: -10px;
-  height: 10px;
+  height: 14px;
   content: "";
-  pointer-events: none;
 }
 
 .fideo__volume {
