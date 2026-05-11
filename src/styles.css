@@ -446,11 +446,6 @@
     left: 12px;
   }
 
-  .fideo__volume-group,
-  .fideo__settings {
-    display: none;
-  }
-
   .fideo__time,
   .fideo__time-separator {
     font-size: 11px;
