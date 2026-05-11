@@ -164,7 +164,7 @@ function q(s, t = {}) {
     playsInline: d || c(e.fideoPlaysinline ?? e.fideoPlaysInline, t.playsInline ?? !0),
     controls: c(e.fideoControls, t.controls ?? !d),
     background: d,
-    controlVisibility: G(s, t.controlVisibility),
+    controlVisibility: W(s, t.controlVisibility),
     viewport: j(e.fideoViewport, h),
     viewportThreshold: y(e.fideoViewportThreshold, t.viewportThreshold ?? 0.35),
     volume: y(e.fideoVolume, t.volume ?? 1),
@@ -176,12 +176,12 @@ function q(s, t = {}) {
     icons: t.icons ?? {},
     className: e.fideoClass || t.className || "",
     cssVars: {
-      ...W(s),
+      ...G(s),
       ...t.cssVars ?? {}
     }
   };
 }
-function G(s, t = {}) {
+function W(s, t = {}) {
   const e = s.dataset, i = c(e.fideoShowTime, !0);
   return {
     play: c(e.fideoShowPlay, t.play ?? m.play),
@@ -196,7 +196,7 @@ function G(s, t = {}) {
     fullscreen: c(e.fideoShowFullscreen, t.fullscreen ?? m.fullscreen)
   };
 }
-function W(s) {
+function G(s) {
   const t = {}, e = [
     ["--fideo-accent", s.dataset.fideoAccent],
     ["--fideo-control-bg", s.dataset.fideoControlBg],
@@ -274,7 +274,7 @@ class K extends b {
     n(this, "provider", "vimeo");
     n(this, "player");
     n(this, "ready");
-    this.element = e, this.options = i;
+    this.element = e, this.options = i, this.options.muted && (this.state.muted = !0);
     const r = {
       api: 1,
       controls: 0,
@@ -454,7 +454,7 @@ class te extends b {
     n(this, "ready");
     n(this, "readyResolver");
     n(this, "timer");
-    this.element = e, this.options = i;
+    this.element = e, this.options = i, this.options.muted && (this.state.muted = !0);
     const r = L(this.element.src), a = {
       enablejsapi: 1,
       playsinline: 1,
@@ -637,10 +637,6 @@ class ne {
     });
   }
   toggleMute() {
-    if (!this.volumeGroup.classList.contains("is-open")) {
-      this.volumeGroup.classList.add("is-open");
-      return;
-    }
     const t = this.adapter.getState();
     this.adapter.setMuted(!t.muted).catch(() => {
     });

@@ -59,6 +59,7 @@ export class YouTubeProvider extends BaseProvider {
     private options: FideoResolvedOptions,
   ) {
     super();
+    if (this.options.muted) this.state.muted = true;
     const normalizedUrl = normalizeYouTubeEmbedUrl(this.element.src);
     const params: Record<string, string | number | boolean> = {
       enablejsapi: 1,

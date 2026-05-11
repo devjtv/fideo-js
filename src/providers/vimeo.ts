@@ -39,6 +39,7 @@ export class VimeoProvider extends BaseProvider {
     private options: FideoResolvedOptions,
   ) {
     super();
+    if (this.options.muted) this.state.muted = true;
     const params: Record<string, string | number | boolean> = {
       api: 1,
       controls: 0,

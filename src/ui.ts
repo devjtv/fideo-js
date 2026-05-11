@@ -132,11 +132,6 @@ export class FideoControls {
   }
 
   private toggleMute(): void {
-    if (!this.volumeGroup.classList.contains('is-open')) {
-      this.volumeGroup.classList.add('is-open');
-      return;
-    }
-
     const state = this.adapter.getState();
     this.adapter.setMuted(!state.muted).catch(() => undefined);
   }
