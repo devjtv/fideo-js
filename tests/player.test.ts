@@ -134,6 +134,24 @@ describe('Fideo player', () => {
     expect(iframe.allow).toContain('encrypted-media');
   });
 
+  it('keeps Vimeo background autoplay paused until real playback starts', () => {
+    document.body.innerHTML = `
+      <iframe
+        data-fideo
+        data-fideo-background="true"
+        data-fideo-poster="/desktop-poster.jpg"
+        src="https://vimeo.com/76979871"
+      ></iframe>
+    `;
+
+    const iframe = document.querySelector('iframe')!;
+    const player = mountFideo(iframe);
+
+    expect(player.wrapper.classList.contains('is-paused')).toBe(true);
+    expect(player.wrapper.classList.contains('is-playing')).toBe(false);
+    expect(player.wrapper.classList.contains('is-poster-visible')).toBe(true);
+  });
+
   it('renders responsive poster overlays for iframe providers', () => {
     document.body.innerHTML = `
       <iframe

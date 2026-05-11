@@ -154,7 +154,7 @@ function q(s, t = {}) {
   const e = s.dataset, i = {
     mobile: y(e.fideoBreakpointMobile, ((p = t.breakpoints) == null ? void 0 : p.mobile) ?? M.mobile),
     tablet: y(e.fideoBreakpointTablet, ((f = t.breakpoints) == null ? void 0 : f.tablet) ?? M.tablet)
-  }, r = e.fideoProvider, a = t.provider ?? r ?? "auto", o = { ...Y(s), ...t.sources }, l = a === "auto" ? U(s, o) : a, h = t.viewport ?? !1, d = c(e.fideoBackground, t.background ?? !1);
+  }, r = e.fideoProvider, a = t.provider ?? r ?? "auto", o = { ...Y(s), ...t.sources }, l = a === "auto" ? U(s, o) : a, u = t.viewport ?? !1, d = c(e.fideoBackground, t.background ?? !1);
   return {
     selector: t.selector ?? I,
     provider: l,
@@ -165,7 +165,7 @@ function q(s, t = {}) {
     controls: d ? !1 : c(e.fideoControls, t.controls ?? !0),
     background: d,
     controlVisibility: G(s, t.controlVisibility),
-    viewport: j(e.fideoViewport, h),
+    viewport: j(e.fideoViewport, u),
     viewportThreshold: y(e.fideoViewportThreshold, t.viewportThreshold ?? 0.35),
     volume: y(e.fideoVolume, t.volume ?? 1),
     playbackRates: O(e.fideoPlaybackRates, t.playbackRates ?? [0.5, 1, 1.25, 1.5, 2]),
@@ -242,9 +242,9 @@ function P(s) {
   if (e === "player.vimeo.com" || e !== "vimeo.com" || !i[0])
     return t.toString();
   const [r, a] = i, o = new URL(`https://player.vimeo.com/video/${r}`);
-  return t.searchParams.forEach((l, h) => o.searchParams.set(h, l)), a && !o.searchParams.has("h") && o.searchParams.set("h", a), o.toString();
+  return t.searchParams.forEach((l, u) => o.searchParams.set(u, l)), a && !o.searchParams.has("h") && o.searchParams.set("h", a), o.toString();
 }
-function u(s, t) {
+function h(s, t) {
   const e = document.createElement(s);
   return t && (e.className = t), e;
 }
@@ -283,14 +283,14 @@ class K extends b {
     this.options.autoplay && (r.autoplay = 1), this.options.muted && (r.muted = 1), this.options.loop && (r.loop = 1), this.options.background && (r.background = 1), this.element.src = g(P(this.element.src), r), this.ready = x("https://player.vimeo.com/api/player.js").then(() => (this.player = new window.Vimeo.Player(this.element), this.bind(), this.sync()));
   }
   async play() {
-    this.postMessage("play"), this.update({ paused: !1 }, "play"), this.ready.then(() => {
+    this.postMessage("play"), this.ready.then(() => {
       var e;
       return (e = this.player) == null ? void 0 : e.play();
     }).catch(() => {
     });
   }
   async pause() {
-    this.postMessage("pause"), this.update({ paused: !0 }, "pause"), this.ready.then(() => {
+    this.postMessage("pause"), this.ready.then(() => {
       var e;
       return (e = this.player) == null ? void 0 : e.pause();
     }).catch(() => {
@@ -527,13 +527,13 @@ class te extends b {
     this.sync(), e === 1 && (this.startTimer(), this.dispatchEvent(new CustomEvent("play", { detail: this.getState() }))), e === 2 && (this.stopTimer(), this.dispatchEvent(new CustomEvent("pause", { detail: this.getState() }))), e === 0 && (this.stopTimer(), this.dispatchEvent(new CustomEvent("ended", { detail: this.getState() }))), this.dispatchEvent(new CustomEvent("change", { detail: this.getState() }));
   }
   sync() {
-    var i, r, a, o, l, h, d, p, f, T;
+    var i, r, a, o, l, u, d, p, f, T;
     if (!this.player) return;
     const e = ((r = (i = this.player).getDuration) == null ? void 0 : r.call(i)) || 0;
     this.state = {
       currentTime: ((o = (a = this.player).getCurrentTime) == null ? void 0 : o.call(a)) || 0,
       duration: e,
-      volume: (((h = (l = this.player).getVolume) == null ? void 0 : h.call(l)) ?? 100) / 100,
+      volume: (((u = (l = this.player).getVolume) == null ? void 0 : u.call(l)) ?? 100) / 100,
       muted: ((p = (d = this.player).isMuted) == null ? void 0 : p.call(d)) ?? !1,
       paused: this.state.paused,
       playbackRate: ((T = (f = this.player).getPlaybackRate) == null ? void 0 : T.call(f)) || 1,
@@ -602,17 +602,17 @@ class ne {
     n(this, "seeking", !1);
     n(this, "icons");
     n(this, "handleFullscreenChange", () => this.render(this.adapter.getState()));
-    this.adapter = t, this.wrapper = e, this.icons = { ...ae, ...i.icons }, this.element = u("div", "fideo__controls"), this.playButton = this.button("fideo__button fideo__play", "Play", this.icons.play), this.muteButton = this.button("fideo__button fideo__mute", "Mute", this.icons.volume), this.track = this.range("fideo__track", 0, 1e3, 1), this.volume = this.range("fideo__volume", 0, 1, 0.01), this.currentTime = u("span", "fideo__time"), this.duration = u("span", "fideo__time"), this.speedMenu = this.createSpeedMenu(i.playbackRates), this.fullscreenButton = this.button("fideo__button", "Fullscreen", this.icons.fullscreen);
-    const r = this.button("fideo__button fideo__settings-toggle", "Settings", this.icons.settings), a = u("div", "fideo__timeline");
+    this.adapter = t, this.wrapper = e, this.icons = { ...ae, ...i.icons }, this.element = h("div", "fideo__controls"), this.playButton = this.button("fideo__button fideo__play", "Play", this.icons.play), this.muteButton = this.button("fideo__button fideo__mute", "Mute", this.icons.volume), this.track = this.range("fideo__track", 0, 1e3, 1), this.volume = this.range("fideo__volume", 0, 1, 0.01), this.currentTime = h("span", "fideo__time"), this.duration = h("span", "fideo__time"), this.speedMenu = this.createSpeedMenu(i.playbackRates), this.fullscreenButton = this.button("fideo__button", "Fullscreen", this.icons.fullscreen);
+    const r = this.button("fideo__button fideo__settings-toggle", "Settings", this.icons.settings), a = h("div", "fideo__timeline");
     a.append(this.track);
-    const o = u("span", "fideo__time-group"), l = u("span", "fideo__time-separator");
-    l.textContent = "/", o.append(this.currentTime, l, this.duration), this.volumeGroup = u("div", "fideo__volume-group"), this.volumePanel = u("div", "fideo__volume-panel"), this.volumePanel.append(this.volume), this.volumeGroup.append(this.muteButton, this.volumePanel);
-    const h = u("div", "fideo__settings");
-    h.append(r, this.speedMenu);
-    const d = u("div", "fideo__control-row"), p = u("span", "fideo__spacer");
-    i.controlVisibility.play && d.append(this.playButton), (i.controlVisibility.currentTime || i.controlVisibility.duration) && d.append(o), d.append(p), i.controlVisibility.volume && d.append(this.volumeGroup), i.controlVisibility.settings && d.append(h), i.controlVisibility.fullscreen && d.append(this.fullscreenButton), this.element.append(d), i.controlVisibility.timeline && this.element.append(a), this.wrapper.append(this.element), i.controlVisibility.currentTime || this.currentTime.remove(), i.controlVisibility.duration || this.duration.remove(), (!i.controlVisibility.currentTime || !i.controlVisibility.duration) && l.remove(), this.playButton.addEventListener("click", () => this.togglePlay()), this.muteButton.addEventListener("click", () => this.toggleMute()), this.volume.addEventListener("input", () => this.changeVolume()), this.track.addEventListener("pointerdown", () => {
+    const o = h("span", "fideo__time-group"), l = h("span", "fideo__time-separator");
+    l.textContent = "/", o.append(this.currentTime, l, this.duration), this.volumeGroup = h("div", "fideo__volume-group"), this.volumePanel = h("div", "fideo__volume-panel"), this.volumePanel.append(this.volume), this.volumeGroup.append(this.muteButton, this.volumePanel);
+    const u = h("div", "fideo__settings");
+    u.append(r, this.speedMenu);
+    const d = h("div", "fideo__control-row"), p = h("span", "fideo__spacer");
+    i.controlVisibility.play && d.append(this.playButton), (i.controlVisibility.currentTime || i.controlVisibility.duration) && d.append(o), d.append(p), i.controlVisibility.volume && d.append(this.volumeGroup), i.controlVisibility.settings && d.append(u), i.controlVisibility.fullscreen && d.append(this.fullscreenButton), this.element.append(d), i.controlVisibility.timeline && this.element.append(a), this.wrapper.append(this.element), i.controlVisibility.currentTime || this.currentTime.remove(), i.controlVisibility.duration || this.duration.remove(), (!i.controlVisibility.currentTime || !i.controlVisibility.duration) && l.remove(), this.playButton.addEventListener("click", () => this.togglePlay()), this.muteButton.addEventListener("click", () => this.toggleMute()), this.volume.addEventListener("input", () => this.changeVolume()), this.track.addEventListener("pointerdown", () => {
       this.seeking = !0;
-    }), this.track.addEventListener("input", () => this.previewSeek()), this.track.addEventListener("change", () => this.commitSeek()), r.addEventListener("click", () => h.classList.toggle("is-open")), this.fullscreenButton.addEventListener("click", () => this.toggleFullscreen()), document.addEventListener("fullscreenchange", this.handleFullscreenChange), this.adapter.addEventListener("change", () => this.render(this.adapter.getState())), this.render(this.adapter.getState());
+    }), this.track.addEventListener("input", () => this.previewSeek()), this.track.addEventListener("change", () => this.commitSeek()), r.addEventListener("click", () => u.classList.toggle("is-open")), this.fullscreenButton.addEventListener("click", () => this.toggleFullscreen()), document.addEventListener("fullscreenchange", this.handleFullscreenChange), this.adapter.addEventListener("change", () => this.render(this.adapter.getState())), this.render(this.adapter.getState());
   }
   destroy() {
     document.removeEventListener("fullscreenchange", this.handleFullscreenChange), this.element.remove();
@@ -626,7 +626,7 @@ class ne {
     return a.className = t, a.type = "range", a.min = String(e), a.max = String(i), a.step = String(r), a;
   }
   createSpeedMenu(t) {
-    const e = u("div", "fideo__settings-menu");
+    const e = h("div", "fideo__settings-menu");
     for (const i of t) {
       const r = this.button("fideo__speed", `${i}x`, "");
       r.textContent = `${i}x`, r.addEventListener("click", () => {

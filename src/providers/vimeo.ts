@@ -59,13 +59,11 @@ export class VimeoProvider extends BaseProvider {
 
   async play(): Promise<void> {
     this.postMessage('play');
-    this.update({ paused: false }, 'play');
     this.ready.then(() => this.player?.play()).catch(() => undefined);
   }
 
   async pause(): Promise<void> {
     this.postMessage('pause');
-    this.update({ paused: true }, 'pause');
     this.ready.then(() => this.player?.pause()).catch(() => undefined);
   }
 
