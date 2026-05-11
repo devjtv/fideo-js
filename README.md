@@ -144,7 +144,20 @@ Use the same pattern for iframe providers:
 ></iframe>
 ```
 
-Fideo will normalize that YouTube URL to a no-cookie embed URL and add the provider API parameters it needs. When poster images are configured, Fideo renders them as a visual cover while the player is paused or still getting ready, then fades them away when playback starts.
+Fideo will normalize that YouTube URL to a no-cookie embed URL and add the provider API parameters it needs. Wistia embeds are initialized from a `<wistia-player>` custom element:
+
+```html
+<iframe
+  data-fideo
+  data-fideo-muted="true"
+  data-fideo-autoplay="true"
+  data-fideo-poster="/posters/wistia-poster.jpg"
+  src="https://fast.wistia.com/embed/medias/358edhd4og"
+  title="Wistia video"
+></iframe>
+```
+
+When poster images are configured, Fideo renders them as a visual cover while the player is paused or still getting ready, then fades them away when playback starts.
 
 ## JavaScript Initialization
 
@@ -251,6 +264,20 @@ You do not need to set this for normal `16:9` YouTube or Vimeo videos because `1
     data-fideo-background-aspect-ratio="16:9"
     src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
     title="YouTube background video"
+  ></iframe>
+</div>
+```
+
+### Wistia Background
+
+```html
+<div class="video-tile">
+  <iframe
+    data-fideo
+    data-fideo-background="true"
+    data-fideo-background-aspect-ratio="16:9"
+    src="https://fast.wistia.com/embed/medias/358edhd4og"
+    title="Wistia background video"
   ></iframe>
 </div>
 ```
@@ -489,7 +516,7 @@ Supported icon keys:
 | HTML5 / MP4 | `<video>` | Supports local files and any browser-supported media format. |
 | YouTube | `<iframe>` | Normalizes watch, shorts, youtu.be, and embed URLs to `youtube-nocookie.com/embed/...`. |
 | Vimeo | `<iframe>` | Supports public, private, and unlisted URLs, including `vimeo.com/[id]/[hash]`. |
-| Wistia | `<iframe>` | Uses the Wistia external player API. |
+| Wistia | `<iframe>` | Uses the Wistia Aurora player. The `<wistia-player>` element is created automatically from the iframe `src`. Supports autoplay, muted, loop, background cover, and responsive posters. |
 
 Provider detection is automatic for normal provider URLs in `src`, `data-fideo-src`, responsive source attributes, and JavaScript `sources`. Use `provider` or `data-fideo-provider` only when a URL is unusual enough that Fideo cannot infer it.
 
