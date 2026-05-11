@@ -891,6 +891,9 @@ class he {
   get options() {
     return this.player.options;
   }
+  get adapter() {
+    return this.player.adapter;
+  }
   play() {
     return this.player.play();
   }

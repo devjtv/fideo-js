@@ -7,7 +7,7 @@ export class FideoPlayer implements FideoPlayerInstance {
   readonly element: HTMLVideoElement | HTMLIFrameElement;
   readonly wrapper: HTMLElement;
   readonly options: FideoResolvedOptions;
-  private adapter: FideoAdapter;
+  readonly adapter: FideoAdapter;
   private controls?: FideoControls;
   private observer?: IntersectionObserver;
   private currentSource?: string;

@@ -1,9 +1,9 @@
-import type { FideoPlayerInstance, FideoResolvedOptions } from './types';
+import type { FideoAdapter, FideoPlayerInstance, FideoResolvedOptions } from './types';
 export declare class FideoPlayer implements FideoPlayerInstance {
     readonly element: HTMLVideoElement | HTMLIFrameElement;
     readonly wrapper: HTMLElement;
     readonly options: FideoResolvedOptions;
-    private adapter;
+    readonly adapter: FideoAdapter;
     private controls?;
     private observer?;
     private currentSource?;

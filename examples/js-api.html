@@ -37,6 +37,13 @@
         margin-bottom: 28px;
       }
 
+      .demo-player video {
+        display: block;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        background: #0b100d;
+      }
+
       .controls-card {
         display: grid;
         gap: 16px;
@@ -59,6 +66,7 @@
         color: #b8c4bc;
         text-transform: uppercase;
         letter-spacing: 0.04em;
+        min-width: 80px;
       }
 
       button {
@@ -127,12 +135,7 @@
       </p>
 
       <div class="demo-player">
-        <video
-          id="api-player"
-          data-fideo
-          data-fideo-src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
-          data-fideo-poster="https://interactive-examples.mdn.mozilla.net/media/examples/flower.jpg"
-        ></video>
+        <video id="api-player"></video>
       </div>
 
       <div class="controls-card">
@@ -174,10 +177,7 @@
     <script>
       const video = document.querySelector('#api-player');
 
-      // Initialise the player via the JS API instead of data attributes
       const player = new Fideo('#api-player', {
-        muted: true,
-        loop: true,
         controls: true,
         sources: {
           desktop: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
@@ -200,7 +200,6 @@
         logEl.prepend(entry);
       }
 
-      // Listen to every Fideo event fired on the original element
       const events = ['fideo:play', 'fideo:pause', 'fideo:ended', 'fideo:timeupdate', 'fideo:volumechange', 'fideo:change'];
       for (const eventName of events) {
         video.addEventListener(eventName, (e) => logEvent(eventName, e.detail));
@@ -210,15 +209,16 @@
         player.adapter.seek(seconds).catch(() => undefined);
       }
 
-      function toggleMute() {
+      async function toggleMute() {
         const state = player.adapter.getState();
-        player.adapter.setMuted(!state.muted).catch(() => undefined);
+        await player.adapter.setMuted(!state.muted).catch(() => undefined);
       }
 
-      function setVolume(value) {
+      async function setVolume(value) {
         const v = parseFloat(value);
-        player.adapter.setVolume(v).catch(() => undefined);
-        player.adapter.setMuted(v === 0).catch(() => undefined);
+        await player.adapter.setVolume(v).catch(() => undefined);
+        if (v > 0) await player.adapter.setMuted(false).catch(() => undefined);
+        if (v === 0) await player.adapter.setMuted(true).catch(() => undefined);
         document.getElementById('volume-value').textContent = `${Math.round(v * 100)}%`;
       }
 

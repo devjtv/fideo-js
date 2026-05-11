@@ -109,6 +109,7 @@ export interface FideoPlayerInstance {
     readonly element: HTMLVideoElement | HTMLIFrameElement;
     readonly wrapper: HTMLElement;
     readonly options: FideoResolvedOptions;
+    readonly adapter: FideoAdapter;
     play(): Promise<void>;
     pause(): Promise<void>;
     destroy(): void;

@@ -1,11 +1,12 @@
 import './styles.css';
-import type { FideoInitResult, FideoOptions, FideoPlayerInstance, FideoResolvedOptions, FideoTarget } from './types';
+import type { FideoAdapter, FideoInitResult, FideoOptions, FideoPlayerInstance, FideoResolvedOptions, FideoTarget } from './types';
 export declare class Fideo implements FideoPlayerInstance {
     private player;
     constructor(target: FideoTarget, options?: FideoOptions);
     get element(): HTMLVideoElement | HTMLIFrameElement;
     get wrapper(): HTMLElement;
     get options(): FideoResolvedOptions;
+    get adapter(): FideoAdapter;
     play(): Promise<void>;
     pause(): Promise<void>;
     destroy(): void;
