@@ -14,9 +14,19 @@ export class FideoControls {
   private speedMenu: HTMLElement;
   private volumeGroup: HTMLElement;
   private volumePanel: HTMLElement;
+  private settingsGroup: HTMLElement;
   private seeking = false;
   private icons: Required<NonNullable<FideoResolvedOptions['icons']>>;
   private handleFullscreenChange = () => this.renderFullscreenState();
+
+  private onAdapterPlay = () => this.syncPlayState(this.adapter.getState());
+  private onAdapterPause = () => this.syncPlayState(this.adapter.getState());
+  private onAdapterEnded = () => this.syncPlayState(this.adapter.getState());
+  private onAdapterVolumeChange = () => this.syncVolumeState(this.adapter.getState());
+  private onAdapterDurationChange = () => this.syncPlaybackState(this.adapter.getState(), true);
+  private onAdapterTimeUpdate = () => this.syncPlaybackState(this.adapter.getState());
+  private onAdapterChange = () => this.syncPlaybackState(this.adapter.getState());
+  private onDocumentClick = (e: MouseEvent) => this.closeMenus(e);
 
   constructor(private adapter: FideoAdapter, private wrapper: HTMLElement, options: FideoResolvedOptions) {
     this.icons = { ...defaultIcons, ...options.icons };
@@ -44,8 +54,8 @@ export class FideoControls {
     this.volumePanel.append(this.volume);
     this.volumeGroup.append(this.muteButton, this.volumePanel);
 
-    const settingsGroup = createElement('div', 'fideo__settings');
-    settingsGroup.append(settings, this.speedMenu);
+    this.settingsGroup = createElement('div', 'fideo__settings');
+    this.settingsGroup.append(settings, this.speedMenu);
 
     const primaryControls = createElement('div', 'fideo__control-row');
     const spacer = createElement('span', 'fideo__spacer');
@@ -54,7 +64,7 @@ export class FideoControls {
     if (options.controlVisibility.currentTime || options.controlVisibility.duration) primaryControls.append(timeGroup);
     primaryControls.append(spacer);
     if (options.controlVisibility.volume) primaryControls.append(this.volumeGroup);
-    if (options.controlVisibility.settings) primaryControls.append(settingsGroup);
+    if (options.controlVisibility.settings) primaryControls.append(this.settingsGroup);
     if (options.controlVisibility.fullscreen) primaryControls.append(this.fullscreenButton);
 
     this.element.append(primaryControls);
@@ -77,17 +87,34 @@ export class FideoControls {
     this.track.addEventListener('pointerup', () => {
       this.seeking = false;
     });
-    settings.addEventListener('click', () => { this.wrapper.classList.add('is-user-active'); settingsGroup.classList.toggle('is-open'); });
-    this.fullscreenButton.addEventListener('click', () => { this.wrapper.classList.add('is-user-active'); this.toggleFullscreen(); });
-    document.addEventListener('fullscreenchange', this.handleFullscreenChange);
+    this.track.addEventListener('pointercancel', () => {
+      this.seeking = false;
+    });
+    settings.addEventListener('click', () => {
+      this.wrapper.classList.add('is-user-active');
+      this.settingsGroup.classList.toggle('is-open');
+    });
+    this.volumeGroup.addEventListener('click', (e) => {
+      if (e.target !== this.volume && e.target !== this.muteButton) {
+        this.wrapper.classList.add('is-user-active');
+        this.volumeGroup.classList.toggle('is-open');
+      }
+    });
+    this.fullscreenButton.addEventListener('click', () => {
+      this.wrapper.classList.add('is-user-active');
+      this.toggleFullscreen();
+    });
 
-    this.adapter.addEventListener('play', () => this.syncPlayState(this.adapter.getState()));
-    this.adapter.addEventListener('pause', () => this.syncPlayState(this.adapter.getState()));
-    this.adapter.addEventListener('ended', () => this.syncPlayState(this.adapter.getState()));
-    this.adapter.addEventListener('volumechange', () => this.syncVolumeState(this.adapter.getState()));
-    this.adapter.addEventListener('durationchange', () => this.syncPlaybackState(this.adapter.getState(), true));
-    this.adapter.addEventListener('timeupdate', () => this.syncPlaybackState(this.adapter.getState()));
-    this.adapter.addEventListener('change', () => this.syncPlaybackState(this.adapter.getState()));
+    document.addEventListener('fullscreenchange', this.handleFullscreenChange);
+    document.addEventListener('click', this.onDocumentClick);
+
+    this.adapter.addEventListener('play', this.onAdapterPlay);
+    this.adapter.addEventListener('pause', this.onAdapterPause);
+    this.adapter.addEventListener('ended', this.onAdapterEnded);
+    this.adapter.addEventListener('volumechange', this.onAdapterVolumeChange);
+    this.adapter.addEventListener('durationchange', this.onAdapterDurationChange);
+    this.adapter.addEventListener('timeupdate', this.onAdapterTimeUpdate);
+    this.adapter.addEventListener('change', this.onAdapterChange);
 
     const state = this.adapter.getState();
     this.syncPlayState(state);
@@ -98,6 +125,14 @@ export class FideoControls {
 
   destroy(): void {
     document.removeEventListener('fullscreenchange', this.handleFullscreenChange);
+    document.removeEventListener('click', this.onDocumentClick);
+    this.adapter.removeEventListener('play', this.onAdapterPlay);
+    this.adapter.removeEventListener('pause', this.onAdapterPause);
+    this.adapter.removeEventListener('ended', this.onAdapterEnded);
+    this.adapter.removeEventListener('volumechange', this.onAdapterVolumeChange);
+    this.adapter.removeEventListener('durationchange', this.onAdapterDurationChange);
+    this.adapter.removeEventListener('timeupdate', this.onAdapterTimeUpdate);
+    this.adapter.removeEventListener('change', this.onAdapterChange);
     this.element.remove();
   }
 
@@ -134,6 +169,16 @@ export class FideoControls {
       menu.append(button);
     }
     return menu;
+  }
+
+  private closeMenus(event: MouseEvent): void {
+    const target = event.target as Node;
+    if (!this.settingsGroup.contains(target)) {
+      this.settingsGroup.classList.remove('is-open');
+    }
+    if (!this.volumeGroup.contains(target)) {
+      this.volumeGroup.classList.remove('is-open');
+    }
   }
 
   private togglePlay(): void {
@@ -226,7 +271,6 @@ export class FideoControls {
     this.fullscreenButton.ariaLabel = fullscreenActive ? 'Exit fullscreen' : 'Fullscreen';
     this.fullscreenButton.title = fullscreenActive ? 'Exit fullscreen' : 'Fullscreen';
   }
-
 }
 
 export function formatTime(seconds: number): string {

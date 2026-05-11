@@ -148,7 +148,6 @@ export class FideoPlayer implements FideoPlayerInstance {
     const paused = this.adapter.getState().paused;
     this.wrapper.classList.toggle('is-playing', !paused);
     this.wrapper.classList.toggle('is-paused', paused);
-    this.wrapper.classList.toggle('has-click-target', paused);
     if (paused) this.activateControls(0);
   }
 
@@ -271,7 +270,7 @@ export class FideoPlayer implements FideoPlayerInstance {
     }
 
     const posterImage = this.ensurePosterImage();
-    if (posterImage.src !== poster) posterImage.src = poster;
+    if (posterImage.getAttribute('src') !== poster) posterImage.src = poster;
     this.wrapper.classList.add('has-poster');
     this.syncPosterVisibility();
   }

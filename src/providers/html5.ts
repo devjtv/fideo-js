@@ -2,6 +2,8 @@ import { BaseProvider } from './base';
 
 export class Html5Provider extends BaseProvider {
   readonly provider = 'html5' as const;
+  private boundHandler = this.handleMediaEvent.bind(this);
+  private boundEvents: string[] = [];
 
   constructor(readonly element: HTMLVideoElement) {
     super();
@@ -47,16 +49,23 @@ export class Html5Provider extends BaseProvider {
 
   destroy(): void {
     this.element.pause();
+    for (const type of this.boundEvents) {
+      this.element.removeEventListener(type, this.boundHandler);
+    }
+    this.boundEvents = [];
   }
 
   private bind(): void {
     const events = ['play', 'pause', 'timeupdate', 'durationchange', 'loadedmetadata', 'volumechange', 'ratechange', 'ended'];
     for (const eventName of events) {
-      this.element.addEventListener(eventName, () => {
-        this.syncFromElement();
-        this.dispatchEvent(new CustomEvent(eventName, { detail: this.getState() }));
-      });
+      this.element.addEventListener(eventName, this.boundHandler);
+      this.boundEvents.push(eventName);
     }
+  }
+
+  private handleMediaEvent(event: Event): void {
+    this.syncFromElement();
+    this.dispatchEvent(new CustomEvent(event.type, { detail: this.getState() }));
   }
 
   private syncFromElement(): void {
