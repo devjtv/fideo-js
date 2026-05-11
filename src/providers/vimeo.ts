@@ -58,13 +58,13 @@ export class VimeoProvider extends BaseProvider {
   }
 
   async play(): Promise<void> {
-    this.postMessage('play');
-    this.ready.then(() => this.player?.play()).catch(() => undefined);
+    await this.ready;
+    this.player?.play();
   }
 
   async pause(): Promise<void> {
-    this.postMessage('pause');
-    this.ready.then(() => this.player?.pause()).catch(() => undefined);
+    await this.ready;
+    this.player?.pause();
   }
 
   async seek(time: number): Promise<void> {

@@ -94,6 +94,18 @@
         --fideo-control-bg: rgba(20, 31, 45, 0.48);
       }
 
+      .fideo.brand-purple {
+        --fideo-accent: #c084fc;
+        --fideo-control-bg: rgba(30, 10, 50, 0.5);
+        --fideo-radius: 10px;
+      }
+
+      .fideo.brand-green {
+        --fideo-accent: #4ade80;
+        --fideo-radius: 12px;
+        --fideo-control-bg: rgba(6, 30, 6, 0.45);
+      }
+
       .background-surface {
         position: relative;
         display: grid;
@@ -183,6 +195,12 @@
         gap: 16px;
       }
 
+      .provider-grid-four {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+      }
+
       .provider-demo {
         display: grid;
         gap: 10px;
@@ -235,6 +253,28 @@
         font-size: 22px;
       }
 
+      .provider-controls-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .provider-controls-demo {
+        display: grid;
+        gap: 10px;
+        min-width: 0;
+      }
+
+      .provider-controls-demo h3 {
+        margin: 0;
+        font-size: 16px;
+      }
+
+      .provider-controls-demo pre {
+        font-size: 11px;
+        min-height: 100px;
+      }
+
       @media (max-width: 760px) {
         .background-hero {
           min-height: 360px;
@@ -252,7 +292,12 @@
           grid-template-columns: 1fr;
         }
 
-        .provider-grid {
+        .provider-grid,
+        .provider-grid-four {
+          grid-template-columns: 1fr;
+        }
+
+        .provider-controls-grid {
           grid-template-columns: 1fr;
         }
 
@@ -270,10 +315,13 @@
         <h1>Fideo JS</h1>
         <p>
           Normal video and iframe embeds with a small custom UI, responsive sources, viewport playback, and per-control
-          configuration.
+          configuration. Supports HTML5, YouTube, Vimeo, and Wistia.
         </p>
       </header>
 
+      <!-- ================================================ -->
+      <!-- HTML5 Section                                    -->
+      <!-- ================================================ -->
       <section>
         <h2>HTML5 video, full controls, viewport play/pause</h2>
         <video
@@ -336,57 +384,7 @@
       </section>
 
       <section>
-        <h2>YouTube no-cookie embed</h2>
-        <iframe
-          class="brand-blue"
-          data-fideo
-          data-fideo-muted="true"
-          src="https://www.youtube-nocookie.com/embed/M7lc1UVf-VE"
-          title="YouTube video"
-        ></iframe>
-        <pre><code>&lt;iframe
-  data-fideo
-  data-fideo-muted="true"
-  src="https://www.youtube-nocookie.com/embed/M7lc1UVf-VE"
-&gt;&lt;/iframe&gt;</code></pre>
-      </section>
-
-      <section>
-        <h2>Vimeo embed with hidden settings</h2>
-        <iframe
-          data-fideo
-          data-fideo-show-settings="false"
-          src="https://player.vimeo.com/video/76979871"
-          title="Vimeo video"
-        ></iframe>
-        <pre><code>&lt;iframe
-  data-fideo
-  data-fideo-show-settings="false"
-  src="https://player.vimeo.com/video/76979871"
-&gt;&lt;/iframe&gt;</code></pre>
-      </section>
-
-      <section>
-        <h2>Iframe poster overlays with responsive posters</h2>
-        <iframe
-          data-fideo
-          data-fideo-poster="./posters/youtube-desktop.svg"
-          data-fideo-poster-tablet="./posters/youtube-tablet.svg"
-          data-fideo-poster-mobile="./posters/youtube-mobile.svg"
-          src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
-          title="YouTube video with responsive poster overlay"
-        ></iframe>
-        <pre><code>&lt;iframe
-  data-fideo
-  data-fideo-poster="./posters/youtube-desktop.svg"
-  data-fideo-poster-tablet="./posters/youtube-tablet.svg"
-  data-fideo-poster-mobile="./posters/youtube-mobile.svg"
-  src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
-&gt;&lt;/iframe&gt;</code></pre>
-      </section>
-
-      <section>
-        <h2>No controls</h2>
+        <h2>No controls (click to toggle play/pause)</h2>
         <video
           data-fideo
           data-fideo-controls="false"
@@ -421,127 +419,313 @@
 &gt;&lt;/video&gt;</code></pre>
       </section>
 
+      <!-- ================================================ -->
+      <!-- YouTube Section                                  -->
+      <!-- ================================================ -->
       <section>
-        <h2>JavaScript object initialization</h2>
-        <video id="object-player"></video>
-        <pre><code>import { Fideo } from 'fideo-js';
-
-new Fideo('#object-player', {
-  autoplay: true,
-  muted: true,
-  loop: true,
-  controls: false,
-  sources: {
-    desktop: '/videos/background-loop.mp4',
-  },
-  posters: {
-    desktop: '/posters/background-loop.jpg',
-  },
-});</code></pre>
-      </section>
-
-      <section>
-        <h2>Background video hero</h2>
-        <div class="background-surface background-hero">
-          <video
-            data-fideo
-            data-fideo-background="true"
-            data-fideo-src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
-            data-fideo-poster="https://interactive-examples.mdn.mozilla.net/media/examples/flower.jpg"
-          ></video>
-          <div class="background-content">
-            <h3>Full bleed, no controls</h3>
-            <p>Background mode fills the parent container, mutes, loops, autoplays, and keeps controls hidden.</p>
-          </div>
-        </div>
-        <pre><code>&lt;div class="hero"&gt;
-  &lt;video
-    data-fideo
-    data-fideo-background="true"
-    data-fideo-src="/videos/hero.mp4"
-    data-fideo-poster="/posters/hero.jpg"
-  &gt;&lt;/video&gt;
-&lt;/div&gt;</code></pre>
+        <h2>YouTube &mdash; watch URL (auto-converts to no-cookie embed)</h2>
+        <iframe
+          class="brand-blue"
+          data-fideo
+          data-fideo-muted="true"
+          src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
+          title="YouTube video"
+        ></iframe>
+        <pre><code>&lt;iframe
+  data-fideo
+  data-fideo-muted="true"
+  src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
+&gt;&lt;/iframe&gt;</code></pre>
       </section>
 
       <section>
-        <h2>Background iframe banner with cover sizing</h2>
-        <div class="background-surface background-wide">
-          <iframe
-            data-fideo
-            data-fideo-background="true"
-            data-fideo-background-aspect-ratio="16:9"
-            src="https://vimeo.com/76979871"
-            title="Vimeo background video"
-          ></iframe>
-          <div class="background-content">
-            <h3>Iframe cover</h3>
-            <p>Iframe media is resized by Fideo so it covers unusual container shapes without black bars.</p>
-          </div>
-        </div>
-        <pre><code>&lt;div class="banner"&gt;
-  &lt;iframe
-    data-fideo
-    data-fideo-background="true"
-    data-fideo-background-aspect-ratio="16:9"
-    src="https://vimeo.com/76979871"
-  &gt;&lt;/iframe&gt;
-&lt;/div&gt;</code></pre>
+        <h2>YouTube &mdash; youtu.be short URL</h2>
+        <iframe
+          data-fideo
+          data-fideo-muted="true"
+          src="https://youtu.be/M7lc1UVf-VE"
+          title="YouTube short URL video"
+        ></iframe>
+        <pre><code>&lt;iframe
+  data-fideo
+  data-fideo-muted="true"
+  src="https://youtu.be/M7lc1UVf-VE"
+&gt;&lt;/iframe&gt;</code></pre>
       </section>
 
-      <section class="full-bleed-section">
-        <h2>Full browser width Vimeo iframe hero</h2>
-        <div class="background-surface iframe-cover-hero">
-          <iframe
-            data-fideo
-            data-fideo-background="true"
-            data-fideo-background-aspect-ratio="16:9"
-            src="https://vimeo.com/76979871"
-            title="Full width Vimeo background hero"
-          ></iframe>
-          <div class="background-content">
-            <h3>Vimeo cover hero</h3>
-            <p>A fixed-height, full viewport-width hero using an iframe background with cover sizing.</p>
-          </div>
-        </div>
-        <pre><code>&lt;section class="hero"&gt;
-  &lt;iframe
-    data-fideo
-    data-fideo-background="true"
-    data-fideo-background-aspect-ratio="16:9"
-    src="https://vimeo.com/76979871"
-  &gt;&lt;/iframe&gt;
-&lt;/section&gt;</code></pre>
+      <section>
+        <h2>YouTube &mdash; embed URL with poster overlay</h2>
+        <iframe
+          data-fideo
+          data-fideo-poster="./posters/youtube-desktop.svg"
+          data-fideo-poster-tablet="./posters/youtube-tablet.svg"
+          data-fideo-poster-mobile="./posters/youtube-mobile.svg"
+          src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
+          title="YouTube video with responsive poster overlay"
+        ></iframe>
+        <pre><code>&lt;iframe
+  data-fideo
+  data-fideo-poster="./posters/youtube-desktop.svg"
+  data-fideo-poster-tablet="./posters/youtube-tablet.svg"
+  data-fideo-poster-mobile="./posters/youtube-mobile.svg"
+  src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
+&gt;&lt;/iframe&gt;</code></pre>
       </section>
 
-      <section class="full-bleed-section">
-        <h2>Full browser width YouTube iframe hero</h2>
-        <div class="background-surface iframe-cover-hero">
-          <iframe
-            data-fideo
-            data-fideo-background="true"
-            data-fideo-background-aspect-ratio="16:9"
-            src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
-            title="Full width YouTube background hero"
-          ></iframe>
-          <div class="background-content">
-            <h3>YouTube cover hero</h3>
-            <p>The same background mode works with YouTube and normal watch URLs are converted automatically.</p>
-          </div>
-        </div>
-        <pre><code>&lt;section class="hero"&gt;
-  &lt;iframe
-    data-fideo
-    data-fideo-background="true"
-    data-fideo-background-aspect-ratio="16:9"
-    src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
-  &gt;&lt;/iframe&gt;
-&lt;/section&gt;</code></pre>
+      <section>
+        <h2>YouTube &mdash; custom theme, hidden settings</h2>
+        <iframe
+          class="brand-purple"
+          data-fideo
+          data-fideo-show-settings="false"
+          data-fideo-show-fullscreen="false"
+          src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
+          title="YouTube themed video"
+        ></iframe>
+        <pre><code>&lt;iframe
+  class="brand-purple"
+  data-fideo
+  data-fideo-show-settings="false"
+  data-fideo-show-fullscreen="false"
+  src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
+&gt;&lt;/iframe&gt;</code></pre>
       </section>
 
+      <!-- ================================================ -->
+      <!-- Vimeo Section                                    -->
+      <!-- ================================================ -->
+      <section>
+        <h2>Vimeo &mdash; full controls</h2>
+        <iframe
+          class="brand-green"
+          data-fideo
+          src="https://player.vimeo.com/video/76979871"
+          title="Vimeo video with full controls"
+        ></iframe>
+        <pre><code>&lt;iframe
+  data-fideo
+  src="https://player.vimeo.com/video/76979871"
+&gt;&lt;/iframe&gt;</code></pre>
+      </section>
+
+      <section>
+        <h2>Vimeo &mdash; vimeo.com page URL (auto-normalized)</h2>
+        <iframe
+          data-fideo
+          data-fideo-show-settings="false"
+          src="https://vimeo.com/76979871"
+          title="Vimeo page URL auto-normalized"
+        ></iframe>
+        <pre><code>&lt;iframe
+  data-fideo
+  data-fideo-show-settings="false"
+  src="https://vimeo.com/76979871"
+&gt;&lt;/iframe&gt;</code></pre>
+      </section>
+
+      <section>
+        <h2>Vimeo &mdash; with poster overlay</h2>
+        <iframe
+          data-fideo
+          data-fideo-poster="./posters/youtube-desktop.svg"
+          src="https://player.vimeo.com/video/76979871"
+          title="Vimeo video with poster"
+        ></iframe>
+        <pre><code>&lt;iframe
+  data-fideo
+  data-fideo-poster="./posters/vimeo-poster.jpg"
+  src="https://player.vimeo.com/video/76979871"
+&gt;&lt;/iframe&gt;</code></pre>
+      </section>
+
+      <section>
+        <h2>Vimeo &mdash; muted, custom theme</h2>
+        <iframe
+          class="brand-coral"
+          data-fideo
+          data-fideo-muted="true"
+          src="https://vimeo.com/76979871"
+          title="Vimeo muted with custom theme"
+        ></iframe>
+        <pre><code>&lt;iframe
+  class="brand-coral"
+  data-fideo
+  data-fideo-muted="true"
+  src="https://vimeo.com/76979871"
+&gt;&lt;/iframe&gt;</code></pre>
+      </section>
+
+      <!-- ================================================ -->
+      <!-- Wistia Section                                   -->
+      <!-- ================================================ -->
+      <section>
+        <h2>Wistia &mdash; full controls</h2>
+        <iframe
+          data-fideo
+          data-fideo-muted="true"
+          src="https://home.wistia.com/medias/e4a27b971d"
+          title="Wistia video with controls"
+        ></iframe>
+        <pre><code>&lt;iframe
+  data-fideo
+  data-fideo-muted="true"
+  src="https://home.wistia.com/medias/e4a27b971d"
+&gt;&lt;/iframe&gt;</code></pre>
+      </section>
+
+      <section>
+        <h2>Wistia &mdash; with poster overlay</h2>
+        <iframe
+          data-fideo
+          data-fideo-poster="./posters/youtube-desktop.svg"
+          src="https://home.wistia.com/medias/e4a27b971d"
+          title="Wistia video with poster"
+        ></iframe>
+        <pre><code>&lt;iframe
+  data-fideo
+  data-fideo-poster="./posters/wistia-poster.jpg"
+  src="https://home.wistia.com/medias/e4a27b971d"
+&gt;&lt;/iframe&gt;</code></pre>
+      </section>
+
+      <!-- ================================================ -->
+      <!-- All Provider Controls Matrix                     -->
+      <!-- ================================================ -->
+      <section>
+        <h2>All providers with standard controls</h2>
+        <div class="provider-controls-grid">
+          <div class="provider-controls-demo">
+            <h3>HTML5</h3>
+            <video
+              data-fideo
+              data-fideo-src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+              data-fideo-poster="https://interactive-examples.mdn.mozilla.net/media/examples/flower.jpg"
+            ></video>
+            <pre><code>&lt;video
+  data-fideo
+  data-fideo-src="/videos/clip.mp4"
+  data-fideo-poster="/posters/clip.jpg"
+&gt;&lt;/video&gt;</code></pre>
+          </div>
+          <div class="provider-controls-demo">
+            <h3>YouTube</h3>
+            <iframe
+              data-fideo
+              data-fideo-muted="true"
+              src="https://youtu.be/M7lc1UVf-VE"
+              title="YouTube controls demo"
+            ></iframe>
+            <pre><code>&lt;iframe
+  data-fideo
+  data-fideo-muted="true"
+  src="https://youtu.be/M7lc1UVf-VE"
+&gt;&lt;/iframe&gt;</code></pre>
+          </div>
+          <div class="provider-controls-demo">
+            <h3>Vimeo</h3>
+            <iframe
+              data-fideo
+              src="https://vimeo.com/76979871"
+              title="Vimeo controls demo"
+            ></iframe>
+            <pre><code>&lt;iframe
+  data-fideo
+  src="https://vimeo.com/76979871"
+&gt;&lt;/iframe&gt;</code></pre>
+          </div>
+          <div class="provider-controls-demo">
+            <h3>Wistia</h3>
+            <iframe
+              data-fideo
+              data-fideo-muted="true"
+              src="https://home.wistia.com/medias/e4a27b971d"
+              title="Wistia controls demo"
+            ></iframe>
+            <pre><code>&lt;iframe
+  data-fideo
+  data-fideo-muted="true"
+  src="https://home.wistia.com/medias/e4a27b971d"
+&gt;&lt;/iframe&gt;</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================ -->
+      <!-- All Provider Poster Matrix                       -->
+      <!-- ================================================ -->
+      <section>
+        <h2>All providers with poster overlays</h2>
+        <div class="provider-controls-grid">
+          <div class="provider-controls-demo">
+            <h3>YouTube poster</h3>
+            <iframe
+              data-fideo
+              data-fideo-muted="true"
+              data-fideo-poster="./posters/youtube-desktop.svg"
+              data-fideo-poster-tablet="./posters/youtube-tablet.svg"
+              data-fideo-poster-mobile="./posters/youtube-mobile.svg"
+              src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
+              title="YouTube poster demo"
+            ></iframe>
+            <pre><code>&lt;iframe
+  data-fideo
+  data-fideo-muted="true"
+  data-fideo-poster="./posters/youtube-desktop.svg"
+  data-fideo-poster-tablet="./posters/youtube-tablet.svg"
+  data-fideo-poster-mobile="./posters/youtube-mobile.svg"
+  src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
+&gt;&lt;/iframe&gt;</code></pre>
+          </div>
+          <div class="provider-controls-demo">
+            <h3>Vimeo poster</h3>
+            <iframe
+              data-fideo
+              data-fideo-poster="./posters/youtube-desktop.svg"
+              src="https://player.vimeo.com/video/76979871"
+              title="Vimeo poster demo"
+            ></iframe>
+            <pre><code>&lt;iframe
+  data-fideo
+  data-fideo-poster="./posters/vimeo-poster.jpg"
+  src="https://player.vimeo.com/video/76979871"
+&gt;&lt;/iframe&gt;</code></pre>
+          </div>
+          <div class="provider-controls-demo">
+            <h3>Wistia poster</h3>
+            <iframe
+              data-fideo
+              data-fideo-poster="./posters/youtube-desktop.svg"
+              src="https://home.wistia.com/medias/e4a27b971d"
+              title="Wistia poster demo"
+            ></iframe>
+            <pre><code>&lt;iframe
+  data-fideo
+  data-fideo-poster="./posters/wistia-poster.jpg"
+  src="https://home.wistia.com/medias/e4a27b971d"
+&gt;&lt;/iframe&gt;</code></pre>
+          </div>
+          <div class="provider-controls-demo">
+            <h3>HTML5 poster</h3>
+            <video
+              data-fideo
+              data-fideo-poster="https://interactive-examples.mdn.mozilla.net/media/examples/flower.jpg"
+              data-fideo-src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+            ></video>
+            <pre><code>&lt;video
+  data-fideo
+  data-fideo-poster="/posters/html5-poster.jpg"
+  data-fideo-src="/videos/clip.mp4"
+&gt;&lt;/video&gt;</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================ -->
+      <!-- All Provider Background Matrix                   -->
+      <!-- ================================================ -->
       <section>
         <h2>Background provider matrix</h2>
-        <div class="provider-grid">
+        <div class="provider-grid-four">
           <div class="provider-demo">
             <div class="background-surface">
               <video
@@ -603,9 +787,207 @@ new Fideo('#object-player', {
   src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
 &gt;&lt;/iframe&gt;</code></pre>
           </div>
+
+          <div class="provider-demo">
+            <div class="background-surface">
+              <iframe
+                data-fideo
+                data-fideo-background="true"
+                data-fideo-background-aspect-ratio="16:9"
+                src="https://home.wistia.com/medias/e4a27b971d"
+                title="Wistia provider background"
+              ></iframe>
+              <div class="background-content">
+                <h3>Wistia</h3>
+              </div>
+            </div>
+            <pre><code>&lt;iframe
+  data-fideo
+  data-fideo-background="true"
+  data-fideo-background-aspect-ratio="16:9"
+  src="https://home.wistia.com/medias/e4a27b971d"
+&gt;&lt;/iframe&gt;</code></pre>
+          </div>
         </div>
       </section>
 
+      <!-- ================================================ -->
+      <!-- Hero / Background Banners                        -->
+      <!-- ================================================ -->
+      <section>
+        <h2>Background video hero (HTML5)</h2>
+        <div class="background-surface background-hero">
+          <video
+            data-fideo
+            data-fideo-background="true"
+            data-fideo-src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+            data-fideo-poster="https://interactive-examples.mdn.mozilla.net/media/examples/flower.jpg"
+          ></video>
+          <div class="background-content">
+            <h3>Full bleed, no controls</h3>
+            <p>Background mode fills the parent container, mutes, loops, autoplays, and keeps controls hidden.</p>
+          </div>
+        </div>
+        <pre><code>&lt;div class="hero"&gt;
+  &lt;video
+    data-fideo
+    data-fideo-background="true"
+    data-fideo-src="/videos/hero.mp4"
+    data-fideo-poster="/posters/hero.jpg"
+  &gt;&lt;/video&gt;
+&lt;/div&gt;</code></pre>
+      </section>
+
+      <section>
+        <h2>Background iframe banner with cover sizing (Vimeo)</h2>
+        <div class="background-surface background-wide">
+          <iframe
+            data-fideo
+            data-fideo-background="true"
+            data-fideo-background-aspect-ratio="16:9"
+            src="https://vimeo.com/76979871"
+            title="Vimeo background video"
+          ></iframe>
+          <div class="background-content">
+            <h3>Iframe cover</h3>
+            <p>Iframe media is resized by Fideo so it covers unusual container shapes without black bars.</p>
+          </div>
+        </div>
+        <pre><code>&lt;div class="banner"&gt;
+  &lt;iframe
+    data-fideo
+    data-fideo-background="true"
+    data-fideo-background-aspect-ratio="16:9"
+    src="https://vimeo.com/76979871"
+  &gt;&lt;/iframe&gt;
+&lt;/div&gt;</code></pre>
+      </section>
+
+      <section>
+        <h2>Background iframe banner with cover sizing (YouTube)</h2>
+        <div class="background-surface background-wide">
+          <iframe
+            data-fideo
+            data-fideo-background="true"
+            data-fideo-background-aspect-ratio="16:9"
+            src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
+            title="YouTube background video"
+          ></iframe>
+          <div class="background-content">
+            <h3>YouTube cover</h3>
+            <p>Same cover sizing works for YouTube. Watch URLs are auto-converted.</p>
+          </div>
+        </div>
+        <pre><code>&lt;div class="banner"&gt;
+  &lt;iframe
+    data-fideo
+    data-fideo-background="true"
+    data-fideo-background-aspect-ratio="16:9"
+    src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
+  &gt;&lt;/iframe&gt;
+&lt;/div&gt;</code></pre>
+      </section>
+
+      <section class="full-bleed-section">
+        <h2>Full browser width Vimeo iframe hero</h2>
+        <div class="background-surface iframe-cover-hero">
+          <iframe
+            data-fideo
+            data-fideo-background="true"
+            data-fideo-background-aspect-ratio="16:9"
+            src="https://vimeo.com/76979871"
+            title="Full width Vimeo background hero"
+          ></iframe>
+          <div class="background-content">
+            <h3>Vimeo cover hero</h3>
+            <p>A fixed-height, full viewport-width hero using an iframe background with cover sizing.</p>
+          </div>
+        </div>
+        <pre><code>&lt;section class="hero"&gt;
+  &lt;iframe
+    data-fideo
+    data-fideo-background="true"
+    data-fideo-background-aspect-ratio="16:9"
+    src="https://vimeo.com/76979871"
+  &gt;&lt;/iframe&gt;
+&lt;/section&gt;</code></pre>
+      </section>
+
+      <section class="full-bleed-section">
+        <h2>Full browser width YouTube iframe hero</h2>
+        <div class="background-surface iframe-cover-hero">
+          <iframe
+            data-fideo
+            data-fideo-background="true"
+            data-fideo-background-aspect-ratio="16:9"
+            src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
+            title="Full width YouTube background hero"
+          ></iframe>
+          <div class="background-content">
+            <h3>YouTube cover hero</h3>
+            <p>The same background mode works with YouTube and normal watch URLs are converted automatically.</p>
+          </div>
+        </div>
+        <pre><code>&lt;section class="hero"&gt;
+  &lt;iframe
+    data-fideo
+    data-fideo-background="true"
+    data-fideo-background-aspect-ratio="16:9"
+    src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
+  &gt;&lt;/iframe&gt;
+&lt;/section&gt;</code></pre>
+      </section>
+
+      <section class="full-bleed-section">
+        <h2>Full browser width Wistia iframe hero</h2>
+        <div class="background-surface iframe-cover-hero">
+          <iframe
+            data-fideo
+            data-fideo-background="true"
+            data-fideo-background-aspect-ratio="16:9"
+            src="https://home.wistia.com/medias/e4a27b971d"
+            title="Full width Wistia background hero"
+          ></iframe>
+          <div class="background-content">
+            <h3>Wistia cover hero</h3>
+            <p>Wistia also works with background mode and cover sizing.</p>
+          </div>
+        </div>
+        <pre><code>&lt;section class="hero"&gt;
+  &lt;iframe
+    data-fideo
+    data-fideo-background="true"
+    data-fideo-background-aspect-ratio="16:9"
+    src="https://home.wistia.com/medias/e4a27b971d"
+  &gt;&lt;/iframe&gt;
+&lt;/section&gt;</code></pre>
+      </section>
+
+      <!-- ================================================ -->
+      <!-- JavaScript Object Init                           -->
+      <!-- ================================================ -->
+      <section>
+        <h2>JavaScript object initialization</h2>
+        <video id="object-player"></video>
+        <pre><code>import { Fideo } from 'fideo-js';
+
+new Fideo('#object-player', {
+  autoplay: true,
+  muted: true,
+  loop: true,
+  controls: false,
+  sources: {
+    desktop: '/videos/background-loop.mp4',
+  },
+  posters: {
+    desktop: '/posters/background-loop.jpg',
+  },
+});</code></pre>
+      </section>
+
+      <!-- ================================================ -->
+      <!-- Background Video Tiles                           -->
+      <!-- ================================================ -->
       <section>
         <h2>Background video tiles</h2>
         <div class="background-grid">
