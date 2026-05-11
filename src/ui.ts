@@ -16,13 +16,9 @@ export class FideoControls {
   private volumePanel: HTMLElement;
   private seeking = false;
   private icons: Required<NonNullable<FideoResolvedOptions['icons']>>;
-  private handleFullscreenChange = () => this.render(this.adapter.getState());
+  private handleFullscreenChange = () => this.renderFullscreenState();
 
-  constructor(
-    private adapter: FideoAdapter,
-    private wrapper: HTMLElement,
-    options: FideoResolvedOptions,
-  ) {
+  constructor(private adapter: FideoAdapter, private wrapper: HTMLElement, options: FideoResolvedOptions) {
     this.icons = { ...defaultIcons, ...options.icons };
     this.element = createElement('div', 'fideo__controls');
     this.playButton = this.button('fideo__button fideo__play', 'Play', this.icons.play);
@@ -35,7 +31,6 @@ export class FideoControls {
     this.fullscreenButton = this.button('fideo__button', 'Fullscreen', this.icons.fullscreen);
 
     const settings = this.button('fideo__button fideo__settings-toggle', 'Settings', this.icons.settings);
-
     const timeline = createElement('div', 'fideo__timeline');
     timeline.append(this.track);
 
@@ -75,15 +70,30 @@ export class FideoControls {
     this.volume.addEventListener('input', () => this.changeVolume());
     this.track.addEventListener('pointerdown', () => {
       this.seeking = true;
+      this.syncPlaybackState(this.adapter.getState(), true);
     });
     this.track.addEventListener('input', () => this.previewSeek());
     this.track.addEventListener('change', () => this.commitSeek());
-    settings.addEventListener('click', () => settingsGroup.classList.toggle('is-open'));
-    this.fullscreenButton.addEventListener('click', () => this.toggleFullscreen());
+    this.track.addEventListener('pointerup', () => {
+      this.seeking = false;
+    });
+    settings.addEventListener('click', () => { this.wrapper.classList.add('is-user-active'); settingsGroup.classList.toggle('is-open'); });
+    this.fullscreenButton.addEventListener('click', () => { this.wrapper.classList.add('is-user-active'); this.toggleFullscreen(); });
     document.addEventListener('fullscreenchange', this.handleFullscreenChange);
 
-    this.adapter.addEventListener('change', () => this.render(this.adapter.getState()));
-    this.render(this.adapter.getState());
+    this.adapter.addEventListener('play', () => this.syncPlayState(this.adapter.getState()));
+    this.adapter.addEventListener('pause', () => this.syncPlayState(this.adapter.getState()));
+    this.adapter.addEventListener('ended', () => this.syncPlayState(this.adapter.getState()));
+    this.adapter.addEventListener('volumechange', () => this.syncVolumeState(this.adapter.getState()));
+    this.adapter.addEventListener('durationchange', () => this.syncPlaybackState(this.adapter.getState(), true));
+    this.adapter.addEventListener('timeupdate', () => this.syncPlaybackState(this.adapter.getState()));
+    this.adapter.addEventListener('change', () => this.syncPlaybackState(this.adapter.getState()));
+
+    const state = this.adapter.getState();
+    this.syncPlayState(state);
+    this.syncVolumeState(state);
+    this.syncPlaybackState(state, true);
+    this.renderFullscreenState();
   }
 
   destroy(): void {
@@ -117,6 +127,7 @@ export class FideoControls {
       const button = this.button('fideo__speed', `${rate}x`, '');
       button.textContent = `${rate}x`;
       button.addEventListener('click', () => {
+        this.wrapper.classList.add('is-user-active');
         this.adapter.setPlaybackRate(rate).catch(() => undefined);
         menu.parentElement?.classList.remove('is-open');
       });
@@ -126,29 +137,34 @@ export class FideoControls {
   }
 
   private togglePlay(): void {
+    this.wrapper.classList.add('is-user-active');
     const state = this.adapter.getState();
     if (state.paused) this.adapter.play().catch(() => undefined);
     else this.adapter.pause().catch(() => undefined);
   }
 
   private toggleMute(): void {
+    this.wrapper.classList.add('is-user-active');
     const state = this.adapter.getState();
     this.adapter.setMuted(!state.muted).catch(() => undefined);
   }
 
   private changeVolume(): void {
+    this.wrapper.classList.add('is-user-active');
     const volume = Number(this.volume.value);
     if (volume > 0) this.adapter.setMuted(false).catch(() => undefined);
     this.adapter.setVolume(volume).catch(() => undefined);
   }
 
   private previewSeek(): void {
+    this.wrapper.classList.add('is-user-active');
     const state = this.adapter.getState();
     if (!state.duration) return;
     this.currentTime.textContent = formatTime((Number(this.track.value) / 1000) * state.duration);
   }
 
   private commitSeek(): void {
+    this.wrapper.classList.add('is-user-active');
     const state = this.adapter.getState();
     this.seeking = false;
     if (!state.duration) return;
@@ -163,29 +179,54 @@ export class FideoControls {
     this.wrapper.requestFullscreen?.();
   }
 
-  private render(state: FideoState): void {
-    this.playButton.innerHTML = state.paused ? this.icons.play : this.icons.pause;
-    this.playButton.ariaLabel = state.paused ? 'Play' : 'Pause';
-    this.playButton.title = state.paused ? 'Play' : 'Pause';
-    this.muteButton.innerHTML = state.muted || state.volume === 0 ? this.icons.muted : this.icons.volume;
-    if (!state.muted && state.volume > 0 && state.volume <= 0.5) this.muteButton.innerHTML = this.icons.volumeLow;
-    this.muteButton.ariaLabel = state.muted || state.volume === 0 ? 'Unmute' : 'Mute';
-    this.muteButton.title = state.muted || state.volume === 0 ? 'Unmute' : 'Mute';
+  private syncPlayState(state: FideoState): void {
+    const playIcon = state.paused ? this.icons.play : this.icons.pause;
+    const playLabel = state.paused ? 'Play' : 'Pause';
+    if (this.playButton.innerHTML !== playIcon) {
+      this.playButton.innerHTML = playIcon;
+    }
+    if (this.playButton.ariaLabel !== playLabel) {
+      this.playButton.ariaLabel = playLabel;
+    }
+    if (this.playButton.title !== playLabel) {
+      this.playButton.title = playLabel;
+    }
+  }
+
+  private syncVolumeState(state: FideoState): void {
+    this.volume.value = String(state.muted ? 0 : state.volume);
+    this.volume.style.setProperty('--fideo-progress', `${Number(this.volume.value) * 100}%`);
+
+    let muteIcon = state.muted || state.volume === 0 ? this.icons.muted : this.icons.volume;
+    if (!state.muted && state.volume > 0 && state.volume <= 0.5) muteIcon = this.icons.volumeLow;
+    const muteLabel = state.muted || state.volume === 0 ? 'Unmute' : 'Mute';
+
+    if (this.muteButton.innerHTML !== muteIcon) {
+      this.muteButton.innerHTML = muteIcon;
+    }
+    if (this.muteButton.ariaLabel !== muteLabel) {
+      this.muteButton.ariaLabel = muteLabel;
+    }
+    if (this.muteButton.title !== muteLabel) {
+      this.muteButton.title = muteLabel;
+    }
+  }
+
+  private syncPlaybackState(state: FideoState, force = false): void {
+    if (!force && this.seeking) return;
+    this.currentTime.textContent = formatTime(state.currentTime);
+    this.duration.textContent = formatTime(state.duration);
+    this.track.value = state.duration ? String((state.currentTime / state.duration) * 1000) : '0';
+    this.track.style.setProperty('--fideo-progress', `${Number(this.track.value) / 10}%`);
+  }
+
+  private renderFullscreenState(): void {
     const fullscreenActive = document.fullscreenElement === this.wrapper;
     this.fullscreenButton.innerHTML = fullscreenActive ? this.icons.fullscreenExit : this.icons.fullscreen;
     this.fullscreenButton.ariaLabel = fullscreenActive ? 'Exit fullscreen' : 'Fullscreen';
     this.fullscreenButton.title = fullscreenActive ? 'Exit fullscreen' : 'Fullscreen';
-    this.volume.value = String(state.muted ? 0 : state.volume);
-    this.currentTime.textContent = formatTime(state.currentTime);
-    this.duration.textContent = formatTime(state.duration);
-
-    if (!this.seeking) {
-      this.track.value = state.duration ? String((state.currentTime / state.duration) * 1000) : '0';
-    }
-
-    this.track.style.setProperty('--fideo-progress', `${Number(this.track.value) / 10}%`);
-    this.volume.style.setProperty('--fideo-progress', `${Number(this.volume.value) * 100}%`);
   }
+
 }
 
 export function formatTime(seconds: number): string {

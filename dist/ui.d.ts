@@ -27,6 +27,9 @@ export declare class FideoControls {
     private previewSeek;
     private commitSeek;
     private toggleFullscreen;
-    private render;
+    private syncPlayState;
+    private syncVolumeState;
+    private syncPlaybackState;
+    private renderFullscreenState;
 }
 export declare function formatTime(seconds: number): string;

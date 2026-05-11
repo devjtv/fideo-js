@@ -108,6 +108,7 @@
   cursor: pointer;
 }
 
+
 .fideo__controls {
   position: absolute;
   right: 16px;
@@ -143,6 +144,8 @@
 .fideo__button {
   display: inline-grid;
   place-items: center;
+  position: relative;
+  z-index: 1;
   width: var(--fideo-button-size);
   height: var(--fideo-button-size);
   padding: 0;
@@ -172,6 +175,7 @@
   display: block;
   width: 17px;
   height: 17px;
+  pointer-events: none;
 }
 
 .fideo__control-row {
@@ -344,10 +348,11 @@
 .fideo__volume-panel::after {
   position: absolute;
   right: -10px;
-  bottom: -18px;
+  bottom: -8px;
   left: -10px;
-  height: 22px;
+  height: 10px;
   content: "";
+  pointer-events: none;
 }
 
 .fideo__volume {

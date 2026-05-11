@@ -30,6 +30,5 @@ export abstract class BaseProvider extends EventTarget implements FideoAdapter {
   protected update(patch: Partial<FideoState>, eventName = 'change'): void {
     this.state = { ...this.state, ...patch };
     this.dispatchEvent(new CustomEvent(eventName, { detail: this.getState() }));
-    this.dispatchEvent(new CustomEvent('change', { detail: this.getState() }));
   }
 }

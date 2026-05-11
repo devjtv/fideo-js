@@ -8,6 +8,19 @@
     <script src="../dist/fideo.global.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', () => {
+        new Fideo('#object-player-playing', {
+          muted: true,
+          loop: true,
+          autoplay: true,
+          controls: true,
+          sources: {
+            desktop: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+          },
+          posters: {
+            desktop: 'https://interactive-examples.mdn.mozilla.net/media/examples/flower.jpg',
+          },
+        });
+
         new Fideo('#object-player', {
           muted: true,
           loop: true,
@@ -968,6 +981,19 @@
       <!-- ================================================ -->
       <section>
         <h2>JavaScript object initialization</h2>
+        <video id="object-player-playing"></video>
+        <pre><code>new Fideo('#object-player-playing', {
+  autoplay: true,
+  muted: true,
+  loop: true,
+  controls: true,
+  sources: {
+    desktop: '/videos/background-loop.mp4',
+  },
+  posters: {
+    desktop: '/posters/background-loop.jpg',
+  },
+});</code></pre>
         <video id="object-player"></video>
         <pre><code>import { Fideo } from 'fideo-js';
 

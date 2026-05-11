@@ -157,22 +157,21 @@ export class YouTubeProvider extends BaseProvider {
       this.stopTimer();
       this.dispatchEvent(new CustomEvent('ended', { detail: this.getState() }));
     }
-    this.dispatchEvent(new CustomEvent('change', { detail: this.getState() }));
   }
 
   private sync(): void {
     if (!this.player) return;
     const duration = this.player.getDuration?.() || 0;
+    const paused = this.state.paused;
     this.state = {
       currentTime: this.player.getCurrentTime?.() || 0,
       duration,
       volume: (this.player.getVolume?.() ?? 100) / 100,
       muted: this.player.isMuted?.() ?? false,
-      paused: this.state.paused,
+      paused,
       playbackRate: this.player.getPlaybackRate?.() || 1,
       buffered: 0,
     };
-    this.dispatchEvent(new CustomEvent('change', { detail: this.getState() }));
   }
 
   private startTimer(): void {

@@ -103,12 +103,11 @@ export class VimeoProvider extends BaseProvider {
   }
 
   private bind(): void {
-    const events = ['play', 'pause', 'ended', 'timeupdate', 'volumechange', 'durationchange', 'playbackratechange'];
+    const events = ['play', 'pause', 'ended', 'volumechange', 'durationchange', 'playbackratechange'];
     for (const eventName of events) {
       this.player?.on(eventName, (event = {}) => {
         this.applyEvent(eventName, event);
         this.dispatchEvent(new CustomEvent(eventName, { detail: this.getState() }));
-        this.dispatchEvent(new CustomEvent('change', { detail: this.getState() }));
       });
     }
   }

@@ -50,12 +50,11 @@ export class Html5Provider extends BaseProvider {
   }
 
   private bind(): void {
-    const events = ['play', 'pause', 'timeupdate', 'durationchange', 'loadedmetadata', 'volumechange', 'ratechange', 'progress', 'ended'];
+    const events = ['play', 'pause', 'timeupdate', 'durationchange', 'loadedmetadata', 'volumechange', 'ratechange', 'ended'];
     for (const eventName of events) {
       this.element.addEventListener(eventName, () => {
         this.syncFromElement();
         this.dispatchEvent(new CustomEvent(eventName, { detail: this.getState() }));
-        this.dispatchEvent(new CustomEvent('change', { detail: this.getState() }));
       });
     }
   }
