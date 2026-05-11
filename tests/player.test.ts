@@ -55,8 +55,9 @@ describe('Fideo player', () => {
     expect(player.wrapper.querySelector('.fideo__volume-group')).toBeNull();
     expect(player.wrapper.querySelector('.fideo__settings')).toBeNull();
     expect(player.wrapper.querySelector('[title="Fullscreen"]')).toBeNull();
-    expect(player.wrapper.querySelector('.fideo__play')).toBeTruthy();
-    expect(player.wrapper.querySelector('.fideo__timeline')).toBeTruthy();
+    const controls = player.wrapper.querySelector('.fideo__controls')!;
+    expect(controls.shadowRoot!.querySelector('.fideo__play')).toBeTruthy();
+    expect(controls.shadowRoot!.querySelector('.fideo__timeline')).toBeTruthy();
   });
 
   it('skips all controls when controls is false', () => {

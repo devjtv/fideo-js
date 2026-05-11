@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fideo JS — ::part() Styling Demo</title>
+    <link rel="stylesheet" href="../dist/styles.css" />
+    <script src="../dist/fideo.global.js"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 40px 20px 80px;
+        background: #0f1412;
+        color: #e8ede9;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        line-height: 1.55;
+      }
+
+      main {
+        max-width: 960px;
+        margin: 0 auto;
+      }
+
+      main h1 {
+        margin: 0 0 8px;
+        font-size: 32px;
+        font-weight: 700;
+      }
+
+      p.lead {
+        margin: 0 0 28px;
+        color: #98a39b;
+        font-size: 16px;
+      }
+
+      .demo-grid {
+        display: grid;
+        gap: 32px;
+      }
+
+      .demo-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        align-items: start;
+      }
+
+      @media (max-width: 700px) {
+        .demo-row {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .demo-player {
+        position: relative;
+      }
+
+      .demo-player iframe {
+        display: block;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        background: #0b100d;
+      }
+
+      .code-card {
+        padding: 16px;
+        background: #181f1b;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+      }
+
+      .code-card h3 {
+        margin: 0 0 8px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #46d9a7;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .code-card p {
+        margin: 0 0 12px;
+        font-size: 13px;
+        color: #b8c4bc;
+      }
+
+      .code-card pre {
+        margin: 0;
+        padding: 12px;
+        background: #0b100d;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 6px;
+        font-family: ui-monospace, "SF Mono", Menlo, monospace;
+        font-size: 13px;
+        color: #a8b5ad;
+        overflow-x: auto;
+        white-space: pre;
+      }
+
+      .divider {
+        border: 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        margin: 28px 0;
+      }
+
+      /* ================================================================
+         EXAMPLE STYLES BELOW — each block targets a specific ::part()
+         ================================================================ */
+
+      /* --- Example 1: Accent-colored play button with larger icon --- */
+      .demo-1 .fideo__controls::part(play-button) {
+        color: #ff6b6b;
+      }
+      .demo-1 .fideo__controls::part(play-button):hover {
+        color: #ff8787;
+      }
+      .demo-1 .fideo__controls::part(play-button) svg {
+        width: 22px;
+        height: 22px;
+      }
+
+      /* --- Example 2: Thicker, brighter timeline --- */
+      .demo-2 .fideo__controls::part(timeline) {
+        --fideo-track-size: 8px;
+      }
+      .demo-2 .fideo__controls::part(timeline)::-webkit-slider-thumb {
+        width: 18px;
+        height: 18px;
+        background: #46d9a7;
+        opacity: 1;
+      }
+
+      /* --- Example 3: Rounded mute button with background on hover --- */
+      .demo-3 .fideo__controls::part(mute-button) {
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.06);
+        transition: background 180ms ease;
+      }
+      .demo-3 .fideo__controls::part(mute-button):hover {
+        background: rgba(70, 217, 167, 0.15);
+      }
+
+      /* --- Example 4: Fullscreen button with a custom color --- */
+      .demo-4 .fideo__controls::part(fullscreen-button) {
+        color: #f9ca24;
+      }
+      .demo-4 .fideo__controls::part(fullscreen-button):hover {
+        color: #fbd440;
+      }
+
+      /* --- Example 5: Time display with monospace tabular-nums and accent color --- */
+      .demo-5 .fideo__controls::part(current-time),
+      .demo-5 .fideo__controls::part(duration) {
+        color: #46d9a7;
+        font-size: 14px;
+      }
+
+      /* --- Example 6: Vertical volume slider wider & brighter track --- */
+      .demo-6 .fideo__controls::part(volume-slider) {
+        --fideo-track-size: 6px;
+      }
+      .demo-6 .fideo__controls::part(volume-slider)::-webkit-slider-thumb {
+        width: 16px;
+        height: 16px;
+        background: #ff6b6b;
+        margin-left: -5px;
+      }
+
+      /* --- Example 7: Settings button with pill shape --- */
+      .demo-7 .fideo__controls::part(settings-button) {
+        border-radius: 20px;
+        padding: 0 10px;
+      }
+
+      /* --- Example 8: Speed button hover with full-width accent glow --- */
+      .demo-8 .fideo__controls::part(speed-button) {
+        border-radius: 4px;
+      }
+      .demo-8 .fideo__controls::part(speed-button):hover {
+        background: rgba(70, 217, 167, 0.18);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>::part() Styling Demo</h1>
+      <p class="lead">
+        Each example below styles Fideo controls exclusively through CSS <code>::part()</code>
+        selectors &mdash; no custom element leaking or !important battles.
+      </p>
+
+      <div class="demo-grid">
+
+        <div class="demo-row">
+          <div class="demo-player demo-1">
+            <iframe id="player-1" src="https://vimeo.com/347119375"></iframe>
+          </div>
+          <div class="code-card">
+            <h3>part="play-button"</h3>
+            <p>Recolor the play button and enlarge its SVG icon.</p>
+            <pre>.fideo__controls::part(play-button) {
+  color: #ff6b6b;
+}
+.fideo__controls::part(play-button) svg {
+  width: 22px;
+  height: 22px;
+}</pre>
+          </div>
+        </div>
+
+        <hr class="divider"/>
+
+        <div class="demo-row">
+          <div class="demo-player demo-2">
+            <iframe id="player-2" src="https://vimeo.com/347119375"></iframe>
+          </div>
+          <div class="code-card">
+            <h3>part="timeline"</h3>
+            <p>Thicken the track, always-show the thumb, and use a larger accent-colored knob.</p>
+            <pre>.fideo__controls::part(timeline) {
+  --fideo-track-size: 8px;
+}
+.fideo__controls::part(timeline)::-webkit-slider-thumb {
+  width: 18px;
+  height: 18px;
+  background: #46d9a7;
+  opacity: 1;
+}</pre>
+          </div>
+        </div>
+
+        <hr class="divider"/>
+
+        <div class="demo-row">
+          <div class="demo-player demo-3">
+            <iframe id="player-3" src="https://vimeo.com/347119375"></iframe>
+          </div>
+          <div class="code-card">
+            <h3>part="mute-button"</h3>
+            <p>Give the mute toggle a circular background with a tinted hover state.</p>
+            <pre>.fideo__controls::part(mute-button) {
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+}
+.fideo__controls::part(mute-button):hover {
+  background: rgba(70,217,167,0.15);
+}</pre>
+          </div>
+        </div>
+
+        <hr class="divider"/>
+
+        <div class="demo-row">
+          <div class="demo-player demo-4">
+            <iframe id="player-4" src="https://vimeo.com/347119375"></iframe>
+          </div>
+          <div class="code-card">
+            <h3>part="fullscreen-button"</h3>
+            <p>Set a custom brand-color for the fullscreen toggle.</p>
+            <pre>.fideo__controls::part(fullscreen-button) {
+  color: #f9ca24;
+}
+.fideo__controls::part(fullscreen-button):hover {
+  color: #fbd440;
+}</pre>
+          </div>
+        </div>
+
+        <hr class="divider"/>
+
+        <div class="demo-row">
+          <div class="demo-player demo-5">
+            <iframe id="player-5" src="https://vimeo.com/347119375"></iframe>
+          </div>
+          <div class="code-card">
+            <h3>part="current-time" &amp; part="duration"</h3>
+            <p>Change time-display color and bump up the font size.</p>
+            <pre>.fideo__controls::part(current-time),
+.fideo__controls::part(duration) {
+  color: #46d9a7;
+  font-size: 14px;
+}</pre>
+          </div>
+        </div>
+
+        <hr class="divider"/>
+
+        <div class="demo-row">
+          <div class="demo-player demo-6">
+            <iframe id="player-6" src="https://vimeo.com/347119375"></iframe>
+          </div>
+          <div class="code-card">
+            <h3>part="volume-slider"</h3>
+            <p>Widen the vertical volume track and give the thumb a punchy accent.</p>
+            <pre>.fideo__controls::part(volume-slider) {
+  --fideo-track-size: 6px;
+}
+.fideo__controls::part(volume-slider)::-webkit-slider-thumb {
+  width: 16px;
+  height: 16px;
+  background: #ff6b6b;
+  margin-left: -5px;
+}</pre>
+          </div>
+        </div>
+
+        <hr class="divider"/>
+
+        <div class="demo-row">
+          <div class="demo-player demo-7">
+            <iframe id="player-7" src="https://vimeo.com/347119375"></iframe>
+          </div>
+          <div class="code-card">
+            <h3>part="settings-button"</h3>
+            <p>Turn the settings gear into a pill-shaped affordance.</p>
+            <pre>.fideo__controls::part(settings-button) {
+  border-radius: 20px;
+  padding: 0 10px;
+}</pre>
+          </div>
+        </div>
+
+        <hr class="divider"/>
+
+        <div class="demo-row">
+          <div class="demo-player demo-8">
+            <iframe id="player-8" src="https://vimeo.com/347119375"></iframe>
+          </div>
+          <div class="code-card">
+            <h3>part="speed-button"</h3>
+            <p>Give speed-rate menu items a softer border and tinted hover.</p>
+            <pre>.fideo__controls::part(speed-button) {
+  border-radius: 4px;
+}
+.fideo__controls::part(speed-button):hover {
+  background: rgba(70,217,167,0.18);
+}</pre>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <script>
+      const ids = ['player-1', 'player-2', 'player-3', 'player-4', 'player-5', 'player-6', 'player-7', 'player-8'];
+
+      for (const id of ids) {
+        new Fideo(`#${id}`, {
+          controls: true,
+          muted: true,
+          sources: {
+            desktop: 'https://vimeo.com/347119375',
+          },
+        });
+      }
+    </script>
+  </body>
+</html>

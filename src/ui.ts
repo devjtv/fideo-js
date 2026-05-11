@@ -1,3 +1,4 @@
+import stylesheet from './styles.css?inline';
 import { defaultIcons } from './icons';
 import type { FideoAdapter, FideoResolvedOptions, FideoState } from './types';
 import { createElement } from './utils/dom';
@@ -31,16 +32,22 @@ export class FideoControls {
   constructor(private adapter: FideoAdapter, private wrapper: HTMLElement, options: FideoResolvedOptions) {
     this.icons = { ...defaultIcons, ...options.icons };
     this.element = createElement('div', 'fideo__controls');
-    this.playButton = this.button('fideo__button fideo__play', 'Play', this.icons.play);
-    this.muteButton = this.button('fideo__button fideo__mute', 'Mute', this.icons.volume);
-    this.track = this.range('fideo__track', 0, 1000, 1);
-    this.volume = this.range('fideo__volume', 0, 1, 0.01);
+    const root = this.element.attachShadow({ mode: 'open' });
+    const style = document.createElement('style');
+    style.textContent = stylesheet;
+    root.appendChild(style);
+    this.playButton = this.button('fideo__button fideo__play', 'Play', this.icons.play, 'play-button');
+    this.muteButton = this.button('fideo__button fideo__mute', 'Mute', this.icons.volume, 'mute-button');
+    this.track = this.range('fideo__track', 0, 1000, 1, 'timeline');
+    this.volume = this.range('fideo__volume', 0, 1, 0.01, 'volume-slider');
     this.currentTime = createElement('span', 'fideo__time');
+    this.currentTime.setAttribute('part', 'current-time');
     this.duration = createElement('span', 'fideo__time');
+    this.duration.setAttribute('part', 'duration');
     this.speedMenu = this.createSpeedMenu(options.playbackRates);
-    this.fullscreenButton = this.button('fideo__button', 'Fullscreen', this.icons.fullscreen);
+    this.fullscreenButton = this.button('fideo__button', 'Fullscreen', this.icons.fullscreen, 'fullscreen-button');
 
-    const settings = this.button('fideo__button fideo__settings-toggle', 'Settings', this.icons.settings);
+    const settings = this.button('fideo__button fideo__settings-toggle', 'Settings', this.icons.settings, 'settings-button');
     const timeline = createElement('div', 'fideo__timeline');
     timeline.append(this.track);
 
@@ -67,8 +74,8 @@ export class FideoControls {
     if (options.controlVisibility.settings) primaryControls.append(this.settingsGroup);
     if (options.controlVisibility.fullscreen) primaryControls.append(this.fullscreenButton);
 
-    this.element.append(primaryControls);
-    if (options.controlVisibility.timeline) this.element.append(timeline);
+    root.appendChild(primaryControls);
+    if (options.controlVisibility.timeline) root.appendChild(timeline);
     this.wrapper.append(this.element);
 
     if (!options.controlVisibility.currentTime) this.currentTime.remove();
@@ -136,30 +143,32 @@ export class FideoControls {
     this.element.remove();
   }
 
-  private button(className: string, label: string, icon: string): HTMLButtonElement {
+  private button(className: string, label: string, icon: string, part?: string): HTMLButtonElement {
     const button = document.createElement('button');
     button.className = className;
     button.type = 'button';
     button.ariaLabel = label;
     button.title = label;
     button.innerHTML = icon;
+    if (part) button.setAttribute('part', part);
     return button;
   }
 
-  private range(className: string, min: number, max: number, step: number): HTMLInputElement {
+  private range(className: string, min: number, max: number, step: number, part?: string): HTMLInputElement {
     const input = document.createElement('input');
     input.className = className;
     input.type = 'range';
     input.min = String(min);
     input.max = String(max);
     input.step = String(step);
+    if (part) input.setAttribute('part', part);
     return input;
   }
 
   private createSpeedMenu(rates: number[]): HTMLElement {
     const menu = createElement('div', 'fideo__settings-menu');
     for (const rate of rates) {
-      const button = this.button('fideo__speed', `${rate}x`, '');
+      const button = this.button('fideo__speed', `${rate}x`, '', 'speed-button');
       button.textContent = `${rate}x`;
       button.addEventListener('click', () => {
         this.wrapper.classList.add('is-user-active');
@@ -172,11 +181,11 @@ export class FideoControls {
   }
 
   private closeMenus(event: MouseEvent): void {
-    const target = event.target as Node;
-    if (!this.settingsGroup.contains(target)) {
+    const path = event.composedPath();
+    if (!path.some((el) => this.settingsGroup === el || this.settingsGroup.contains(el as Node))) {
       this.settingsGroup.classList.remove('is-open');
     }
-    if (!this.volumeGroup.contains(target)) {
+    if (!path.some((el) => this.volumeGroup === el || this.volumeGroup.contains(el as Node))) {
       this.volumeGroup.classList.remove('is-open');
     }
   }
