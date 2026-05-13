@@ -3,1063 +3,1246 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Fideo JS Demo</title>
+    <meta name="description" content="Fideo JS — a lightweight, data-attribute driven video UI for HTML5, YouTube, Vimeo, and Wistia." />
+    <title>Fideo JS — One video API for every provider</title>
     <link rel="stylesheet" href="../dist/styles.css" />
-    <script src="../dist/fideo.global.js"></script>
-    <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        new Fideo('#object-player-playing', {
-          muted: true,
-          loop: true,
-          autoplay: true,
-          controls: true,
-          sources: {
-            desktop: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
-          },
-          posters: {
-            desktop: 'https://interactive-examples.mdn.mozilla.net/media/examples/flower.jpg',
-          },
-        });
-
-        new Fideo('#object-player', {
-          muted: true,
-          loop: true,
-          autoplay: true,
-          controls: false,
-          sources: {
-            desktop: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
-          },
-          posters: {
-            desktop: 'https://interactive-examples.mdn.mozilla.net/media/examples/flower.jpg',
-          },
-        });
-
-        new Fideo('#object-background-player', {
-          background: true,
-          sources: {
-            desktop: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
-          },
-        });
-      });
-    </script>
+    <link rel="preconnect" href="https://rsms.me/" />
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
     <style>
+      :root {
+        --bg: #08090c;
+        --surface: #11141a;
+        --surface-2: #181c25;
+        --border: #232936;
+        --text: #e7ecf3;
+        --muted: #8a93a3;
+        --dim: #5b6373;
+        --accent: #6cf2c0;
+        --accent-2: #7ab8ff;
+        --warn: #ffb454;
+        --danger: #ff7a7a;
+        --radius: 14px;
+      }
+
+      * { box-sizing: border-box; }
+
+      html, body { margin: 0; padding: 0; }
+
       body {
-        margin: 0;
-        color: #17201c;
-        background: #f7f8f5;
-        font-family:
-          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+        font-feature-settings: "cv11", "ss01", "ss03";
+        -webkit-font-smoothing: antialiased;
+        line-height: 1.55;
       }
 
-      main {
-        width: min(1080px, calc(100% - 32px));
+      a { color: var(--accent-2); text-decoration: none; }
+      a:hover { color: var(--accent); }
+
+      code, pre, kbd { font-family: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; }
+
+      .wrap {
+        width: min(1180px, calc(100% - 40px));
         margin: 0 auto;
-        padding: 44px 0 72px;
       }
 
-      header {
-        margin-bottom: 30px;
+      /* ============ NAV ============ */
+      nav {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        backdrop-filter: blur(14px);
+        background: rgba(8, 9, 12, 0.72);
+        border-bottom: 1px solid var(--border);
       }
+      nav .wrap {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 60px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        font-size: 17px;
+        letter-spacing: -0.01em;
+        color: var(--text);
+      }
+      .brand-dot {
+        width: 10px; height: 10px; border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 18px var(--accent);
+      }
+      nav ul {
+        display: flex;
+        gap: 26px;
+        list-style: none;
+        margin: 0; padding: 0;
+        font-size: 14px;
+      }
+      nav ul a { color: var(--muted); }
+      nav ul a:hover { color: var(--text); }
+      @media (max-width: 720px) { nav ul { display: none; } }
 
+      /* ============ HERO ============ */
+      .hero {
+        position: relative;
+        min-height: 78vh;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        isolation: isolate;
+      }
+      .hero-bg-wrap {
+        position: absolute; inset: 0;
+        z-index: 0;
+      }
+      .hero-bg-wrap::after {
+        content: "";
+        position: absolute; inset: 0;
+        background:
+          radial-gradient(ellipse at 30% 20%, rgba(108, 242, 192, 0.12), transparent 55%),
+          linear-gradient(100deg, rgba(8, 9, 12, 0.75) 0%, rgba(8, 9, 12, 0.45) 55%, rgba(8, 9, 12, 0.15) 100%),
+          linear-gradient(180deg, transparent 60%, var(--bg) 100%);
+        pointer-events: none;
+        z-index: 1;
+      }
+      .hero-bg-wrap .fideo { position: absolute; inset: 0; }
+      .hero-content {
+        position: relative;
+        z-index: 2;
+        padding: 100px 0 80px;
+      }
+      .pill {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 6px 12px;
+        background: rgba(108, 242, 192, 0.1);
+        border: 1px solid rgba(108, 242, 192, 0.25);
+        border-radius: 999px;
+        font-size: 12px;
+        color: var(--accent);
+        font-weight: 500;
+      }
       h1 {
-        margin: 0 0 10px;
-        font-size: clamp(38px, 6vw, 76px);
-        line-height: 0.95;
+        font-size: clamp(40px, 6.5vw, 76px);
+        line-height: 1.02;
+        letter-spacing: -0.03em;
+        margin: 18px 0 18px;
+        font-weight: 800;
+        max-width: 14ch;
+      }
+      h1 em {
+        font-style: normal;
+        background: linear-gradient(120deg, var(--accent) 20%, var(--accent-2) 80%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .lede {
+        font-size: clamp(17px, 1.6vw, 20px);
+        color: var(--muted);
+        max-width: 56ch;
+        margin: 0 0 30px;
+      }
+      .cta-row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .btn {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 600;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--text);
+        cursor: pointer;
+        transition: transform 0.1s, border-color 0.15s, background 0.15s;
+      }
+      .btn:hover { border-color: var(--dim); }
+      .btn:active { transform: translateY(1px); }
+      .btn-primary {
+        background: var(--accent);
+        color: #042018;
+        border-color: var(--accent);
+      }
+      .btn-primary:hover {
+        background: #8af8d2;
+        border-color: #8af8d2;
+        color: #042018;
       }
 
-      p {
-        max-width: 720px;
-        margin: 0;
-        color: #4d5852;
-        font-size: 18px;
-        line-height: 1.6;
+      /* ============ SECTION ============ */
+      section.block {
+        padding: 96px 0;
+        border-top: 1px solid var(--border);
       }
-
-      section {
-        display: grid;
-        gap: 14px;
-        margin-top: 34px;
+      .eyebrow {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--accent);
+        font-weight: 600;
+        margin-bottom: 12px;
       }
-
       h2 {
-        margin: 0;
-        font-size: 18px;
+        font-size: clamp(28px, 3.5vw, 42px);
+        letter-spacing: -0.02em;
+        font-weight: 700;
+        margin: 0 0 14px;
+        max-width: 22ch;
+      }
+      .section-lede {
+        color: var(--muted);
+        max-width: 60ch;
+        font-size: 17px;
+        margin: 0 0 40px;
       }
 
-      pre {
-        overflow: auto;
+      /* ============ FEATURE GRID ============ */
+      .features {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+      }
+      @media (max-width: 900px) { .features { grid-template-columns: repeat(2, 1fr); } }
+      @media (max-width: 540px) { .features { grid-template-columns: 1fr; } }
+      .feature {
+        padding: 22px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+      }
+      .feature-icon {
+        width: 36px; height: 36px;
+        display: grid; place-items: center;
+        background: rgba(108, 242, 192, 0.1);
+        border-radius: 9px;
+        margin-bottom: 14px;
+        color: var(--accent);
+      }
+      .feature h3 {
+        margin: 0 0 6px;
+        font-size: 16px;
+        font-weight: 600;
+      }
+      .feature p {
         margin: 0;
-        padding: 14px 16px;
-        color: #dce8df;
-        background: #151816;
-        border-radius: 8px;
-        font-size: 13px;
+        font-size: 14px;
+        color: var(--muted);
         line-height: 1.5;
       }
 
-      .fideo.brand-coral {
-        --fideo-accent: #ff6f61;
-        --fideo-radius: 6px;
-      }
-
-      .fideo.brand-blue {
-        --fideo-accent: #66a3ff;
-        --fideo-control-bg: rgba(20, 31, 45, 0.48);
-      }
-
-      .fideo.brand-purple {
-        --fideo-accent: #c084fc;
-        --fideo-control-bg: rgba(30, 10, 50, 0.5);
-        --fideo-radius: 10px;
-      }
-
-      .fideo.brand-green {
-        --fideo-accent: #4ade80;
-        --fideo-radius: 12px;
-        --fideo-control-bg: rgba(6, 30, 6, 0.45);
-      }
-
-      .background-surface {
-        position: relative;
+      /* ============ CODE ============ */
+      .code-grid {
         display: grid;
-        align-content: end;
-        min-height: 260px;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+      @media (max-width: 820px) { .code-grid { grid-template-columns: 1fr; } }
+      .code-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
         overflow: hidden;
-        isolation: isolate;
-        border-radius: 8px;
-        background: #0d1311;
       }
-
-      .background-surface::after {
-        position: absolute;
-        inset: 0;
-        z-index: -1;
-        pointer-events: none;
-        content: "";
-        background: linear-gradient(to top, rgba(0, 0, 0, 0.58), rgba(0, 0, 0, 0.08) 58%);
+      .code-head {
+        padding: 12px 18px;
+        border-bottom: 1px solid var(--border);
+        font-size: 13px;
+        color: var(--muted);
+        display: flex; justify-content: space-between; align-items: center;
       }
-
-      .background-surface > .fideo {
-        position: absolute;
-        inset: 0;
-        z-index: -2;
-      }
-
-      .background-content {
-        max-width: 640px;
-        padding: clamp(22px, 5vw, 48px);
-        color: #fff;
-      }
-
-      .background-content h3 {
-        margin: 0 0 8px;
-        font-size: clamp(28px, 5vw, 56px);
-        line-height: 1;
-      }
-
-      .background-content p {
-        color: rgba(255, 255, 255, 0.82);
-      }
-
-      .background-hero {
-        min-height: 440px;
-      }
-
-      .background-wide {
-        aspect-ratio: 21 / 7;
-        min-height: 190px;
-      }
-
-      .full-bleed-section {
-        width: 100vw;
-        margin-left: calc(50% - 50vw);
-      }
-
-      .full-bleed-section h2,
-      .full-bleed-section pre {
-        width: min(1080px, calc(100% - 32px));
-        margin-right: auto;
-        margin-left: auto;
-      }
-
-      .iframe-cover-hero {
-        width: 100vw;
-        height: 460px;
-        min-height: 0;
-        border-radius: 0;
-      }
-
-      .iframe-cover-hero .background-content {
-        box-sizing: border-box;
-        width: min(1080px, calc(100% - 32px));
-        max-width: none;
-        margin: 0 auto;
-      }
-
-      .background-grid {
-        display: grid;
-        grid-template-columns: repeat(12, 1fr);
-        gap: 16px;
-      }
-
-      .provider-grid {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 16px;
-      }
-
-      .provider-grid-four {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 16px;
-      }
-
-      .provider-demo {
-        display: grid;
-        gap: 10px;
-        min-width: 0;
-      }
-
-      .provider-demo .background-surface {
-        min-height: 0;
-        aspect-ratio: 16 / 9;
-      }
-
-      .provider-demo .background-content {
-        padding: 16px;
-      }
-
-      .provider-demo h3 {
+      .code-head .label { color: var(--text); font-weight: 500; }
+      pre {
         margin: 0;
-        font-size: 20px;
+        padding: 20px;
+        font-size: 13.5px;
+        line-height: 1.6;
+        overflow-x: auto;
+        color: var(--text);
+        background: var(--surface);
       }
+      .tk-kw { color: #c98aff; }
+      .tk-str { color: #6cf2c0; }
+      .tk-tag { color: #7ab8ff; }
+      .tk-attr { color: #ffb454; }
+      .tk-com { color: var(--dim); font-style: italic; }
+      .tk-num { color: #ff9d7a; }
 
-      .provider-demo pre {
-        min-height: 184px;
-        font-size: 12px;
+      /* ============ PROVIDER GRID ============ */
+      .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
       }
-
-      .background-tile {
-        min-height: 0;
+      @media (max-width: 860px) { .grid-2 { grid-template-columns: 1fr; } }
+      .provider-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        display: flex; flex-direction: column;
       }
-
-      .background-tile.square {
-        grid-column: span 5;
-        aspect-ratio: 1;
+      .provider-head {
+        padding: 16px 20px;
+        display: flex; justify-content: space-between; align-items: center;
+        border-bottom: 1px solid var(--border);
       }
-
-      .background-tile.portrait {
-        grid-column: span 3;
-        aspect-ratio: 3 / 4;
+      .provider-head h4 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 600;
       }
-
-      .background-tile.wide {
-        grid-column: span 4;
-        aspect-ratio: 16 / 9;
+      .badge {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: var(--surface-2);
+        color: var(--muted);
+        border: 1px solid var(--border);
       }
+      .badge.html5 { color: var(--accent); border-color: rgba(108, 242, 192, 0.3); }
+      .badge.youtube { color: #ff7a7a; border-color: rgba(255, 122, 122, 0.3); }
+      .badge.vimeo { color: var(--accent-2); border-color: rgba(122, 184, 255, 0.3); }
+      .badge.wistia { color: #c98aff; border-color: rgba(201, 138, 255, 0.3); }
+      .provider-body { padding: 16px; }
 
-      .background-tile .background-content {
+      /* ============ RESPONSIVE DEMO ============ */
+      .responsive-frame {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
         padding: 18px;
       }
-
-      .background-tile h3 {
-        font-size: 22px;
+      .bp-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 16px;
+        padding: 8px 14px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .bp-indicator strong { color: var(--accent); font-weight: 600; }
+      .bp-dot {
+        width: 8px; height: 8px; border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 10px var(--accent);
+        animation: pulse 2s infinite;
+      }
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.4; }
       }
 
-      .provider-controls-grid {
+      /* ============ BACKGROUND BANNER ============ */
+      .banner {
+        position: relative;
+        min-height: 460px;
+        border-radius: var(--radius);
+        overflow: hidden;
+        display: flex; align-items: center;
+        border: 1px solid var(--border);
+        isolation: isolate;
+      }
+      .banner .fideo { position: absolute; inset: 0; z-index: 0; }
+      .banner::after {
+        content: "";
+        position: absolute; inset: 0;
+        background: linear-gradient(110deg, rgba(8, 9, 12, 0.78) 0%, rgba(8, 9, 12, 0.4) 60%, rgba(8, 9, 12, 0) 100%);
+        z-index: 1;
+        pointer-events: none;
+      }
+      .banner-content {
+        position: relative;
+        padding: 50px;
+        max-width: 540px;
+        z-index: 2;
+      }
+      .banner-content h3 {
+        font-size: 32px;
+        margin: 0 0 10px;
+        letter-spacing: -0.02em;
+      }
+      .banner-content p { color: var(--muted); margin: 0; }
+      @media (max-width: 600px) { .banner-content { padding: 30px; } }
+
+      /* ============ MASONRY ============ */
+      .masonry-block {
+        padding: 64px 0 96px;
+      }
+      .masonry-head {
+        margin-bottom: 32px;
+        max-width: 760px;
+      }
+      .masonry-head h2 {
+        max-width: 28ch;
+      }
+      .masonry {
+        column-count: 4;
+        column-gap: 14px;
+      }
+      @media (max-width: 1000px) { .masonry { column-count: 3; } }
+      @media (max-width: 700px) { .masonry { column-count: 2; } }
+      @media (max-width: 420px) { .masonry { column-count: 1; } }
+      .tile {
+        position: relative;
+        margin: 0 0 14px;
+        break-inside: avoid;
+        border-radius: var(--radius);
+        overflow: hidden;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        isolation: isolate;
+        display: block;
+      }
+      .tile .fideo {
+        position: absolute;
+        inset: 0;
+      }
+      .tile-portrait  { aspect-ratio: 9 / 16; }
+      .tile-landscape { aspect-ratio: 16 / 9; }
+      .tile-square    { aspect-ratio: 1 / 1; }
+      .tile-tall      { aspect-ratio: 4 / 7; }
+
+      /* ============ SHORTS GRID ============ */
+      .shorts-grid {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+      }
+      @media (max-width: 820px) { .shorts-grid { grid-template-columns: repeat(2, 1fr); } }
+      @media (max-width: 520px) { .shorts-grid { grid-template-columns: 1fr; } }
+      .short-card {
+        position: relative;
+        aspect-ratio: 9 / 16;
+        border-radius: var(--radius);
+        overflow: hidden;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        isolation: isolate;
+      }
+      .short-card .fideo {
+        position: absolute;
+        inset: 0;
+      }
+
+      /* ============ JS API PANEL ============ */
+      .api-grid {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr;
+        gap: 24px;
+      }
+      @media (max-width: 900px) { .api-grid { grid-template-columns: 1fr; } }
+      .api-panel {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 22px;
+      }
+      .api-panel h4 {
+        margin: 0 0 6px;
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .api-panel p.small {
+        color: var(--muted);
+        font-size: 13px;
+        margin: 0 0 18px;
+      }
+      .api-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 20px;
+      }
+      .api-buttons button {
+        font-size: 13px;
+        padding: 8px 14px;
+        background: var(--surface-2);
+        color: var(--text);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        cursor: pointer;
+        font-family: ui-monospace, Menlo, monospace;
+        transition: border-color 0.15s, background 0.15s;
+      }
+      .api-buttons button:hover {
+        border-color: var(--accent);
+        background: rgba(108, 242, 192, 0.08);
+        color: var(--accent);
+      }
+      .state-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        font-size: 13px;
+        border-bottom: 1px solid var(--border);
+      }
+      .state-row:last-child { border-bottom: none; }
+      .state-row .k { color: var(--muted); }
+      .state-row .v { color: var(--text); font-family: ui-monospace, Menlo, monospace; }
+
+      /* ============ EVENT LOG ============ */
+      .log {
+        font-family: ui-monospace, Menlo, monospace;
+        font-size: 12.5px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        height: 220px;
+        overflow-y: auto;
+        padding: 14px;
+        line-height: 1.6;
+      }
+      .log .entry { display: flex; gap: 10px; }
+      .log .t { color: var(--dim); flex: 0 0 70px; }
+      .log .e { color: var(--accent); }
+      .log .d { color: var(--muted); }
+
+      /* ============ THEMES ============ */
+      .theme-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+      }
+      @media (max-width: 900px) { .theme-grid { grid-template-columns: 1fr; } }
+      .theme-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 18px;
+      }
+      .theme-card h4 {
+        margin: 14px 0 4px;
+        font-size: 15px;
+      }
+      .theme-card p { color: var(--muted); font-size: 13px; margin: 0; }
+
+      /* ============ FOOTER ============ */
+      footer {
+        padding: 60px 0 80px;
+        border-top: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 14px;
+      }
+      footer .wrap {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
         gap: 16px;
       }
+      footer .links { display: flex; gap: 22px; }
 
-      .provider-controls-demo {
-        display: grid;
-        gap: 10px;
-        min-width: 0;
+      /* ============ FIDEO TINTS ============ */
+      .fideo-mint {
+        --fideo-accent: #6cf2c0;
+        --fideo-track-fill: #6cf2c0;
       }
-
-      .provider-controls-demo h3 {
-        margin: 0;
-        font-size: 16px;
+      .fideo-coral {
+        --fideo-accent: #ff7a7a;
+        --fideo-track-fill: #ff7a7a;
       }
-
-      .provider-controls-demo pre {
-        font-size: 11px;
-        min-height: 100px;
+      .fideo-violet {
+        --fideo-accent: #c98aff;
+        --fideo-track-fill: #c98aff;
+        --fideo-radius: 4px;
       }
-
-      @media (max-width: 760px) {
-        .background-hero {
-          min-height: 360px;
-        }
-
-        .background-wide {
-          aspect-ratio: 4 / 3;
-        }
-
-        .iframe-cover-hero {
-          height: 360px;
-        }
-
-        .background-grid {
-          grid-template-columns: 1fr;
-        }
-
-        .provider-grid,
-        .provider-grid-four {
-          grid-template-columns: 1fr;
-        }
-
-        .provider-controls-grid {
-          grid-template-columns: 1fr;
-        }
-
-        .background-tile.square,
-        .background-tile.portrait,
-        .background-tile.wide {
-          grid-column: auto;
-        }
+      .fideo-minimal {
+        --fideo-accent: #111;
+        --fideo-control-bg: rgba(255, 255, 255, 0.94);
+        --fideo-control-color: #111;
+        --fideo-track: rgba(0, 0, 0, 0.18);
+        --fideo-track-fill: #111;
       }
     </style>
   </head>
   <body>
-    <main>
-      <header>
-        <h1>Fideo JS</h1>
-        <p>
-          Normal video and iframe embeds with a small custom UI, responsive sources, viewport playback, and per-control
-          configuration. Supports HTML5, YouTube, Vimeo, and Wistia.
+    <nav>
+      <div class="wrap">
+        <a class="brand" href="#top">
+          <span class="brand-dot"></span>
+          Fideo JS
+        </a>
+        <ul>
+          <li><a href="#providers">Providers</a></li>
+          <li><a href="#responsive">Responsive</a></li>
+          <li><a href="#api">JS API</a></li>
+          <li><a href="#themes">Theming</a></li>
+          <li><a href="https://github.com/devjtv/fideo-js">GitHub</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- ============================ HERO ============================ -->
+    <header class="hero" id="top">
+      <div class="hero-bg-wrap">
+        <iframe
+          data-fideo
+          data-fideo-background
+          src="https://player.vimeo.com/video/347119375?background=1&autoplay=1&muted=1&loop=1"
+          allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+        ></iframe>
+      </div>
+      <div class="wrap hero-content">
+        <span class="pill">v0.3.2 · ~12&nbsp;kB gzipped · zero dependencies</span>
+        <h1>One video API for <em>every provider</em>.</h1>
+        <p class="lede">
+          Fideo is a tiny, framework-free video UI that wraps HTML5, YouTube, Vimeo, and Wistia
+          behind a single set of data attributes. Responsive sources, background loops, viewport
+          triggers, and themable controls — without shipping a player runtime.
         </p>
-      </header>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="https://github.com/devjtv/fideo-js">
+            Get started on GitHub
+          </a>
+          <a class="btn" href="#providers">See it in action</a>
+        </div>
+      </div>
+    </header>
 
-      <!-- ================================================ -->
-      <!-- HTML5 Section                                    -->
-      <!-- ================================================ -->
-      <section>
-        <h2>HTML5 video, full controls, viewport play/pause</h2>
-        <video
-          class="brand-coral"
-          data-fideo
-          data-fideo-muted="true"
-          data-fideo-viewport="play-pause"
-          data-fideo-src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
-          data-fideo-src-mobile="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
-          data-fideo-poster="https://interactive-examples.mdn.mozilla.net/media/examples/flower.jpg"
-        ></video>
-        <pre><code>&lt;video
-  data-fideo
-  data-fideo-muted="true"
-  data-fideo-viewport="play-pause"
-  data-fideo-src="/videos/desktop.mp4"
-  data-fideo-src-mobile="/videos/mobile.mp4"
-  data-fideo-poster="/posters/desktop.jpg"
-&gt;&lt;/video&gt;</code></pre>
-      </section>
-
-      <section>
-        <h2>Minimal controls: play and timeline only</h2>
-        <video
-          data-fideo
-          data-fideo-show-volume="false"
-          data-fideo-show-settings="false"
-          data-fideo-show-fullscreen="false"
-          data-fideo-src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
-        ></video>
-        <pre><code>&lt;video
-  data-fideo
-  data-fideo-show-volume="false"
-  data-fideo-show-settings="false"
-  data-fideo-show-fullscreen="false"
-  data-fideo-src="/videos/clip.mp4"
-&gt;&lt;/video&gt;</code></pre>
-      </section>
-
-      <section>
-        <h2>Timeline only, no buttons</h2>
-        <video
-          data-fideo
-          data-fideo-show-play="false"
-          data-fideo-show-time="false"
-          data-fideo-show-volume="false"
-          data-fideo-show-settings="false"
-          data-fideo-show-fullscreen="false"
-          data-fideo-src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
-        ></video>
-        <pre><code>&lt;video
-  data-fideo
-  data-fideo-show-play="false"
-  data-fideo-show-time="false"
-  data-fideo-show-volume="false"
-  data-fideo-show-settings="false"
-  data-fideo-show-fullscreen="false"
-  data-fideo-src="/videos/quiet-loop.mp4"
-&gt;&lt;/video&gt;</code></pre>
-      </section>
-
-      <section>
-        <h2>No controls (click to toggle play/pause)</h2>
-        <video
-          data-fideo
-          data-fideo-controls="false"
-          data-fideo-src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
-        ></video>
-        <pre><code>&lt;video
-  data-fideo
-  data-fideo-controls="false"
-  data-fideo-src="/videos/native.mp4"
-&gt;&lt;/video&gt;</code></pre>
-      </section>
-
-      <section>
-        <h2>Looping autoplay, no controls</h2>
-        <video
-          data-fideo
-          data-fideo-autoplay="true"
-          data-fideo-muted="true"
-          data-fideo-loop="true"
-          data-fideo-controls="false"
-          data-fideo-src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
-          data-fideo-poster="https://interactive-examples.mdn.mozilla.net/media/examples/flower.jpg"
-        ></video>
-        <pre><code>&lt;video
-  data-fideo
-  data-fideo-autoplay="true"
-  data-fideo-muted="true"
-  data-fideo-loop="true"
-  data-fideo-controls="false"
-  data-fideo-src="/videos/background-loop.mp4"
-  data-fideo-poster="/posters/background-loop.jpg"
-&gt;&lt;/video&gt;</code></pre>
-      </section>
-
-      <!-- ================================================ -->
-      <!-- YouTube Section                                  -->
-      <!-- ================================================ -->
-      <section>
-        <h2>YouTube &mdash; watch URL (auto-converts to no-cookie embed)</h2>
-        <iframe
-          class="brand-blue"
-          data-fideo
-          data-fideo-muted="true"
-          src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
-          title="YouTube video"
-        ></iframe>
-        <pre><code>&lt;iframe
-  data-fideo
-  data-fideo-muted="true"
-  src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
-&gt;&lt;/iframe&gt;</code></pre>
-      </section>
-
-      <section>
-        <h2>YouTube &mdash; youtu.be short URL</h2>
-        <iframe
-          data-fideo
-          data-fideo-muted="true"
-          src="https://youtu.be/M7lc1UVf-VE"
-          title="YouTube short URL video"
-        ></iframe>
-        <pre><code>&lt;iframe
-  data-fideo
-  data-fideo-muted="true"
-  src="https://youtu.be/M7lc1UVf-VE"
-&gt;&lt;/iframe&gt;</code></pre>
-      </section>
-
-      <section>
-        <h2>YouTube &mdash; embed URL with poster overlay</h2>
-        <iframe
-          data-fideo
-          data-fideo-poster="./posters/youtube-desktop.svg"
-          data-fideo-poster-tablet="./posters/youtube-tablet.svg"
-          data-fideo-poster-mobile="./posters/youtube-mobile.svg"
-          src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
-          title="YouTube video with responsive poster overlay"
-        ></iframe>
-        <pre><code>&lt;iframe
-  data-fideo
-  data-fideo-poster="./posters/youtube-desktop.svg"
-  data-fideo-poster-tablet="./posters/youtube-tablet.svg"
-  data-fideo-poster-mobile="./posters/youtube-mobile.svg"
-  src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
-&gt;&lt;/iframe&gt;</code></pre>
-      </section>
-
-      <section>
-        <h2>YouTube &mdash; custom theme, hidden settings</h2>
-        <iframe
-          class="brand-purple"
-          data-fideo
-          data-fideo-show-settings="false"
-          data-fideo-show-fullscreen="false"
-          src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
-          title="YouTube themed video"
-        ></iframe>
-        <pre><code>&lt;iframe
-  class="brand-purple"
-  data-fideo
-  data-fideo-show-settings="false"
-  data-fideo-show-fullscreen="false"
-  src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
-&gt;&lt;/iframe&gt;</code></pre>
-      </section>
-
-      <!-- ================================================ -->
-      <!-- Vimeo Section                                    -->
-      <!-- ================================================ -->
-      <section>
-        <h2>Vimeo &mdash; full controls</h2>
-        <iframe
-          class="brand-green"
-          data-fideo
-          src="https://player.vimeo.com/video/76979871"
-          title="Vimeo video with full controls"
-        ></iframe>
-        <pre><code>&lt;iframe
-  data-fideo
-  src="https://player.vimeo.com/video/76979871"
-&gt;&lt;/iframe&gt;</code></pre>
-      </section>
-
-      <section>
-        <h2>Vimeo &mdash; vimeo.com page URL (auto-normalized)</h2>
-        <iframe
-          data-fideo
-          data-fideo-show-settings="false"
-          src="https://vimeo.com/76979871"
-          title="Vimeo page URL auto-normalized"
-        ></iframe>
-        <pre><code>&lt;iframe
-  data-fideo
-  data-fideo-show-settings="false"
-  src="https://vimeo.com/76979871"
-&gt;&lt;/iframe&gt;</code></pre>
-      </section>
-
-      <section>
-        <h2>Vimeo &mdash; with poster overlay</h2>
-        <iframe
-          data-fideo
-          data-fideo-poster="./posters/youtube-desktop.svg"
-          src="https://player.vimeo.com/video/76979871"
-          title="Vimeo video with poster"
-        ></iframe>
-        <pre><code>&lt;iframe
-  data-fideo
-  data-fideo-poster="./posters/vimeo-poster.jpg"
-  src="https://player.vimeo.com/video/76979871"
-&gt;&lt;/iframe&gt;</code></pre>
-      </section>
-
-      <section>
-        <h2>Vimeo &mdash; muted, custom theme</h2>
-        <iframe
-          class="brand-coral"
-          data-fideo
-          data-fideo-muted="true"
-          src="https://vimeo.com/76979871"
-          title="Vimeo muted with custom theme"
-        ></iframe>
-        <pre><code>&lt;iframe
-  class="brand-coral"
-  data-fideo
-  data-fideo-muted="true"
-  src="https://vimeo.com/76979871"
-&gt;&lt;/iframe&gt;</code></pre>
-      </section>
-
-      <!-- ================================================ -->
-      <!-- Wistia Section                                   -->
-      <!-- ================================================ -->
-      <section>
-        <h2>Wistia &mdash; full controls</h2>
-        <iframe
-          data-fideo
-          data-fideo-muted="true"
-          src="https://fast.wistia.com/embed/medias/358edhd4og"
-          title="Wistia video with controls"
-        ></iframe>
-        <pre><code>&lt;iframe
-  data-fideo
-  data-fideo-muted="true"
-  src="https://fast.wistia.com/embed/medias/358edhd4og"
-&gt;&lt;/iframe&gt;</code></pre>
-      </section>
-
-      <section>
-        <h2>Wistia &mdash; with poster overlay</h2>
-        <iframe
-          data-fideo
-          data-fideo-poster="./posters/youtube-desktop.svg"
-          src="https://fast.wistia.com/embed/medias/358edhd4og"
-          title="Wistia video with poster"
-        ></iframe>
-        <pre><code>&lt;iframe
-  data-fideo
-  data-fideo-poster="./posters/wistia-poster.jpg"
-  src="https://fast.wistia.com/embed/medias/358edhd4og"
-&gt;&lt;/iframe&gt;</code></pre>
-      </section>
-
-      <!-- ================================================ -->
-      <!-- All Provider Controls Matrix                     -->
-      <!-- ================================================ -->
-      <section>
-        <h2>All providers with standard controls</h2>
-        <div class="provider-controls-grid">
-          <div class="provider-controls-demo">
-            <h3>HTML5</h3>
-            <video
-              data-fideo
-              data-fideo-src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
-              data-fideo-poster="https://interactive-examples.mdn.mozilla.net/media/examples/flower.jpg"
-            ></video>
-            <pre><code>&lt;video
-  data-fideo
-  data-fideo-src="/videos/clip.mp4"
-  data-fideo-poster="/posters/clip.jpg"
-&gt;&lt;/video&gt;</code></pre>
+    <!-- ============================ FEATURES ============================ -->
+    <section class="block">
+      <div class="wrap">
+        <div class="features">
+          <div class="feature">
+            <div class="feature-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <h3>Tiny + fast</h3>
+            <p>~12&nbsp;kB gzipped. No React, no Vue, no virtual DOM. Just the browser.</p>
           </div>
-          <div class="provider-controls-demo">
-            <h3>YouTube</h3>
-            <iframe
-              data-fideo
-              data-fideo-muted="true"
-              src="https://youtu.be/M7lc1UVf-VE"
-              title="YouTube controls demo"
-            ></iframe>
-            <pre><code>&lt;iframe
-  data-fideo
-  data-fideo-muted="true"
-  src="https://youtu.be/M7lc1UVf-VE"
-&gt;&lt;/iframe&gt;</code></pre>
+          <div class="feature">
+            <div class="feature-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/></svg>
+            </div>
+            <h3>Multi-provider</h3>
+            <p>HTML5, YouTube, Vimeo, Wistia — one identical API across all four.</p>
           </div>
-          <div class="provider-controls-demo">
-            <h3>Vimeo</h3>
-            <iframe
-              data-fideo
-              src="https://vimeo.com/76979871"
-              title="Vimeo controls demo"
-            ></iframe>
-            <pre><code>&lt;iframe
-  data-fideo
-  src="https://vimeo.com/76979871"
-&gt;&lt;/iframe&gt;</code></pre>
+          <div class="feature">
+            <div class="feature-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="14" height="12" rx="2"/><rect x="18" y="8" width="4" height="8" rx="1"/></svg>
+            </div>
+            <h3>Responsive</h3>
+            <p>Per-breakpoint sources and posters, background-cover for iframes, no jank.</p>
           </div>
-          <div class="provider-controls-demo">
-            <h3>Wistia</h3>
-            <iframe
-              data-fideo
-              data-fideo-muted="true"
-              src="https://fast.wistia.com/embed/medias/358edhd4og"
-              title="Wistia controls demo"
-            ></iframe>
-            <pre><code>&lt;iframe
-  data-fideo
-  data-fideo-muted="true"
-  src="https://fast.wistia.com/embed/medias/358edhd4og"
-&gt;&lt;/iframe&gt;</code></pre>
+          <div class="feature">
+            <div class="feature-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            </div>
+            <h3>Drop-in</h3>
+            <p>Auto-mount with <code>data-fideo</code> attributes, or drive imperatively from JS.</p>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- ================================================ -->
-      <!-- All Provider Poster Matrix                       -->
-      <!-- ================================================ -->
-      <section>
-        <h2>All providers with poster overlays</h2>
-        <div class="provider-controls-grid">
-          <div class="provider-controls-demo">
-            <h3>YouTube poster</h3>
-            <iframe
-              data-fideo
-              data-fideo-muted="true"
-              data-fideo-poster="./posters/youtube-desktop.svg"
-              data-fideo-poster-tablet="./posters/youtube-tablet.svg"
-              data-fideo-poster-mobile="./posters/youtube-mobile.svg"
-              src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
-              title="YouTube poster demo"
-            ></iframe>
-            <pre><code>&lt;iframe
-  data-fideo
-  data-fideo-muted="true"
-  data-fideo-poster="./posters/youtube-desktop.svg"
-  data-fideo-poster-tablet="./posters/youtube-tablet.svg"
-  data-fideo-poster-mobile="./posters/youtube-mobile.svg"
-  src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
-&gt;&lt;/iframe&gt;</code></pre>
+    <!-- ============================ QUICK START ============================ -->
+    <section class="block">
+      <div class="wrap">
+        <div class="eyebrow">Quick start</div>
+        <h2>Two lines of HTML. That's the player.</h2>
+        <p class="section-lede">
+          Drop in the CDN bundle, mark up a <code>&lt;video&gt;</code> or <code>&lt;iframe&gt;</code>
+          with the right attributes, and Fideo auto-discovers it on load. Same markup pattern for
+          every provider.
+        </p>
+        <div class="code-grid">
+          <div class="code-card">
+            <div class="code-head"><span class="label">Install via CDN</span><span>HTML</span></div>
+<pre><span class="tk-com">&lt;!-- styles + library --&gt;</span>
+<span class="tk-tag">&lt;link</span> <span class="tk-attr">rel</span>=<span class="tk-str">"stylesheet"</span>
+      <span class="tk-attr">href</span>=<span class="tk-str">"https://cdn.jsdelivr.net/npm/fideo-js/dist/styles.css"</span><span class="tk-tag">&gt;</span>
+<span class="tk-tag">&lt;script</span> <span class="tk-attr">src</span>=<span class="tk-str">"https://cdn.jsdelivr.net/npm/fideo-js/dist/fideo.global.js"</span><span class="tk-tag">&gt;&lt;/script&gt;</span></pre>
           </div>
-          <div class="provider-controls-demo">
-            <h3>Vimeo poster</h3>
-            <iframe
-              data-fideo
-              data-fideo-poster="./posters/youtube-desktop.svg"
-              src="https://player.vimeo.com/video/76979871"
-              title="Vimeo poster demo"
-            ></iframe>
-            <pre><code>&lt;iframe
-  data-fideo
-  data-fideo-poster="./posters/vimeo-poster.jpg"
-  src="https://player.vimeo.com/video/76979871"
-&gt;&lt;/iframe&gt;</code></pre>
-          </div>
-          <div class="provider-controls-demo">
-            <h3>Wistia poster</h3>
-            <iframe
-              data-fideo
-              data-fideo-poster="./posters/youtube-desktop.svg"
-              src="https://fast.wistia.com/embed/medias/358edhd4og"
-              title="Wistia poster demo"
-            ></iframe>
-            <pre><code>&lt;iframe
-  data-fideo
-  data-fideo-poster="./posters/wistia-poster.jpg"
-  src="https://fast.wistia.com/embed/medias/358edhd4og"
-&gt;&lt;/iframe&gt;</code></pre>
-          </div>
-          <div class="provider-controls-demo">
-            <h3>HTML5 poster</h3>
-            <video
-              data-fideo
-              data-fideo-poster="https://interactive-examples.mdn.mozilla.net/media/examples/flower.jpg"
-              data-fideo-src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
-            ></video>
-            <pre><code>&lt;video
-  data-fideo
-  data-fideo-poster="/posters/html5-poster.jpg"
-  data-fideo-src="/videos/clip.mp4"
-&gt;&lt;/video&gt;</code></pre>
+          <div class="code-card">
+            <div class="code-head"><span class="label">Drop in a player</span><span>HTML</span></div>
+<pre><span class="tk-tag">&lt;iframe</span>
+  <span class="tk-attr">data-fideo</span>
+  <span class="tk-attr">src</span>=<span class="tk-str">"https://youtu.be/dQw4w9WgXcQ"</span>
+  <span class="tk-attr">data-fideo-poster</span>=<span class="tk-str">"/poster.jpg"</span>
+<span class="tk-tag">&gt;&lt;/iframe&gt;</span></pre>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- ================================================ -->
-      <!-- All Provider Background Matrix                   -->
-      <!-- ================================================ -->
-      <section>
-        <h2>Background provider matrix</h2>
-        <div class="provider-grid-four">
-          <div class="provider-demo">
-            <div class="background-surface">
+    <!-- ============================ PROVIDERS ============================ -->
+    <section class="block" id="providers">
+      <div class="wrap">
+        <div class="eyebrow">Provider gallery</div>
+        <h2>Same markup. Four different runtimes.</h2>
+        <p class="section-lede">
+          Each of these uses identical Fideo controls and identical data attributes — only the
+          element type and source URL change. Provider SDKs are lazy-loaded on demand.
+        </p>
+        <div class="grid-2">
+          <div class="provider-card">
+            <div class="provider-head">
+              <h4>HTML5 Video</h4>
+              <span class="badge html5">native</span>
+            </div>
+            <div class="provider-body">
               <video
                 data-fideo
-                data-fideo-background="true"
-                data-fideo-src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
-                data-fideo-poster="https://interactive-examples.mdn.mozilla.net/media/examples/flower.jpg"
+                data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
+                data-fideo-poster="https://picsum.photos/id/1018/1280/720"
+                data-fideo-muted
+                data-fideo-loop
+                data-fideo-autoplay
               ></video>
-              <div class="background-content">
-                <h3>MP4</h3>
-              </div>
             </div>
-            <pre><code>&lt;video
-  data-fideo
-  data-fideo-background="true"
-  data-fideo-src="/videos/clip.mp4"
-  data-fideo-poster="/posters/clip.jpg"
-&gt;&lt;/video&gt;</code></pre>
           </div>
 
-          <div class="provider-demo">
-            <div class="background-surface">
+          <div class="provider-card">
+            <div class="provider-head">
+              <h4>YouTube</h4>
+              <span class="badge youtube">youtube</span>
+            </div>
+            <div class="provider-body">
               <iframe
                 data-fideo
-                data-fideo-background="true"
-                data-fideo-background-aspect-ratio="16:9"
-                src="https://vimeo.com/76979871"
-                title="Vimeo provider background"
+                src="https://www.youtube.com/watch?v=pb-j3svRQLI"
+                data-fideo-poster="https://img.youtube.com/vi/pb-j3svRQLI/maxresdefault.jpg"
+                data-fideo-muted
+                data-fideo-loop
+                data-fideo-autoplay
+                allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
               ></iframe>
-              <div class="background-content">
-                <h3>Vimeo</h3>
-              </div>
             </div>
-            <pre><code>&lt;iframe
-  data-fideo
-  data-fideo-background="true"
-  data-fideo-background-aspect-ratio="16:9"
-  src="https://vimeo.com/76979871"
-&gt;&lt;/iframe&gt;</code></pre>
           </div>
 
-          <div class="provider-demo">
-            <div class="background-surface">
+          <div class="provider-card">
+            <div class="provider-head">
+              <h4>Vimeo</h4>
+              <span class="badge vimeo">vimeo</span>
+            </div>
+            <div class="provider-body">
               <iframe
                 data-fideo
-                data-fideo-background="true"
-                data-fideo-background-aspect-ratio="16:9"
-                src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
-                title="YouTube provider background"
+                src="https://vimeo.com/347119375"
+                data-fideo-poster="https://picsum.photos/id/1019/1280/720"
+                data-fideo-muted
+                data-fideo-loop
+                data-fideo-autoplay
+                allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
               ></iframe>
-              <div class="background-content">
-                <h3>YouTube</h3>
-              </div>
             </div>
-            <pre><code>&lt;iframe
-  data-fideo
-  data-fideo-background="true"
-  data-fideo-background-aspect-ratio="16:9"
-  src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
-&gt;&lt;/iframe&gt;</code></pre>
           </div>
 
-          <div class="provider-demo">
-            <div class="background-surface">
+          <div class="provider-card">
+            <div class="provider-head">
+              <h4>Wistia</h4>
+              <span class="badge wistia">wistia</span>
+            </div>
+            <div class="provider-body">
               <iframe
                 data-fideo
-                data-fideo-background="true"
-                data-fideo-background-aspect-ratio="16:9"
                 src="https://fast.wistia.com/embed/medias/358edhd4og"
-                title="Wistia provider background"
+                data-fideo-muted
+                data-fideo-loop
+                data-fideo-autoplay
+                allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
               ></iframe>
-              <div class="background-content">
-                <h3>Wistia</h3>
-              </div>
             </div>
-            <pre><code>&lt;iframe
-  data-fideo
-  data-fideo-background="true"
-  data-fideo-background-aspect-ratio="16:9"
-  src="https://fast.wistia.com/embed/medias/358edhd4og"
-&gt;&lt;/iframe&gt;</code></pre>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- ================================================ -->
-      <!-- Hero / Background Banners                        -->
-      <!-- ================================================ -->
-      <section>
-        <h2>Background video hero (HTML5)</h2>
-        <div class="background-surface background-hero">
+    <!-- ============================ RESPONSIVE ============================ -->
+    <section class="block" id="responsive">
+      <div class="wrap">
+        <div class="eyebrow">Responsive sources</div>
+        <h2>Different videos. Different posters. Same player.</h2>
+        <p class="section-lede">
+          Specify desktop / tablet / mobile variants and Fideo picks the right asset at each
+          breakpoint. Resize your browser to watch the source swap.
+        </p>
+        <div class="responsive-frame">
+          <span class="bp-indicator">
+            <span class="bp-dot"></span>
+            Current breakpoint: <strong id="bp-label">desktop</strong>
+          </span>
           <video
             data-fideo
-            data-fideo-background="true"
-            data-fideo-src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
-            data-fideo-poster="https://interactive-examples.mdn.mozilla.net/media/examples/flower.jpg"
+            data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
+            data-fideo-src-tablet="https://videos.pexels.com/video-files/3209828/3209828-hd_1920_1080_25fps.mp4"
+            data-fideo-src-mobile="https://res.cloudinary.com/demo/video/upload/elephants.mp4"
+            data-fideo-poster="https://picsum.photos/id/1018/1600/900"
+            data-fideo-poster-tablet="https://picsum.photos/id/1015/1200/900"
+            data-fideo-poster-mobile="https://picsum.photos/id/1019/720/1280"
+            data-fideo-muted
+            data-fideo-loop
           ></video>
-          <div class="background-content">
-            <h3>Full bleed, no controls</h3>
-            <p>Background mode fills the parent container, mutes, loops, autoplays, and keeps controls hidden.</p>
-          </div>
         </div>
-        <pre><code>&lt;div class="hero"&gt;
-  &lt;video
-    data-fideo
-    data-fideo-background="true"
-    data-fideo-src="/videos/hero.mp4"
-    data-fideo-poster="/posters/hero.jpg"
-  &gt;&lt;/video&gt;
-&lt;/div&gt;</code></pre>
-      </section>
+      </div>
+    </section>
 
-      <section>
-        <h2>Background iframe banner with cover sizing (Vimeo)</h2>
-        <div class="background-surface background-wide">
+    <!-- ============================ BACKGROUND MODE ============================ -->
+    <section class="block">
+      <div class="wrap">
+        <div class="eyebrow">Background mode</div>
+        <h2>Hero videos that just behave.</h2>
+        <p class="section-lede">
+          One attribute turns any provider into a silent, looping, container-filling background —
+          even when the source is a YouTube or Vimeo iframe.
+        </p>
+        <div class="banner">
           <iframe
             data-fideo
-            data-fideo-background="true"
-            data-fideo-background-aspect-ratio="16:9"
-            src="https://vimeo.com/76979871"
-            title="Vimeo background video"
+            data-fideo-background
+            src="https://player.vimeo.com/video/347119375?background=1&autoplay=1&muted=1&loop=1"
+            allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
           ></iframe>
-          <div class="background-content">
-            <h3>Iframe cover</h3>
-            <p>Iframe media is resized by Fideo so it covers unusual container shapes without black bars.</p>
+          <div class="banner-content">
+            <h3>Cinematic, without the bloat.</h3>
+            <p>
+              <code>data-fideo-background</code> hides controls, mutes audio, autoplays, loops,
+              and object-fit covers the container — across every supported provider.
+            </p>
           </div>
         </div>
-        <pre><code>&lt;div class="banner"&gt;
-  &lt;iframe
-    data-fideo
-    data-fideo-background="true"
-    data-fideo-background-aspect-ratio="16:9"
-    src="https://vimeo.com/76979871"
-  &gt;&lt;/iframe&gt;
-&lt;/div&gt;</code></pre>
-      </section>
+      </div>
+    </section>
 
-      <section>
-        <h2>Background iframe banner with cover sizing (YouTube)</h2>
-        <div class="background-surface background-wide">
-          <iframe
-            data-fideo
-            data-fideo-background="true"
-            data-fideo-background-aspect-ratio="16:9"
-            src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
-            title="YouTube background video"
-          ></iframe>
-          <div class="background-content">
-            <h3>YouTube cover</h3>
-            <p>Same cover sizing works for YouTube. Watch URLs are auto-converted.</p>
-          </div>
+    <!-- ============================ MASONRY SHOWCASE ============================ -->
+    <section class="masonry-block">
+      <div class="wrap">
+        <div class="masonry-head">
+          <div class="eyebrow">Background mode in the wild</div>
+          <h2>Eight clips. Eight providers and ratios. One attribute.</h2>
+          <p class="section-lede">
+            Every tile below is a Fideo player in background mode — autoplay, muted, looping,
+            cover-filling its container. Mix HTML5, YouTube Shorts, and Vimeo at any aspect ratio.
+          </p>
         </div>
-        <pre><code>&lt;div class="banner"&gt;
-  &lt;iframe
-    data-fideo
-    data-fideo-background="true"
-    data-fideo-background-aspect-ratio="16:9"
-    src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
-  &gt;&lt;/iframe&gt;
-&lt;/div&gt;</code></pre>
-      </section>
-
-      <section class="full-bleed-section">
-        <h2>Full browser width Vimeo iframe hero</h2>
-        <div class="background-surface iframe-cover-hero">
-          <iframe
-            data-fideo
-            data-fideo-background="true"
-            data-fideo-background-aspect-ratio="16:9"
-            src="https://vimeo.com/76979871"
-            title="Full width Vimeo background hero"
-          ></iframe>
-          <div class="background-content">
-            <h3>Vimeo cover hero</h3>
-            <p>A fixed-height, full viewport-width hero using an iframe background with cover sizing.</p>
+        <div class="masonry">
+          <div class="tile tile-portrait">
+            <iframe
+              data-fideo
+              data-fideo-background
+              data-fideo-background-aspect-ratio="9:16"
+              src="https://www.youtube.com/shorts/ot-vAzEBxlI"
+              allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+            ></iframe>
           </div>
-        </div>
-        <pre><code>&lt;section class="hero"&gt;
-  &lt;iframe
-    data-fideo
-    data-fideo-background="true"
-    data-fideo-background-aspect-ratio="16:9"
-    src="https://vimeo.com/76979871"
-  &gt;&lt;/iframe&gt;
-&lt;/section&gt;</code></pre>
-      </section>
-
-      <section class="full-bleed-section">
-        <h2>Full browser width YouTube iframe hero</h2>
-        <div class="background-surface iframe-cover-hero">
-          <iframe
-            data-fideo
-            data-fideo-background="true"
-            data-fideo-background-aspect-ratio="16:9"
-            src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
-            title="Full width YouTube background hero"
-          ></iframe>
-          <div class="background-content">
-            <h3>YouTube cover hero</h3>
-            <p>The same background mode works with YouTube and normal watch URLs are converted automatically.</p>
-          </div>
-        </div>
-        <pre><code>&lt;section class="hero"&gt;
-  &lt;iframe
-    data-fideo
-    data-fideo-background="true"
-    data-fideo-background-aspect-ratio="16:9"
-    src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
-  &gt;&lt;/iframe&gt;
-&lt;/section&gt;</code></pre>
-      </section>
-
-      <section class="full-bleed-section">
-        <h2>Full browser width Wistia iframe hero</h2>
-        <div class="background-surface iframe-cover-hero">
-          <iframe
-            data-fideo
-            data-fideo-background="true"
-            data-fideo-background-aspect-ratio="16:9"
-            src="https://fast.wistia.com/embed/medias/358edhd4og"
-            title="Full width Wistia background hero"
-          ></iframe>
-          <div class="background-content">
-            <h3>Wistia cover hero</h3>
-            <p>Wistia also works with background mode and cover sizing.</p>
-          </div>
-        </div>
-        <pre><code>&lt;section class="hero"&gt;
-  &lt;iframe
-    data-fideo
-    data-fideo-background="true"
-    data-fideo-background-aspect-ratio="16:9"
-    src="https://fast.wistia.com/embed/medias/358edhd4og"
-  &gt;&lt;/iframe&gt;
-&lt;/section&gt;</code></pre>
-      </section>
-
-      <!-- ================================================ -->
-      <!-- JavaScript Object Init                           -->
-      <!-- ================================================ -->
-      <section>
-        <h2>JavaScript object initialization</h2>
-        <video id="object-player-playing"></video>
-        <pre><code>new Fideo('#object-player-playing', {
-  autoplay: true,
-  muted: true,
-  loop: true,
-  controls: true,
-  sources: {
-    desktop: '/videos/background-loop.mp4',
-  },
-  posters: {
-    desktop: '/posters/background-loop.jpg',
-  },
-});</code></pre>
-        <video id="object-player"></video>
-        <pre><code>import { Fideo } from 'fideo-js';
-
-new Fideo('#object-player', {
-  autoplay: true,
-  muted: true,
-  loop: true,
-  controls: false,
-  sources: {
-    desktop: '/videos/background-loop.mp4',
-  },
-  posters: {
-    desktop: '/posters/background-loop.jpg',
-  },
-});</code></pre>
-      </section>
-
-      <!-- ================================================ -->
-      <!-- Background Video Tiles                           -->
-      <!-- ================================================ -->
-      <section>
-        <h2>Background video tiles</h2>
-        <div class="background-grid">
-          <div class="background-surface background-tile square">
+          <div class="tile tile-landscape">
             <video
               data-fideo
-              data-fideo-background="true"
-              data-fideo-src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+              data-fideo-background
+              data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
             ></video>
-            <div class="background-content">
-              <h3>Square tile</h3>
-            </div>
           </div>
-          <div class="background-surface background-tile portrait">
+          <div class="tile tile-portrait">
+            <iframe
+              data-fideo
+              data-fideo-background
+              data-fideo-background-aspect-ratio="9:16"
+              src="https://www.youtube.com/shorts/jyosrYXFzZA"
+              allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+            ></iframe>
+          </div>
+          <div class="tile tile-landscape">
+            <iframe
+              data-fideo
+              data-fideo-background
+              data-fideo-background-aspect-ratio="16:9"
+              src="https://player.vimeo.com/video/347119375?background=1&autoplay=1&muted=1&loop=1"
+              allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+            ></iframe>
+          </div>
+          <div class="tile tile-square">
             <video
               data-fideo
-              data-fideo-background="true"
-              data-fideo-src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+              data-fideo-background
+              data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
             ></video>
-            <div class="background-content">
-              <h3>Portrait tile</h3>
+          </div>
+          <div class="tile tile-portrait">
+            <iframe
+              data-fideo
+              data-fideo-background
+              data-fideo-background-aspect-ratio="9:16"
+              src="https://www.youtube.com/shorts/JSS_IcFOsfM"
+              allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+            ></iframe>
+          </div>
+          <div class="tile tile-landscape">
+            <video
+              data-fideo
+              data-fideo-background
+              data-fideo-src="https://videos.pexels.com/video-files/3209828/3209828-hd_1920_1080_25fps.mp4"
+            ></video>
+          </div>
+          <div class="tile tile-tall">
+            <video
+              data-fideo
+              data-fideo-background
+              data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
+            ></video>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ SHORTS ============================ -->
+    <section class="block">
+      <div class="wrap">
+        <div class="eyebrow">Vertical / Shorts</div>
+        <h2>Portrait videos? Same attribute.</h2>
+        <p class="section-lede">
+          Pass a <code>/shorts/</code> URL and Fideo normalizes it to the embed format automatically.
+          Set <code>data-fideo-background-aspect-ratio="9:16"</code> so the iframe covers a
+          portrait container without letterboxing — perfect for mobile-first hero modules and
+          social cards.
+        </p>
+        <div class="shorts-grid">
+          <div class="short-card">
+            <iframe
+              data-fideo
+              data-fideo-background
+              data-fideo-background-aspect-ratio="9:16"
+              src="https://www.youtube.com/shorts/ot-vAzEBxlI"
+              allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+            ></iframe>
+          </div>
+          <div class="short-card">
+            <iframe
+              data-fideo
+              data-fideo-background
+              data-fideo-background-aspect-ratio="9:16"
+              src="https://www.youtube.com/shorts/jyosrYXFzZA"
+              allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+            ></iframe>
+          </div>
+          <div class="short-card">
+            <iframe
+              data-fideo
+              data-fideo-background
+              data-fideo-background-aspect-ratio="9:16"
+              src="https://www.youtube.com/shorts/JSS_IcFOsfM"
+              allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+            ></iframe>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ VIEWPORT ============================ -->
+    <section class="block">
+      <div class="wrap">
+        <div class="eyebrow">Viewport playback</div>
+        <h2>Plays when seen. Pauses when not.</h2>
+        <p class="section-lede">
+          Tie playback to an IntersectionObserver with a single attribute. Great for autoplaying
+          card grids without burning CPU off-screen.
+        </p>
+        <div class="grid-2">
+          <div class="provider-card">
+            <div class="provider-head">
+              <h4>Scroll into view to start</h4>
+              <span class="badge html5">viewport="play-pause"</span>
+            </div>
+            <div class="provider-body">
+              <video
+                data-fideo
+                data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
+                data-fideo-poster="https://picsum.photos/id/1018/1280/720"
+                data-fideo-viewport="play-pause"
+                data-fideo-viewport-threshold="0.5"
+                data-fideo-muted
+                data-fideo-loop
+              ></video>
             </div>
           </div>
-          <div class="background-surface background-tile wide">
-            <video
-              id="object-background-player"
-              data-fideo-class="brand-coral"
-            ></video>
-            <div class="background-content">
-              <h3>JS object tile</h3>
+          <div class="provider-card">
+            <div class="provider-head">
+              <h4>Pause-only on exit</h4>
+              <span class="badge html5">viewport="pause"</span>
+            </div>
+            <div class="provider-body">
+              <video
+                data-fideo
+                data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
+                data-fideo-poster="https://picsum.photos/id/1018/1280/720"
+                data-fideo-viewport="pause"
+                data-fideo-muted
+              ></video>
             </div>
           </div>
         </div>
-        <pre><code>&lt;video
-  data-fideo
-  data-fideo-background="true"
-  data-fideo-src="/videos/tile.mp4"
-&gt;&lt;/video&gt;
+      </div>
+    </section>
 
-new Fideo('#object-background-player', {
-  background: true,
-  sources: {
-    desktop: '/videos/tile.mp4',
-  },
-});</code></pre>
-      </section>
-    </main>
+    <!-- ============================ JS API + EVENTS ============================ -->
+    <section class="block" id="api">
+      <div class="wrap">
+        <div class="eyebrow">Imperative JS API</div>
+        <h2>Drive the player from anywhere.</h2>
+        <p class="section-lede">
+          Skip auto-init when you need finer control. Construct a Fideo instance, call
+          <code>play()</code>, <code>pause()</code>, seek, mute, change rate — and listen to a
+          normalized set of DOM events that fire across every provider.
+        </p>
+        <div class="api-grid">
+          <div class="api-panel">
+            <video id="p-api"></video>
+            <div class="api-buttons" style="margin-top: 16px;">
+              <button data-api="play">player.play()</button>
+              <button data-api="pause">player.pause()</button>
+              <button data-api="seek-back">seek -10s</button>
+              <button data-api="seek-fwd">seek +10s</button>
+              <button data-api="rate-half">0.5×</button>
+              <button data-api="rate-one">1×</button>
+              <button data-api="rate-two">2×</button>
+              <button data-api="mute">toggle mute</button>
+            </div>
+          </div>
+          <div>
+            <div class="api-panel" style="margin-bottom: 20px;">
+              <h4>Live state</h4>
+              <p class="small">Read from <code>adapter.getState()</code></p>
+              <div id="state">
+                <div class="state-row"><span class="k">paused</span><span class="v" data-k="paused">—</span></div>
+                <div class="state-row"><span class="k">currentTime</span><span class="v" data-k="currentTime">—</span></div>
+                <div class="state-row"><span class="k">duration</span><span class="v" data-k="duration">—</span></div>
+                <div class="state-row"><span class="k">volume</span><span class="v" data-k="volume">—</span></div>
+                <div class="state-row"><span class="k">muted</span><span class="v" data-k="muted">—</span></div>
+                <div class="state-row"><span class="k">playbackRate</span><span class="v" data-k="playbackRate">—</span></div>
+              </div>
+            </div>
+            <div class="api-panel">
+              <h4>Event stream</h4>
+              <p class="small">Normalized <code>fideo:*</code> DOM events</p>
+              <div class="log" id="log"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ THEMES ============================ -->
+    <section class="block" id="themes">
+      <div class="wrap">
+        <div class="eyebrow">Theming</div>
+        <h2>Match your brand without forking the CSS.</h2>
+        <p class="section-lede">
+          Every control color, track, radius, and icon size is exposed as a CSS variable. Override
+          per-instance with inline styles, per-section with a class, or globally on <code>:root</code>.
+        </p>
+        <div class="theme-grid">
+          <div class="theme-card">
+            <div class="fideo-mint">
+              <video
+                data-fideo
+                data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
+                data-fideo-poster="https://picsum.photos/id/1018/1280/720"
+                data-fideo-muted
+              ></video>
+            </div>
+            <h4>Mint accent</h4>
+            <p>Bright, friendly. Default in this demo.</p>
+          </div>
+          <div class="theme-card">
+            <div class="fideo-violet">
+              <video
+                data-fideo
+                data-fideo-src="https://videos.pexels.com/video-files/3209828/3209828-hd_1920_1080_25fps.mp4"
+                data-fideo-poster="https://picsum.photos/id/1018/1280/720"
+                data-fideo-muted
+              ></video>
+            </div>
+            <h4>Violet, sharp corners</h4>
+            <p>Override radius and accent together for a more editorial look.</p>
+          </div>
+          <div class="theme-card">
+            <div class="fideo-minimal">
+              <video
+                data-fideo
+                data-fideo-src="https://res.cloudinary.com/demo/video/upload/elephants.mp4"
+                data-fideo-poster="https://picsum.photos/id/1015/1280/720"
+                data-fideo-muted
+              ></video>
+            </div>
+            <h4>Light, minimal</h4>
+            <p>Inverted controls for white-page layouts.</p>
+          </div>
+        </div>
+        <p class="section-lede" style="margin-top: 32px;">
+          Need finer control? Every control is a CSS Shadow Part — see
+          <a href="part-styling.html">the part-styling demo</a> for per-button overrides.
+        </p>
+      </div>
+    </section>
+
+    <!-- ============================ CONTROLS VISIBILITY ============================ -->
+    <section class="block">
+      <div class="wrap">
+        <div class="eyebrow">Control configurations</div>
+        <h2>Show only what you need.</h2>
+        <p class="section-lede">
+          Toggle individual controls — play, timeline, volume, settings, fullscreen — to match
+          context. Below: a minimal player, a no-timeline ambient player, and a fully loaded one.
+        </p>
+        <div class="theme-grid">
+          <div class="theme-card">
+            <video
+              data-fideo
+              data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
+              data-fideo-poster="https://picsum.photos/id/1019/1280/720"
+              data-fideo-show-timeline="false"
+              data-fideo-show-volume="false"
+              data-fideo-show-settings="false"
+              data-fideo-show-current-time="false"
+              data-fideo-show-duration="false"
+              data-fideo-muted
+            ></video>
+            <h4>Minimal</h4>
+            <p>Play + fullscreen only. Great for galleries and cards.</p>
+          </div>
+          <div class="theme-card">
+            <video
+              data-fideo
+              data-fideo-src="https://videos.pexels.com/video-files/3209828/3209828-hd_1920_1080_25fps.mp4"
+              data-fideo-poster="https://picsum.photos/id/1018/1280/720"
+              data-fideo-show-timeline="false"
+              data-fideo-show-settings="false"
+              data-fideo-muted
+            ></video>
+            <h4>Ambient</h4>
+            <p>No timeline. Keeps focus on the visual.</p>
+          </div>
+          <div class="theme-card">
+            <video
+              data-fideo
+              data-fideo-src="https://res.cloudinary.com/demo/video/upload/elephants.mp4"
+              data-fideo-poster="https://picsum.photos/id/1043/1280/720"
+              data-fideo-playback-rates="0.5, 1, 1.5, 2"
+              data-fideo-muted
+            ></video>
+            <h4>Full controls</h4>
+            <p>All defaults, with custom playback rates.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================ FOOTER ============================ -->
+    <footer>
+      <div class="wrap">
+        <div>
+          Fideo JS · MIT licensed · Built by
+          <a href="https://github.com/devjtv">@devjtv</a>
+        </div>
+        <div class="links">
+          <a href="https://github.com/devjtv/fideo-js">GitHub</a>
+          <a href="https://www.npmjs.com/package/fideo-js">npm</a>
+          <a href="js-api.html">JS API demo</a>
+          <a href="part-styling.html">Theming demo</a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="../dist/fideo.global.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        // Library auto-inits every [data-fideo] element on DOMContentLoaded.
+        // The JS API panel's <video id="p-api"> intentionally has no data-fideo
+        // so we can construct it manually below.
+
+        // ===== Breakpoint indicator =====
+        const bpLabel = document.getElementById('bp-label');
+        function reportBp() {
+          const w = window.innerWidth;
+          bpLabel.textContent = w <= 767 ? 'mobile' : w <= 1024 ? 'tablet' : 'desktop';
+        }
+        reportBp();
+        window.addEventListener('resize', reportBp);
+
+        // ===== JS API panel =====
+        const apiPlayer = new Fideo('#p-api', {
+          provider: 'html5',
+          sources: {
+            desktop: 'https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4',
+          },
+          posters: {
+            desktop: 'https://picsum.photos/id/1018/1280/720',
+          },
+          muted: true,
+        });
+
+        const stateBox = document.getElementById('state');
+        function fmt(v) {
+          if (v == null) return '—';
+          if (typeof v === 'number') return v.toFixed(2);
+          return String(v);
+        }
+        function paintState() {
+          const s = apiPlayer.adapter?.getState?.() ?? {};
+          stateBox.querySelectorAll('[data-k]').forEach((el) => {
+            el.textContent = fmt(s[el.dataset.k]);
+          });
+        }
+        paintState();
+        setInterval(paintState, 250);
+
+        document.querySelectorAll('[data-api]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const a = apiPlayer.adapter;
+            const s = a?.getState?.() ?? {};
+            switch (btn.dataset.api) {
+              case 'play': apiPlayer.play(); break;
+              case 'pause': apiPlayer.pause(); break;
+              case 'seek-back': a?.seek?.(Math.max(0, (s.currentTime || 0) - 10)); break;
+              case 'seek-fwd': a?.seek?.((s.currentTime || 0) + 10); break;
+              case 'rate-half': a?.setPlaybackRate?.(0.5); break;
+              case 'rate-one': a?.setPlaybackRate?.(1); break;
+              case 'rate-two': a?.setPlaybackRate?.(2); break;
+              case 'mute': a?.setMuted?.(!s.muted); break;
+            }
+          });
+        });
+
+        // ===== Event log =====
+        const log = document.getElementById('log');
+        const apiEl = apiPlayer.element;
+        const events = ['fideo:play', 'fideo:pause', 'fideo:ended', 'fideo:volumechange', 'fideo:timeupdate'];
+        let lastTimeLog = 0;
+        events.forEach((name) => {
+          apiEl.addEventListener(name, (e) => {
+            if (name === 'fideo:timeupdate') {
+              const now = Date.now();
+              if (now - lastTimeLog < 1000) return;
+              lastTimeLog = now;
+            }
+            const t = new Date().toLocaleTimeString(undefined, { hour12: false });
+            const s = e.detail?.state ?? {};
+            const detail = name === 'fideo:timeupdate'
+              ? `t=${s.currentTime?.toFixed?.(2) ?? '?'}`
+              : name === 'fideo:volumechange'
+              ? `vol=${s.volume?.toFixed?.(2)} muted=${s.muted}`
+              : '';
+            const row = document.createElement('div');
+            row.className = 'entry';
+            row.innerHTML = `<span class="t">${t}</span><span class="e">${name}</span><span class="d">${detail}</span>`;
+            log.prepend(row);
+            while (log.children.length > 50) log.lastChild.remove();
+          });
+        });
+      });
+    </script>
   </body>
 </html>
