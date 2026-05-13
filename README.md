@@ -13,6 +13,7 @@
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-ready-3178c6">
   <img alt="Providers" src="https://img.shields.io/badge/providers-MP4%20%7C%20YouTube%20%7C%20Vimeo%20%7C%20Wistia-26d3bd">
   <img alt="No dependencies" src="https://img.shields.io/badge/runtime-lightweight-f97316">
+  <a href="https://fideo-js.pages.dev"><img alt="Live demo" src="https://img.shields.io/badge/demo-live-6cf2c0"></a>
 </p>
 
 Fideo JS turns normal `<video>` and `<iframe>` elements into polished, configurable video experiences. Keep your markup simple, add `data-fideo`, and get custom controls, responsive sources, posters, viewport playback, background video mode, and provider normalization — without giving up control of your HTML.
