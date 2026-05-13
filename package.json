@@ -36,6 +36,7 @@
   ],
   "scripts": {
     "build": "vite build && node scripts/copy-global-build.mjs && tsc -p tsconfig.types.json",
+    "build:site": "npm run build && node scripts/build-site.mjs",
     "dev": "vite --host 127.0.0.1",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
