@@ -106,7 +106,7 @@ export class FideoPlayer implements FideoPlayerInstance {
   }
 
   private bindAdapterEvents(): void {
-    const events = ['play', 'pause', 'ended', 'volumechange', 'change'];
+    const events = ['play', 'pause', 'ended', 'timeupdate', 'volumechange', 'change'];
     for (const eventName of events) {
       this.adapter.addEventListener(eventName, () => {
         this.syncPosterVisibility();

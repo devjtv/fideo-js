@@ -777,7 +777,7 @@ class le {
     this.element instanceof HTMLVideoElement ? (this.element.controls = !1, this.element.loop = this.options.loop, this.element.muted = this.options.muted, this.element.playsInline = this.options.playsInline, this.element.setAttribute("playsinline", "")) : (this.element.allow = ce(this.element.allow, ["autoplay", "fullscreen", "picture-in-picture", "encrypted-media"]), this.element.setAttribute("allowfullscreen", ""));
   }
   bindAdapterEvents() {
-    const t = ["play", "pause", "ended", "volumechange", "change"];
+    const t = ["play", "pause", "ended", "timeupdate", "volumechange", "change"];
     for (const e of t)
       this.adapter.addEventListener(e, () => {
         this.syncPosterVisibility(), this.syncPlaybackClasses(), this.element.dispatchEvent(

@@ -15,28 +15,38 @@
   <img alt="No dependencies" src="https://img.shields.io/badge/runtime-lightweight-f97316">
 </p>
 
-<p align="center">
-  <a href="./examples/index.html">Demo Source</a>
-  ·
-  <a href="#quick-start">Quick Start</a>
-</p>
-
-Fideo JS turns normal `<video>` and `<iframe>` elements into polished, configurable video experiences. Keep your markup simple, add `data-fideo`, and get custom controls, responsive sources, posters, viewport playback, background video mode, and provider normalization without giving up control of your HTML.
+Fideo JS turns normal `<video>` and `<iframe>` elements into polished, configurable video experiences. Keep your markup simple, add `data-fideo`, and get custom controls, responsive sources, posters, viewport playback, background video mode, and provider normalization — without giving up control of your HTML.
 
 ## Highlights
 
-- Works with native video, YouTube, Vimeo, and Wistia.
-- Data-attribute initialization for simple CMS and template usage.
-- JavaScript object initialization for app-style usage, similar to Plyr.
-- Custom UI for play/pause, timeline, volume, playback speed, and fullscreen.
-- Per-control visibility options.
-- CSS variable theming for colors, tracks, radius, and control styling.
-- Custom SVG icon support through JavaScript.
-- Responsive sources and posters for desktop, tablet, and mobile.
-- Viewport autoplay and auto-pause.
-- Background video mode for heroes, banners, and tiles.
-- YouTube URLs normalize to `youtube-nocookie.com` embeds.
-- Vimeo private/unlisted URLs with hashes are normalized to the `h` embed parameter.
+- One UI across MP4, YouTube, Vimeo, and Wistia, with automatic URL normalization for each provider.
+- Data-attribute initialization for CMS/template usage, plus a JavaScript API for app-style usage.
+- Responsive `sources` and `posters` per breakpoint, with mobile/tablet/desktop fallbacks.
+- Viewport autoplay and auto-pause via `IntersectionObserver`.
+- Background-video mode for heroes, banners, and tiles, with cover-fill sizing on iframes too.
+- Shadow-DOM controls themed via CSS custom properties and `::part()`, with optional custom SVG icons.
+
+## Table of Contents
+
+- [Install](#install)
+- [Quick Start](#quick-start)
+- [CDN](#cdn)
+- [JavaScript Initialization](#javascript-initialization)
+- [Player API](#player-api)
+- [Events](#events)
+- [Background Video](#background-video)
+- [Responsive Sources And Posters](#responsive-sources-and-posters)
+- [Viewport Playback](#viewport-playback)
+- [Controls](#controls)
+- [Styling](#styling)
+- [Shadow DOM Parts](#shadow-dom-parts)
+- [Custom Icons](#custom-icons)
+- [Provider Support](#provider-support)
+- [Options](#options)
+- [Data Attributes](#data-attributes)
+- [Compiled Files](#compiled-files)
+- [Development](#development)
+- [Browser Notes](#browser-notes)
 
 ## Install
 
@@ -54,58 +64,6 @@ initFideo();
 ```
 
 Or use the browser bundle:
-
-```html
-<link rel="stylesheet" href="./dist/styles.css" />
-<script src="./dist/fideo.global.js"></script>
-<script>
-  Fideo.init();
-</script>
-```
-
-## CDN
-
-Because the compiled files are committed in `dist/`, Fideo JS can be loaded directly from jsDelivr.
-
-```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.3.1/dist/styles.css" />
-<script src="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.3.1/dist/fideo.global.js"></script>
-<script>
-  Fideo.init();
-</script>
-```
-
-For production sites, prefer pinning a tag or release instead of `main` once one exists:
-
-```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.3.1/dist/styles.css" />
-<script src="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.3.1/dist/fideo.global.js"></script>
-```
-
-ES module usage is also available:
-
-```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.3.1/dist/styles.css" />
-<script type="module">
-  import { initFideo } from 'https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.3.1/dist/fideo.js';
-
-  initFideo();
-</script>
-```
-
-## Compiled Files
-
-The compiled browser files are committed in `dist/` for users who want to download Fideo JS directly from the repository without running a build.
-
-| File | Use |
-| --- | --- |
-| `dist/fideo.global.js` | Browser global build. Adds `Fideo`, `initFideo`, `createFideo`, and `mountFideo` to `window`. Best for CDN or direct `<script>` usage. |
-| `dist/fideo.js` | ES module build. |
-| `dist/fideo.umd.cjs` | UMD/CommonJS-compatible build used by package tooling. |
-| `dist/styles.css` | Fideo control styles. |
-| `dist/index.d.ts` | TypeScript declarations. |
-
-For direct browser usage:
 
 ```html
 <link rel="stylesheet" href="./dist/styles.css" />
@@ -144,7 +102,7 @@ Use the same pattern for iframe providers:
 ></iframe>
 ```
 
-Fideo will normalize that YouTube URL to a no-cookie embed URL and add the provider API parameters it needs. Wistia embeds are initialized from a `<wistia-player>` custom element:
+Fideo will normalize that YouTube URL to a no-cookie embed URL and add the provider API parameters it needs. Wistia embeds use a `<wistia-player>` custom element under the hood, but the iframe authoring stays the same:
 
 ```html
 <iframe
@@ -158,6 +116,29 @@ Fideo will normalize that YouTube URL to a no-cookie embed URL and add the provi
 ```
 
 When poster images are configured, Fideo renders them as a visual cover while the player is paused or still getting ready, then fades them away when playback starts.
+
+## CDN
+
+Because the compiled files are committed in `dist/`, Fideo JS can be loaded directly from jsDelivr. Pin a release tag for production:
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.3.2/dist/styles.css" />
+<script src="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.3.2/dist/fideo.global.js"></script>
+<script>
+  Fideo.init();
+</script>
+```
+
+ES module usage is also available:
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.3.2/dist/styles.css" />
+<script type="module">
+  import { initFideo } from 'https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.3.2/dist/fideo.js';
+
+  initFideo();
+</script>
+```
 
 ## JavaScript Initialization
 
@@ -208,6 +189,89 @@ pagePlayers.destroy();
 singlePlayer.destroy();
 objectPlayer.destroy();
 ```
+
+Which entry point to use:
+
+| Entry point | Use when |
+| --- | --- |
+| `new Fideo(target, options)` | App-style usage where you keep a player reference around. |
+| `Fideo.init(options)` / `initFideo(options)` | Scan the page (default selector `[data-fideo]`) and mount every match. Returns `{ players, destroy() }`. |
+| `mountFideo(element, options)` | Mount a single element you already have a reference to. Reuses an existing instance if one is bound. |
+| `createFideo(target, options)` | Same as `mountFideo`, but accepts a selector string. |
+
+## Player API
+
+`new Fideo(...)`, `mountFideo`, and `createFideo` all return a player instance that implements `FideoPlayerInstance`:
+
+```ts
+const player = new Fideo('#player', { sources: { desktop: '/clip.mp4' } });
+
+await player.play();
+await player.pause();
+player.destroy();
+
+player.element;   // the original <video> or <iframe>
+player.wrapper;   // the generated .fideo wrapper element
+player.options;   // the resolved options object
+player.adapter;   // the provider adapter (see below)
+```
+
+The `adapter` exposes lower-level provider operations and is the right place to look for things like seeking, programmatic volume, or reading the current playback state:
+
+```ts
+const { adapter } = player;
+
+await adapter.seek(30);            // jump to 30s
+await adapter.setVolume(0.5);
+await adapter.setMuted(true);
+await adapter.setPlaybackRate(1.5);
+await adapter.setSource('/clip-alt.mp4');
+
+const state = adapter.getState();
+// {
+//   currentTime: number,
+//   duration: number,
+//   volume: number,
+//   muted: boolean,
+//   paused: boolean,
+//   playbackRate: number,
+//   buffered: number,
+// }
+```
+
+State changes are also dispatched as DOM events; see [Events](#events).
+
+In TypeScript, the relevant types travel with the package:
+
+```ts
+import type { FideoOptions, FideoPlayerInstance, FideoState } from 'fideo-js';
+```
+
+## Events
+
+Fideo forwards provider state changes as DOM events on the original media element. Every event's `detail` is `{ player: FideoPlayerInstance, state: FideoState }`.
+
+```ts
+const video = document.querySelector('[data-fideo]')!;
+
+video.addEventListener('fideo:timeupdate', (event) => {
+  const { currentTime, duration } = event.detail.state;
+  console.log(`${currentTime} / ${duration}`);
+});
+
+video.addEventListener('fideo:play', (event) => {
+  console.log(event.detail.player);
+});
+```
+
+| Event | Description |
+| --- | --- |
+| `fideo:play` | Playback started. |
+| `fideo:pause` | Playback paused. |
+| `fideo:ended` | Playback ended. |
+| `fideo:timeupdate` | Current time changed during playback. |
+| `fideo:volumechange` | Volume or muted state changed. |
+| `fideo:change` | General state update (volume, source, duration, etc.). |
 
 ## Background Video
 
@@ -483,6 +547,38 @@ new Fideo('#player', {
 });
 ```
 
+## Shadow DOM Parts
+
+Controls render inside a Shadow DOM so internal styles can't leak in or out. For deeper customisation beyond CSS variables, individual control elements are exposed via the [`::part()`](https://developer.mozilla.org/en-US/docs/Web/CSS/::part) pseudo-element on the `.fideo__controls` host element:
+
+```css
+.fideo__controls::part(play-button) {
+  background: rgba(0, 0, 0, 0.55);
+  border-radius: 999px;
+}
+
+.fideo__controls::part(timeline) {
+  height: 8px;
+}
+
+.fideo__controls::part(current-time),
+.fideo__controls::part(duration) {
+  font-variant-numeric: tabular-nums;
+}
+```
+
+| Part | Element |
+| --- | --- |
+| `play-button` | Play/pause toggle. |
+| `mute-button` | Mute/unmute toggle. |
+| `volume-slider` | Volume range input. |
+| `timeline` | Seek bar range input. |
+| `current-time` | Current-time text span. |
+| `duration` | Duration text span. |
+| `settings-button` | Settings (playback rate) toggle. |
+| `speed-button` | Individual playback-rate option button. |
+| `fullscreen-button` | Fullscreen toggle. |
+
 ## Custom Icons
 
 Pass inline SVG strings for any control icon:
@@ -511,12 +607,12 @@ Supported icon keys:
 
 ## Provider Support
 
-| Provider | Element | Notes |
+| Provider | Element | URL formats accepted |
 | --- | --- | --- |
-| HTML5 / MP4 | `<video>` | Supports local files and any browser-supported media format. |
-| YouTube | `<iframe>` | Normalizes watch, shorts, youtu.be, and embed URLs to `youtube-nocookie.com/embed/...`. |
-| Vimeo | `<iframe>` | Supports public, private, and unlisted URLs, including `vimeo.com/[id]/[hash]`. |
-| Wistia | `<iframe>` | Uses the Wistia Aurora player. The `<wistia-player>` element is created automatically from the iframe `src`. Supports autoplay, muted, loop, background cover, and responsive posters. |
+| HTML5 / MP4 | `<video>` | Local files and any browser-supported media format. |
+| YouTube | `<iframe>` | `youtube.com/watch?v=`, `youtu.be/`, `youtube.com/shorts/`, and existing `/embed/` URLs. All are normalized to `youtube-nocookie.com/embed/...`. |
+| Vimeo | `<iframe>` | Public, private, and unlisted URLs, including `vimeo.com/{id}/{hash}` and existing `player.vimeo.com/video/{id}?h=` URLs. |
+| Wistia | `<iframe>` | `fast.wistia.com/embed/medias/{id}` and `iframe/{id}`. Fideo swaps the iframe for a `<wistia-player>` custom element under the hood. |
 
 Provider detection is automatic for normal provider URLs in `src`, `data-fideo-src`, responsive source attributes, and JavaScript `sources`. Use `provider` or `data-fideo-provider` only when a URL is unusual enough that Fideo cannot infer it.
 
@@ -555,7 +651,7 @@ https://player.vimeo.com/video/123456789?h=5e2d1c1e6d
 
 Existing Vimeo embed URLs with `?h=` are preserved.
 
-### Opting out of provider SDKs
+### Opting Out Of Provider SDKs
 
 If your page only uses certain providers, you can prevent the unused provider JavaScript SDKs from loading:
 
@@ -637,29 +733,27 @@ When a disabled provider is requested, Fideo throws an error. Supported provider
 | `data-fideo-radius` | Sets `--fideo-radius`. |
 | `data-fideo-class` | Adds a class to the generated Fideo wrapper. |
 
-## Events
+## Compiled Files
 
-Fideo forwards provider state changes as DOM events on the original media element.
+The compiled browser files are committed in `dist/` for users who want to download Fideo JS directly from the repository without running a build.
 
-```ts
-const video = document.querySelector('[data-fideo]')!;
-
-video.addEventListener('fideo:play', (event) => {
-  console.log(event.detail.player);
-  console.log(event.detail.state);
-});
-```
-
-Available events:
-
-| Event | Description |
+| File | Use |
 | --- | --- |
-| `fideo:play` | Playback started. |
-| `fideo:pause` | Playback paused. |
-| `fideo:ended` | Playback ended. |
-| `fideo:timeupdate` | Current time changed. |
-| `fideo:volumechange` | Volume or muted state changed. |
-| `fideo:change` | General state update. |
+| `dist/fideo.global.js` | Browser global build. Adds `Fideo`, `initFideo`, `createFideo`, and `mountFideo` to `window`. Best for CDN or direct `<script>` usage. |
+| `dist/fideo.js` | ES module build. |
+| `dist/fideo.umd.cjs` | UMD/CommonJS-compatible build used by package tooling. |
+| `dist/styles.css` | Fideo control styles. |
+| `dist/index.d.ts` | TypeScript declarations. |
+
+For direct browser usage:
+
+```html
+<link rel="stylesheet" href="./dist/styles.css" />
+<script src="./dist/fideo.global.js"></script>
+<script>
+  Fideo.init();
+</script>
+```
 
 ## Development
 
