@@ -324,7 +324,7 @@ class Q extends _ {
   }
   bind() {
     var i;
-    const e = ["play", "pause", "ended", "volumechange", "durationchange", "playbackratechange"];
+    const e = ["play", "pause", "ended", "timeupdate", "volumechange", "durationchange", "playbackratechange"];
     for (const r of e)
       (i = this.player) == null || i.on(r, (a = {}) => {
         this.applyEvent(r, a), this.dispatchEvent(new CustomEvent(r, { detail: this.getState() }));
@@ -547,7 +547,9 @@ class ie extends _ {
     };
   }
   startTimer() {
-    this.state.paused = !1, !this.timer && (this.timer = window.setInterval(() => this.sync(), 500));
+    this.state.paused = !1, !this.timer && (this.timer = window.setInterval(() => {
+      this.sync(), this.dispatchEvent(new CustomEvent("timeupdate", { detail: this.getState() }));
+    }, 250));
   }
   stopTimer() {
     this.state.paused = !0, this.timer && window.clearInterval(this.timer), this.timer = void 0;

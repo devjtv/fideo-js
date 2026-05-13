@@ -177,7 +177,10 @@ export class YouTubeProvider extends BaseProvider {
   private startTimer(): void {
     this.state.paused = false;
     if (this.timer) return;
-    this.timer = window.setInterval(() => this.sync(), 500);
+    this.timer = window.setInterval(() => {
+      this.sync();
+      this.dispatchEvent(new CustomEvent('timeupdate', { detail: this.getState() }));
+    }, 250);
   }
 
   private stopTimer(): void {
