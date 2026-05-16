@@ -85,6 +85,7 @@ export class FideoControls {
 
     const timeGroup = createElement('span', 'fideo__time-group');
     const separator = createElement('span', 'fideo__time-separator');
+    separator.setAttribute('part', 'time-separator');
     separator.textContent = '/';
     timeGroup.append(this.currentTime, separator, this.duration);
 

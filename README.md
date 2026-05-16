@@ -123,8 +123,8 @@ When poster images are configured, Fideo renders them as a visual cover while th
 Because the compiled files are committed in `dist/`, Fideo JS can be loaded directly from jsDelivr. Pin a release tag for production:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.5.0/dist/fideo.css" />
-<script src="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.5.0/dist/fideo.global.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.5.1/dist/fideo.css" />
+<script src="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.5.1/dist/fideo.global.js"></script>
 <script>
   Fideo.init();
 </script>
@@ -133,9 +133,9 @@ Because the compiled files are committed in `dist/`, Fideo JS can be loaded dire
 ES module usage is also available:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.5.0/dist/fideo.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.5.1/dist/fideo.css" />
 <script type="module">
-  import { initFideo } from 'https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.5.0/dist/fideo.js';
+  import { initFideo } from 'https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.5.1/dist/fideo.js';
 
   initFideo();
 </script>
@@ -576,7 +576,8 @@ Controls render inside a Shadow DOM so internal styles can't leak in or out. For
 }
 
 .fideo__controls::part(current-time),
-.fideo__controls::part(duration) {
+.fideo__controls::part(duration),
+.fideo__controls::part(time-separator) {
   font-variant-numeric: tabular-nums;
 }
 ```
@@ -589,6 +590,7 @@ Controls render inside a Shadow DOM so internal styles can't leak in or out. For
 | `timeline` | Seek bar range input. |
 | `current-time` | Current-time text span. |
 | `duration` | Duration text span. |
+| `time-separator` | Slash separator between current time and duration. |
 | `settings-button` | Settings (playback rate) toggle. |
 | `settings-menu` | Playback-rate dropdown container. |
 | `speed-button` | Individual playback-rate option button. |
