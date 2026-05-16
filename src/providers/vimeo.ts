@@ -52,7 +52,8 @@ export class VimeoProvider extends BaseProvider {
     if (this.options.background) params.background = 1;
     this.element.src = addUrlParams(normalizeVimeoEmbedUrl(this.element.src), params);
 
-    this.ready = loadScript('https://player.vimeo.com/api/player.js').then(() => {
+    const sdkReady = window.Vimeo?.Player ? Promise.resolve() : loadScript('https://player.vimeo.com/api/player.js');
+    this.ready = sdkReady.then(() => {
       if (this.destroyed) return;
       this.player = new window.Vimeo!.Player(this.element);
       this.bind();
@@ -83,14 +84,14 @@ export class VimeoProvider extends BaseProvider {
     await this.ready;
     if (this.destroyed) return;
     await this.player?.setVolume(clamp(volume));
-    await this.sync();
+    await this.sync('volumechange');
   }
 
   async setMuted(muted: boolean): Promise<void> {
     await this.ready;
     if (this.destroyed) return;
     await this.player?.setMuted(muted);
-    await this.sync();
+    await this.sync('volumechange');
   }
 
   async setPlaybackRate(rate: number): Promise<void> {
@@ -133,7 +134,7 @@ export class VimeoProvider extends BaseProvider {
     };
   }
 
-  private async sync(): Promise<void> {
+  private async sync(eventName = 'change'): Promise<void> {
     if (!this.player) return;
     const [currentTime, duration, volume, muted, playbackRate] = await Promise.all([
       this.player.getCurrentTime().catch(() => 0),
@@ -142,7 +143,7 @@ export class VimeoProvider extends BaseProvider {
       this.player.getMuted().catch(() => false),
       this.player.getPlaybackRate().catch(() => 1),
     ]);
-    this.update({ currentTime, duration, volume, muted, playbackRate });
+    this.update({ currentTime, duration, volume, muted, playbackRate }, eventName);
   }
 
   private postMessage(method: string, value?: unknown): void {

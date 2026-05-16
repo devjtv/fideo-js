@@ -15,6 +15,9 @@ export declare class FideoControls {
     private volumePanel;
     private settingsGroup;
     private seeking;
+    private lastAudibleVolume;
+    private volumeQueue;
+    private volumeMutationDepth;
     private icons;
     private handleFullscreenChange;
     private onAdapterPlay;
@@ -39,6 +42,7 @@ export declare class FideoControls {
     private toggleFullscreen;
     private syncPlayState;
     private syncVolumeState;
+    private enqueueVolumeMutation;
     private syncPlaybackState;
     private renderFullscreenState;
 }

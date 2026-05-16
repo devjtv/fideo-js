@@ -17,13 +17,19 @@ export class FideoControls {
   private volumePanel: HTMLElement;
   private settingsGroup: HTMLElement;
   private seeking = false;
+  private lastAudibleVolume = 1;
+  private volumeQueue = Promise.resolve();
+  private volumeMutationDepth = 0;
   private icons: Required<NonNullable<FideoResolvedOptions['icons']>>;
   private handleFullscreenChange = () => this.renderFullscreenState();
 
   private onAdapterPlay = () => this.syncPlayState(this.adapter.getState());
   private onAdapterPause = () => this.syncPlayState(this.adapter.getState());
   private onAdapterEnded = () => this.syncPlayState(this.adapter.getState());
-  private onAdapterVolumeChange = () => this.syncVolumeState(this.adapter.getState());
+  private onAdapterVolumeChange = () => {
+    if (this.volumeMutationDepth > 0) return;
+    this.syncVolumeState(this.adapter.getState());
+  };
   private onAdapterDurationChange = () => this.syncPlaybackState(this.adapter.getState(), true);
   private onAdapterTimeUpdate = () => this.syncPlaybackState(this.adapter.getState());
   private onAdapterChange = () => this.syncPlaybackState(this.adapter.getState());
@@ -200,14 +206,29 @@ export class FideoControls {
   private toggleMute(): void {
     this.wrapper.classList.add('is-user-active');
     const state = this.adapter.getState();
-    this.adapter.setMuted(!state.muted).catch(() => undefined);
+    const nextMuted = !state.muted;
+    const nextVolume = !nextMuted && state.volume === 0 ? this.lastAudibleVolume : state.volume;
+    const optimisticState = { ...state, muted: nextMuted, volume: nextVolume };
+
+    this.enqueueVolumeMutation(optimisticState, async () => {
+      if (!nextMuted && state.volume === 0) {
+        await this.adapter.setVolume(nextVolume);
+      }
+      await this.adapter.setMuted(nextMuted);
+    });
   }
 
   private changeVolume(): void {
     this.wrapper.classList.add('is-user-active');
-    const volume = Number(this.volume.value);
-    if (volume > 0) this.adapter.setMuted(false).catch(() => undefined);
-    this.adapter.setVolume(volume).catch(() => undefined);
+    const state = this.adapter.getState();
+    const volume = clampVolume(Number(this.volume.value));
+    const muted = volume === 0;
+
+    if (volume > 0) this.lastAudibleVolume = volume;
+    this.enqueueVolumeMutation({ ...state, volume, muted }, async () => {
+      await this.adapter.setVolume(volume);
+      await this.adapter.setMuted(muted);
+    });
   }
 
   private previewSeek(): void {
@@ -248,12 +269,14 @@ export class FideoControls {
   }
 
   private syncVolumeState(state: FideoState): void {
-    this.volume.value = String(state.muted ? 0 : state.volume);
+    const volume = clampVolume(state.volume);
+    if (!state.muted && volume > 0) this.lastAudibleVolume = volume;
+    this.volume.value = String(state.muted ? 0 : volume);
     this.volume.style.setProperty('--fideo-progress', `${Number(this.volume.value) * 100}%`);
 
-    let muteIcon = state.muted || state.volume === 0 ? this.icons.muted : this.icons.volume;
-    if (!state.muted && state.volume > 0 && state.volume <= 0.5) muteIcon = this.icons.volumeLow;
-    const muteLabel = state.muted || state.volume === 0 ? 'Unmute' : 'Mute';
+    let muteIcon = state.muted || volume === 0 ? this.icons.muted : this.icons.volume;
+    if (!state.muted && volume > 0 && volume <= 0.5) muteIcon = this.icons.volumeLow;
+    const muteLabel = state.muted || volume === 0 ? 'Unmute' : 'Mute';
 
     if (this.muteButton.innerHTML !== muteIcon) {
       this.muteButton.innerHTML = muteIcon;
@@ -261,9 +284,30 @@ export class FideoControls {
     if (this.muteButton.ariaLabel !== muteLabel) {
       this.muteButton.ariaLabel = muteLabel;
     }
-    if (this.muteButton.title !== muteLabel) {
-      this.muteButton.title = muteLabel;
+    const mutedState = state.muted || volume === 0;
+    const muteTitle = mutedState ? 'Muted' : 'Unmuted';
+    if (this.muteButton.title !== muteTitle) {
+      this.muteButton.title = muteTitle;
     }
+    this.muteButton.setAttribute('aria-pressed', String(mutedState));
+  }
+
+  private enqueueVolumeMutation(optimisticState: FideoState, task: () => Promise<void>): void {
+    this.syncVolumeState(optimisticState);
+
+    this.volumeQueue = this.volumeQueue
+      .catch(() => undefined)
+      .then(async () => {
+        this.volumeMutationDepth += 1;
+        try {
+          await task();
+        } catch {
+          // Keep controls responsive even when a provider blocks a volume operation.
+        } finally {
+          this.volumeMutationDepth -= 1;
+          this.syncVolumeState(this.adapter.getState());
+        }
+      });
   }
 
   private syncPlaybackState(state: FideoState, force = false): void {
@@ -280,6 +324,10 @@ export class FideoControls {
     this.fullscreenButton.ariaLabel = fullscreenActive ? 'Exit fullscreen' : 'Fullscreen';
     this.fullscreenButton.title = fullscreenActive ? 'Exit fullscreen' : 'Fullscreen';
   }
+}
+
+function clampVolume(value: number): number {
+  return Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 0;
 }
 
 export function formatTime(seconds: number): string {

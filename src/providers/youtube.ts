@@ -133,8 +133,11 @@ export class YouTubeProvider extends BaseProvider {
   async setVolume(volume: number): Promise<void> {
     await this.ready;
     if (this.destroyed) return;
-    this.player?.setVolume(Math.round(clamp(volume) * 100));
+    const nextVolume = clamp(volume);
+    this.player?.setVolume(Math.round(nextVolume * 100));
     this.sync();
+    this.state.volume = nextVolume;
+    this.dispatchEvent(new CustomEvent('volumechange', { detail: this.getState() }));
   }
 
   async setMuted(muted: boolean): Promise<void> {
@@ -143,6 +146,8 @@ export class YouTubeProvider extends BaseProvider {
     if (muted) this.player?.mute();
     else this.player?.unMute();
     this.sync();
+    this.state.muted = muted;
+    this.dispatchEvent(new CustomEvent('volumechange', { detail: this.getState() }));
   }
 
   async setPlaybackRate(rate: number): Promise<void> {

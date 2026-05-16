@@ -1,5 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Fideo, createFideo, initFideo, mountFideo } from '../src';
+import { VimeoProvider } from '../src/providers/vimeo';
+import { YouTubeProvider } from '../src/providers/youtube';
+import { resolveOptions } from '../src/utils/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -256,6 +259,227 @@ describe('Fideo player', () => {
     Object.defineProperty(video, 'paused', { configurable: true, value: true });
     video.dispatchEvent(new Event('pause'));
     expect(player.wrapper.classList.contains('is-poster-visible')).toBe(true);
+  });
+
+  it('unmutes the control state when the volume slider is raised above zero', () => {
+    document.body.innerHTML = `
+      <video
+        data-fideo
+        data-fideo-muted
+        data-fideo-src="/movie.mp4"
+      ></video>
+    `;
+    const video = document.querySelector('video')!;
+    const player = mountFideo(video);
+    const controls = player.wrapper.querySelector('.fideo__controls')!;
+    const root = controls.shadowRoot!;
+    const muteButton = root.querySelector('.fideo__mute') as HTMLButtonElement;
+    const volume = root.querySelector('.fideo__volume') as HTMLInputElement;
+
+    expect(muteButton.title).toBe('Muted');
+    expect(muteButton.ariaLabel).toBe('Unmute');
+    expect(muteButton.getAttribute('aria-pressed')).toBe('true');
+
+    volume.value = '0.75';
+    volume.dispatchEvent(new Event('input'));
+
+    expect(muteButton.title).toBe('Unmuted');
+    expect(muteButton.ariaLabel).toBe('Mute');
+    expect(muteButton.getAttribute('aria-pressed')).toBe('false');
+    expect(volume.value).toBe('0.75');
+    expect(volume.style.getPropertyValue('--fideo-progress')).toBe('75%');
+  });
+
+  it('emits volumechange after YouTube SDK volume mutations', async () => {
+    let sdkVolume = 0;
+    let sdkMuted = true;
+    let eventCount = 0;
+
+    (window as any).YT = {
+      Player: class {
+        constructor(_id: string, config: { events?: { onReady?: () => void } }) {
+          config.events?.onReady?.();
+        }
+
+        playVideo() {}
+        pauseVideo() {}
+        seekTo() {}
+        setVolume(value: number) {
+          sdkVolume = value;
+        }
+        mute() {
+          sdkMuted = true;
+        }
+        unMute() {
+          sdkMuted = false;
+        }
+        setPlaybackRate() {}
+        loadVideoByUrl() {}
+        getCurrentTime() {
+          return 0;
+        }
+        getDuration() {
+          return 0;
+        }
+        getVolume() {
+          return sdkVolume;
+        }
+        isMuted() {
+          return sdkMuted;
+        }
+        getPlaybackRate() {
+          return 1;
+        }
+        destroy() {}
+      },
+      PlayerState: {
+        ENDED: 0,
+        PLAYING: 1,
+        PAUSED: 2,
+        BUFFERING: 3,
+        CUED: 5,
+      },
+    };
+    document.body.innerHTML = '<iframe src="https://www.youtube.com/watch?v=M7lc1UVf-VE"></iframe>';
+    const iframe = document.querySelector('iframe')!;
+    const provider = new YouTubeProvider(iframe, resolveOptions(iframe, { provider: 'youtube', muted: true }));
+    provider.addEventListener('volumechange', () => {
+      eventCount += 1;
+    });
+
+    await provider.setVolume(0.75);
+    await provider.setMuted(false);
+
+    expect(eventCount).toBe(2);
+    expect(provider.getState().volume).toBe(0.75);
+    expect(provider.getState().muted).toBe(false);
+  });
+
+  it('trusts YouTube mute commands when the SDK reports stale mute state', async () => {
+    let eventCount = 0;
+
+    (window as any).YT = {
+      Player: class {
+        constructor(_id: string, config: { events?: { onReady?: () => void } }) {
+          config.events?.onReady?.();
+        }
+
+        playVideo() {}
+        pauseVideo() {}
+        seekTo() {}
+        setVolume() {}
+        mute() {}
+        unMute() {}
+        setPlaybackRate() {}
+        loadVideoByUrl() {}
+        getCurrentTime() {
+          return 0;
+        }
+        getDuration() {
+          return 0;
+        }
+        getVolume() {
+          return 100;
+        }
+        isMuted() {
+          return true;
+        }
+        getPlaybackRate() {
+          return 1;
+        }
+        destroy() {}
+      },
+      PlayerState: {
+        ENDED: 0,
+        PLAYING: 1,
+        PAUSED: 2,
+        BUFFERING: 3,
+        CUED: 5,
+      },
+    };
+    document.body.innerHTML = '<iframe src="https://www.youtube.com/watch?v=M7lc1UVf-VE"></iframe>';
+    const iframe = document.querySelector('iframe')!;
+    const provider = new YouTubeProvider(iframe, resolveOptions(iframe, { provider: 'youtube', muted: true }));
+    provider.addEventListener('volumechange', () => {
+      eventCount += 1;
+    });
+
+    await provider.setMuted(false);
+
+    expect(eventCount).toBe(1);
+    expect(provider.getState().volume).toBe(1);
+    expect(provider.getState().muted).toBe(false);
+  });
+
+  it('emits volumechange after Vimeo SDK volume mutations', async () => {
+    let sdkVolume = 0;
+    let sdkMuted = true;
+    let eventCount = 0;
+    const script = document.createElement('script');
+    script.src = 'https://player.vimeo.com/api/player.js';
+    script.dataset.loaded = 'true';
+    document.head.append(script);
+
+    (window as any).Vimeo = {
+      Player: class {
+        play() {
+          return Promise.resolve();
+        }
+        pause() {
+          return Promise.resolve();
+        }
+        setCurrentTime() {
+          return Promise.resolve(0);
+        }
+        setVolume(value: number) {
+          sdkVolume = value;
+          return Promise.resolve(value);
+        }
+        setMuted(value: boolean) {
+          sdkMuted = value;
+          return Promise.resolve(value);
+        }
+        setPlaybackRate(value: number) {
+          return Promise.resolve(value);
+        }
+        loadVideo() {
+          return Promise.resolve(0);
+        }
+        getCurrentTime() {
+          return Promise.resolve(0);
+        }
+        getDuration() {
+          return Promise.resolve(0);
+        }
+        getVolume() {
+          return Promise.resolve(sdkVolume);
+        }
+        getMuted() {
+          return Promise.resolve(sdkMuted);
+        }
+        getPlaybackRate() {
+          return Promise.resolve(1);
+        }
+        on() {}
+        off() {}
+        destroy() {
+          return Promise.resolve();
+        }
+      },
+    };
+    document.body.innerHTML = '<iframe src="https://vimeo.com/347119375"></iframe>';
+    const iframe = document.querySelector('iframe')!;
+    const provider = new VimeoProvider(iframe, resolveOptions(iframe, { provider: 'vimeo', muted: true }));
+    provider.addEventListener('volumechange', () => {
+      eventCount += 1;
+    });
+
+    await provider.setVolume(0.75);
+    await provider.setMuted(false);
+
+    expect(eventCount).toBe(2);
+    expect(provider.getState().volume).toBe(0.75);
+    expect(provider.getState().muted).toBe(false);
   });
 
   it('initializes all data-fideo elements and can destroy them together', () => {

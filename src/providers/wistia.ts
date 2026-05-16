@@ -122,14 +122,14 @@ export class WistiaProvider extends BaseProvider {
     await this.ready;
     if (this.destroyed) return;
     if (this.player) (this.player as any).volume = clamp(volume);
-    this.sync();
+    this.sync('volumechange');
   }
 
   async setMuted(muted: boolean): Promise<void> {
     await this.ready;
     if (this.destroyed) return;
     if (this.player) (this.player as any).muted = muted;
-    this.sync();
+    this.sync('volumechange');
   }
 
   async setPlaybackRate(rate: number): Promise<void> {
@@ -179,7 +179,7 @@ export class WistiaProvider extends BaseProvider {
     });
   }
 
-  private sync(): void {
+  private sync(eventName = 'change'): void {
     if (!this.player) return;
     const p = this.player as any;
     this.update({
@@ -188,7 +188,7 @@ export class WistiaProvider extends BaseProvider {
       volume: p.volume ?? 1,
       muted: p.muted ?? false,
       playbackRate: p.playbackRate ?? 1,
-    });
+    }, eventName);
   }
 }
 
