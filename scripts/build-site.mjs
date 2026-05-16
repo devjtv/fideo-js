@@ -9,6 +9,7 @@ await rm(SITE, { recursive: true, force: true });
 await mkdir(SITE, { recursive: true });
 
 await cp(DIST, join(SITE, 'dist'), { recursive: true });
+await cp('assets', join(SITE, 'assets'), { recursive: true });
 await cp(join(EXAMPLES, 'posters'), join(SITE, 'posters'), { recursive: true });
 
 const entries = await readdir(EXAMPLES, { withFileTypes: true });
@@ -17,7 +18,9 @@ for (const entry of entries) {
   const src = join(EXAMPLES, entry.name);
   const dest = join(SITE, entry.name);
   const html = await readFile(src, 'utf8');
-  await writeFile(dest, html.replaceAll('../dist/', './dist/'));
+  await writeFile(dest, html
+    .replaceAll('../dist/', './dist/')
+    .replaceAll('../assets/', './assets/'));
 }
 
 console.log(`Built ${SITE}/ for static deploy.`);
