@@ -17,14 +17,19 @@ await cp(join(EXAMPLES, 'posters'), join(SITE, 'posters'), { recursive: true });
 
 const entries = await readdir(EXAMPLES, { withFileTypes: true });
 for (const entry of entries) {
-  if (!entry.isFile() || !entry.name.endsWith('.html')) continue;
+  if (!entry.isFile()) continue; // directories (e.g. posters/) are copied separately
   const src = join(EXAMPLES, entry.name);
   const dest = join(SITE, entry.name);
-  const html = await readFile(src, 'utf8');
-  await writeFile(dest, html
-    .replaceAll('../dist/', './dist/')
-    .replaceAll('../assets/', './assets/')
-    .replace('</head>', `  ${versionScript}\n  </head>`));
+  if (entry.name.endsWith('.html')) {
+    const html = await readFile(src, 'utf8');
+    await writeFile(dest, html
+      .replaceAll('../dist/', './dist/')
+      .replaceAll('../assets/', './assets/')
+      .replace('</head>', `  ${versionScript}\n  </head>`));
+  } else {
+    // Favicons, manifest, verification files, etc. — copy as-is.
+    await cp(src, dest);
+  }
 }
 
 console.log(`Built ${SITE}/ for static deploy (v${pkg.version}).`);
