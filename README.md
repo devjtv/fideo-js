@@ -123,8 +123,8 @@ When poster images are configured, Fideo renders them as a visual cover while th
 Because the compiled files are committed in `dist/`, Fideo JS can be loaded directly from jsDelivr. Pin a release tag for production:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.5.1/dist/fideo.css" />
-<script src="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.5.1/dist/fideo.global.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.5.2/dist/fideo.css" />
+<script src="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.5.2/dist/fideo.global.js"></script>
 <script>
   Fideo.init();
 </script>
@@ -133,9 +133,9 @@ Because the compiled files are committed in `dist/`, Fideo JS can be loaded dire
 ES module usage is also available:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.5.1/dist/fideo.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.5.2/dist/fideo.css" />
 <script type="module">
-  import { initFideo } from 'https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.5.1/dist/fideo.js';
+  import { initFideo } from 'https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.5.2/dist/fideo.js';
 
   initFideo();
 </script>
@@ -219,26 +219,30 @@ const player = new Fideo('#player', { sources: { desktop: '/clip.mp4' } });
 
 await player.play();
 await player.pause();
+await player.seek(30);
+await player.setVolume(0.5);
+await player.setMuted(true);
+await player.setPlaybackRate(1.5);
+await player.setSource('/clip-alt.mp4');
+const state = player.getState();
 player.destroy();
 
 player.element;   // the original <video> or <iframe>
 player.wrapper;   // the generated .fideo wrapper element
 player.options;   // the resolved options object
-player.adapter;   // the provider adapter (see below)
+player.adapter;   // the provider adapter (advanced / lower-level access)
 ```
 
-The `adapter` exposes lower-level provider operations and is the right place to look for things like seeking, programmatic volume, or reading the current playback state:
+The player methods cover the common API surface. The `adapter` stays available for provider-specific or lower-level access:
 
 ```ts
-const { adapter } = player;
+await player.seek(30);             // jump to 30s
+await player.setVolume(0.5);
+await player.setMuted(true);
+await player.setPlaybackRate(1.5);
+await player.setSource('/clip-alt.mp4');
 
-await adapter.seek(30);            // jump to 30s
-await adapter.setVolume(0.5);
-await adapter.setMuted(true);
-await adapter.setPlaybackRate(1.5);
-await adapter.setSource('/clip-alt.mp4');
-
-const state = adapter.getState();
+const state = player.getState();
 // {
 //   currentTime: number,
 //   duration: number,

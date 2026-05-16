@@ -1,4 +1,4 @@
-import type { FideoAdapter, FideoPlayerInstance, FideoResolvedOptions } from './types';
+import type { FideoAdapter, FideoPlayerInstance, FideoResolvedOptions, FideoState } from './types';
 import { createProvider } from './providers';
 import { FideoControls } from './ui';
 import { getResponsiveValue } from './utils/dom';
@@ -60,6 +60,30 @@ export class FideoPlayer implements FideoPlayerInstance {
 
   pause(): Promise<void> {
     return this.adapter.pause();
+  }
+
+  seek(time: number): Promise<void> {
+    return this.adapter.seek(time);
+  }
+
+  setVolume(volume: number): Promise<void> {
+    return this.adapter.setVolume(volume);
+  }
+
+  setMuted(muted: boolean): Promise<void> {
+    return this.adapter.setMuted(muted);
+  }
+
+  setPlaybackRate(rate: number): Promise<void> {
+    return this.adapter.setPlaybackRate(rate);
+  }
+
+  setSource(source: string): Promise<void> {
+    return this.adapter.setSource(source);
+  }
+
+  getState(): FideoState {
+    return this.adapter.getState();
   }
 
   destroy(): void {

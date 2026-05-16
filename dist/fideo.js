@@ -86,7 +86,7 @@ class O extends S {
 function D(s) {
   return Math.min(1, Math.max(0, s));
 }
-const P = {
+const L = {
   mobile: 767,
   tablet: 1024
 }, F = /* @__PURE__ */ new Set(["", "true", "1", "yes", "on"]), B = /* @__PURE__ */ new Set(["false", "0", "no", "off"]), I = "[data-fideo]", y = {
@@ -166,19 +166,19 @@ function K(s) {
 function Z(s, t = {}) {
   var f, m;
   const e = s.dataset, i = {
-    mobile: b(e.fideoBreakpointMobile, ((f = t.breakpoints) == null ? void 0 : f.mobile) ?? P.mobile),
-    tablet: b(e.fideoBreakpointTablet, ((m = t.breakpoints) == null ? void 0 : m.tablet) ?? P.tablet)
-  }, r = e.fideoProvider, a = t.provider ?? r ?? "auto", n = { ...J(s), ...M(t.sources) }, d = a === "auto" ? q(s, n) : a, l = t.viewport ?? !1, c = h(e.fideoBackground, t.background ?? !1), u = d !== "html5";
+    mobile: b(e.fideoBreakpointMobile, ((f = t.breakpoints) == null ? void 0 : f.mobile) ?? L.mobile),
+    tablet: b(e.fideoBreakpointTablet, ((m = t.breakpoints) == null ? void 0 : m.tablet) ?? L.tablet)
+  }, r = e.fideoProvider, a = t.provider ?? r ?? "auto", n = { ...J(s), ...M(t.sources) }, d = a === "auto" ? q(s, n) : a, l = t.viewport ?? !1, u = h(e.fideoBackground, t.background ?? !1), c = d !== "html5";
   return {
     selector: t.selector ?? I,
     provider: d,
-    autoplay: c || h(e.fideoAutoplay, t.autoplay ?? !1),
-    muted: c || h(e.fideoMuted, t.muted ?? !1),
-    loop: c || h(e.fideoLoop, t.loop ?? !1),
-    playsInline: c || h(e.fideoPlaysinline ?? e.fideoPlaysInline, t.playsInline ?? !0),
-    controls: h(e.fideoControls, t.controls ?? !c),
-    background: c,
-    lazy: h(e.fideoLazy, t.lazy ?? u),
+    autoplay: u || h(e.fideoAutoplay, t.autoplay ?? !1),
+    muted: u || h(e.fideoMuted, t.muted ?? !1),
+    loop: u || h(e.fideoLoop, t.loop ?? !1),
+    playsInline: u || h(e.fideoPlaysinline ?? e.fideoPlaysInline, t.playsInline ?? !0),
+    controls: h(e.fideoControls, t.controls ?? !u),
+    background: u,
+    lazy: h(e.fideoLazy, t.lazy ?? c),
     lazyRootMargin: e.fideoLazyRootMargin || t.lazyRootMargin || "800px 0px",
     preload: Q(e.fideoPreload, t.preload ?? "metadata"),
     controlVisibility: X(s, t.controlVisibility),
@@ -527,12 +527,12 @@ class oe extends S {
       this.player = new window.YT.Player(n, {
         events: {
           onReady: () => {
-            var l, c, u;
+            var l, u, c;
             if (this.destroyed) {
-              (l = this.player) == null || l.destroy(), (c = this.readyResolver) == null || c.call(this);
+              (l = this.player) == null || l.destroy(), (u = this.readyResolver) == null || u.call(this);
               return;
             }
-            this.sync(), (u = this.readyResolver) == null || u.call(this);
+            this.sync(), (c = this.readyResolver) == null || c.call(this);
           },
           onStateChange: ({ data: l }) => {
             this.destroyed || this.handleStateChange(l);
@@ -587,14 +587,14 @@ class oe extends S {
     this.sync(), e === 1 && (this.startTimer(), this.dispatchEvent(new CustomEvent("play", { detail: this.getState() }))), e === 2 && (this.stopTimer(), this.dispatchEvent(new CustomEvent("pause", { detail: this.getState() }))), e === 0 && (this.stopTimer(), this.dispatchEvent(new CustomEvent("ended", { detail: this.getState() })));
   }
   sync() {
-    var r, a, n, d, l, c, u, f, m, v;
+    var r, a, n, d, l, u, c, f, m, v;
     if (!this.player) return;
     const e = ((a = (r = this.player).getDuration) == null ? void 0 : a.call(r)) || 0, i = this.state.paused;
     this.state = {
       currentTime: ((d = (n = this.player).getCurrentTime) == null ? void 0 : d.call(n)) || 0,
       duration: e,
-      volume: (((c = (l = this.player).getVolume) == null ? void 0 : c.call(l)) ?? 100) / 100,
-      muted: ((f = (u = this.player).isMuted) == null ? void 0 : f.call(u)) ?? !1,
+      volume: (((u = (l = this.player).getVolume) == null ? void 0 : u.call(l)) ?? 100) / 100,
+      muted: ((f = (c = this.player).isMuted) == null ? void 0 : f.call(c)) ?? !1,
       paused: i,
       playbackRate: ((v = (m = this.player).getPlaybackRate) == null ? void 0 : v.call(m)) || 1,
       buffered: 0
@@ -653,12 +653,12 @@ function le(s, t, e) {
   }
   if (!(t instanceof HTMLIFrameElement))
     throw new Error(`Fideo ${s} provider needs an <iframe> element.`);
-  return e.lazy ? new ce(s, t, e) : H(s, t, e);
+  return e.lazy ? new ue(s, t, e) : H(s, t, e);
 }
 function H(s, t, e) {
   return s === "youtube" ? new oe(t, e) : s === "vimeo" ? new ie(t, e) : new re(t, e);
 }
-class ce extends EventTarget {
+class ue extends EventTarget {
   constructor(e, i, r) {
     super();
     o(this, "element");
@@ -696,7 +696,7 @@ class ce extends EventTarget {
     await (i == null ? void 0 : i.seek(e));
   }
   async setVolume(e) {
-    if (this.pendingVolume = ue(e), !this.adapter) {
+    if (this.pendingVolume = ce(e), !this.adapter) {
       this.update({ volume: this.pendingVolume }, "volumechange");
       return;
     }
@@ -758,7 +758,7 @@ class ce extends EventTarget {
     this.state = { ...this.state, ...e }, this.dispatchEvent(new CustomEvent(i, { detail: this.getState() }));
   }
 }
-function ue(s) {
+function ce(s) {
   return Math.min(1, Math.max(0, s));
 }
 const he = '.fideo{--fideo-accent: #46d9a7;--fideo-bg: transparent;--fideo-control-bg: transparent;--fideo-control-color: #ffffff;--fideo-muted-color: rgba(255, 255, 255, .92);--fideo-track: rgba(255, 255, 255, .46);--fideo-track-fill: rgba(255, 255, 255, .9);--fideo-track-size: 5px;--fideo-thumb-size: 13px;--fideo-radius: 8px;--fideo-button-size: 26px;--fideo-button-radius: 4px;--fideo-icon-size: 17px;--fideo-gap: 10px;position:relative;display:block;overflow:hidden;width:100%;aspect-ratio:16 / 9;background:var(--fideo-bg);color:var(--fideo-control-color);border-radius:var(--fideo-radius)}.fideo:after{position:absolute;inset:auto 0 0;z-index:1;height:104px;pointer-events:none;content:"";background:linear-gradient(to top,#0000006b,#00000042 38%,#0000);opacity:0;transition:opacity .16s ease}.fideo:hover:after,.fideo:focus-within:after,.fideo.is-paused:after,.fideo.is-user-active:after{opacity:1}.fideo__media{position:relative;z-index:0;display:block;width:100%;height:100%;border:0;object-fit:cover}.fideo__poster{position:absolute;top:0;right:0;bottom:0;left:0;z-index:1;width:100%;height:100%;object-fit:cover;pointer-events:none;opacity:0;transition:opacity .18s ease}.fideo.has-poster.is-poster-visible .fideo__poster{opacity:1}.fideo--background{width:100%;height:100%;min-height:inherit;aspect-ratio:auto;border-radius:inherit}.fideo--background:after,.fideo--no-controls:after{display:none}.fideo--background .fideo__media{position:absolute;top:0;right:0;bottom:0;left:0;width:100%;height:100%;max-width:none;max-height:none;object-fit:cover}.fideo--background iframe.fideo__media,.fideo--background wistia-player.fideo__media{inset:auto;object-fit:initial;pointer-events:none}.fideo__click-target{position:absolute;top:0;right:0;bottom:0;left:0;z-index:2;padding:0;background:transparent;border:0;cursor:pointer}.fideo.is-fullscreen{border-radius:0}.fideo.is-fullscreen .fideo__media{object-fit:contain}.fideo--background.is-fullscreen .fideo__media{position:static;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain}.fideo--background.is-fullscreen iframe.fideo__media,.fideo--background.is-fullscreen wistia-player.fideo__media{inset:auto;object-fit:initial;pointer-events:auto}.fideo__controls{position:absolute;right:16px;bottom:10px;left:16px;z-index:3;display:grid;grid-template-rows:auto auto;gap:6px;padding:0;background:var(--fideo-control-bg);border:0;border-radius:0;box-shadow:none;filter:none;opacity:0;pointer-events:none;transform:translateY(5px);transition:opacity .16s ease,transform .16s ease}.fideo:hover .fideo__controls,.fideo:focus-within .fideo__controls,.fideo.is-paused .fideo__controls,.fideo.is-user-active .fideo__controls{opacity:1;pointer-events:auto;transform:translateY(0)}.fideo__button{display:inline-grid;place-items:center;position:relative;z-index:1;width:var(--fideo-button-size);height:var(--fideo-button-size);padding:0;color:var(--fideo-control-color);background:transparent;border:0;border-radius:var(--fideo-button-radius);cursor:pointer;line-height:0;transition:opacity .14s ease,color .14s ease}.fideo__button:hover,.fideo__button:focus-visible{color:var(--fideo-accent);background:transparent}.fideo__button svg{display:block;width:var(--fideo-icon-size);height:var(--fideo-icon-size);pointer-events:none}.fideo__control-row{display:flex;gap:var(--fideo-gap);align-items:center;min-width:0}.fideo__play{margin-right:-4px}.fideo__spacer{flex:1 1 auto}.fideo__timeline{display:block;min-width:0}.fideo__time-group{display:inline-flex;gap:3px;align-items:center;margin-left:2px}.fideo__time{min-width:auto;color:var(--fideo-muted-color);font:600 12px/1 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-variant-numeric:tabular-nums;text-align:left}.fideo__time-separator{color:var(--fideo-muted-color);font:600 12px/1 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}.fideo__track,.fideo__volume{--fideo-progress: 0%;width:100%;height:18px;padding:0;background:transparent;accent-color:var(--fideo-accent);cursor:pointer;-webkit-appearance:none;-moz-appearance:none;appearance:none}.fideo__track::-webkit-slider-runnable-track,.fideo__volume::-webkit-slider-runnable-track{height:var(--fideo-track-size);background:linear-gradient(to right,var(--fideo-track-fill) 0%,var(--fideo-track-fill) var(--fideo-progress),var(--fideo-track) var(--fideo-progress),var(--fideo-track) 100%);border-radius:999px}.fideo__volume::-webkit-slider-runnable-track{width:var(--fideo-track-size);height:100%;background:linear-gradient(to top,var(--fideo-track-fill) 0%,var(--fideo-track-fill) var(--fideo-progress),var(--fideo-track) var(--fideo-progress),var(--fideo-track) 100%)}.fideo__track::-moz-range-track,.fideo__volume::-moz-range-track{height:var(--fideo-track-size);background:var(--fideo-track);border-radius:999px}.fideo__volume::-moz-range-track{width:var(--fideo-track-size);height:100%}.fideo__track::-moz-range-progress,.fideo__volume::-moz-range-progress{height:var(--fideo-track-size);background:var(--fideo-track-fill);border-radius:999px}.fideo__volume::-moz-range-progress{width:var(--fideo-track-size)}.fideo__track::-webkit-slider-thumb,.fideo__volume::-webkit-slider-thumb{width:var(--fideo-thumb-size);height:var(--fideo-thumb-size);margin-top:calc((var(--fideo-thumb-size) - var(--fideo-track-size)) / -2);background:var(--fideo-control-color);border:0;border-radius:999px;-webkit-appearance:none;-moz-appearance:none;appearance:none}.fideo__volume::-webkit-slider-thumb{margin-top:0;margin-left:calc((var(--fideo-thumb-size) - var(--fideo-track-size)) / -2)}.fideo__track::-webkit-slider-thumb{opacity:0}.fideo__track:hover::-webkit-slider-thumb,.fideo__track:focus-visible::-webkit-slider-thumb{opacity:1}.fideo__track::-moz-range-thumb,.fideo__volume::-moz-range-thumb{width:var(--fideo-thumb-size);height:var(--fideo-thumb-size);background:var(--fideo-control-color);border:0;border-radius:999px}.fideo__track::-moz-range-thumb{opacity:0}.fideo__track:hover::-moz-range-thumb,.fideo__track:focus-visible::-moz-range-thumb{opacity:1}.fideo__volume-group{position:relative;display:inline-grid;place-items:center;width:var(--fideo-button-size);height:var(--fideo-button-size)}.fideo__volume-panel{position:absolute;bottom:calc(100% + 10px);left:50%;display:grid;place-items:center;width:24px;height:76px;opacity:0;pointer-events:none;transform:translate(-50%);transition:opacity .14s ease,bottom .14s ease}.fideo__volume-panel:after{position:absolute;right:-10px;bottom:-14px;left:-10px;height:14px;content:""}.fideo__volume{width:18px;height:76px;direction:rtl;writing-mode:vertical-lr}.fideo__volume-group:hover .fideo__volume-panel,.fideo__volume-group.is-open .fideo__volume-panel,.fideo__volume-group:focus-within .fideo__volume-panel{bottom:calc(100% + 14px);opacity:1;pointer-events:auto}.fideo__settings{position:relative}.fideo__settings-menu{position:absolute;right:0;bottom:calc(100% + 8px);display:grid;min-width:90px;padding:6px;pointer-events:none;background:#080a0de0;border:1px solid rgba(255,255,255,.12);border-radius:8px;box-shadow:none;opacity:0;transform:translateY(4px);transition:opacity .14s ease,transform .14s ease}.fideo__settings.is-open .fideo__settings-menu{pointer-events:auto;opacity:1;transform:translateY(0)}.fideo__speed{min-height:32px;padding:0 12px;color:var(--fideo-control-color);text-align:left;background:transparent;border:0;border-radius:6px;cursor:pointer}.fideo__speed:hover,.fideo__speed:focus-visible{color:#07100d;background:var(--fideo-accent)}@media(max-width:700px){.fideo__controls{right:12px;bottom:8px;left:12px}.fideo__time,.fideo__time-separator{font-size:11px}}', pe = {
@@ -824,10 +824,10 @@ class me {
     a.textContent = he, r.appendChild(a), this.playButton = this.button("fideo__button fideo__play", "Play", this.icons.play, "play-button"), this.muteButton = this.button("fideo__button fideo__mute", "Mute", this.icons.volume, "mute-button"), this.track = this.range("fideo__track", 0, 1e3, 1, "timeline"), this.volume = this.range("fideo__volume", 0, 1, 0.01, "volume-slider"), this.currentTime = p("span", "fideo__time"), this.currentTime.setAttribute("part", "current-time"), this.duration = p("span", "fideo__time"), this.duration.setAttribute("part", "duration"), this.speedMenu = this.createSpeedMenu(i.playbackRates), this.fullscreenButton = this.button("fideo__button", "Fullscreen", this.icons.fullscreen, "fullscreen-button");
     const n = this.button("fideo__button fideo__settings-toggle", "Settings", this.icons.settings, "settings-button"), d = p("div", "fideo__timeline");
     d.append(this.track);
-    const l = p("span", "fideo__time-group"), c = p("span", "fideo__time-separator");
-    c.setAttribute("part", "time-separator"), c.textContent = "/", l.append(this.currentTime, c, this.duration), this.volumeGroup = p("div", "fideo__volume-group"), this.volumePanel = p("div", "fideo__volume-panel"), this.volumePanel.append(this.volume), this.volumeGroup.append(this.muteButton, this.volumePanel), this.settingsGroup = p("div", "fideo__settings"), this.settingsGroup.append(n, this.speedMenu);
-    const u = p("div", "fideo__control-row"), f = p("span", "fideo__spacer");
-    i.controlVisibility.play && u.append(this.playButton), (i.controlVisibility.currentTime || i.controlVisibility.duration) && u.append(l), u.append(f), i.controlVisibility.volume && u.append(this.volumeGroup), i.controlVisibility.settings && u.append(this.settingsGroup), i.controlVisibility.fullscreen && u.append(this.fullscreenButton), r.appendChild(u), i.controlVisibility.timeline && r.appendChild(d), this.wrapper.append(this.element), i.controlVisibility.currentTime || this.currentTime.remove(), i.controlVisibility.duration || this.duration.remove(), (!i.controlVisibility.currentTime || !i.controlVisibility.duration) && c.remove(), this.playButton.addEventListener("click", () => this.togglePlay()), this.muteButton.addEventListener("click", () => this.toggleMute()), this.volume.addEventListener("input", () => this.changeVolume()), this.track.addEventListener("pointerdown", () => {
+    const l = p("span", "fideo__time-group"), u = p("span", "fideo__time-separator");
+    u.setAttribute("part", "time-separator"), u.textContent = "/", l.append(this.currentTime, u, this.duration), this.volumeGroup = p("div", "fideo__volume-group"), this.volumePanel = p("div", "fideo__volume-panel"), this.volumePanel.append(this.volume), this.volumeGroup.append(this.muteButton, this.volumePanel), this.settingsGroup = p("div", "fideo__settings"), this.settingsGroup.append(n, this.speedMenu);
+    const c = p("div", "fideo__control-row"), f = p("span", "fideo__spacer");
+    i.controlVisibility.play && c.append(this.playButton), (i.controlVisibility.currentTime || i.controlVisibility.duration) && c.append(l), c.append(f), i.controlVisibility.volume && c.append(this.volumeGroup), i.controlVisibility.settings && c.append(this.settingsGroup), i.controlVisibility.fullscreen && c.append(this.fullscreenButton), r.appendChild(c), i.controlVisibility.timeline && r.appendChild(d), this.wrapper.append(this.element), i.controlVisibility.currentTime || this.currentTime.remove(), i.controlVisibility.duration || this.duration.remove(), (!i.controlVisibility.currentTime || !i.controlVisibility.duration) && u.remove(), this.playButton.addEventListener("click", () => this.togglePlay()), this.muteButton.addEventListener("click", () => this.toggleMute()), this.volume.addEventListener("input", () => this.changeVolume()), this.track.addEventListener("pointerdown", () => {
       this.seeking = !0, this.syncPlaybackState(this.adapter.getState(), !0);
     }), this.track.addEventListener("input", () => this.previewSeek()), this.track.addEventListener("change", () => this.commitSeek()), this.track.addEventListener("pointerup", () => {
       this.seeking = !1;
@@ -1006,6 +1006,24 @@ class fe {
   pause() {
     return this.adapter.pause();
   }
+  seek(t) {
+    return this.adapter.seek(t);
+  }
+  setVolume(t) {
+    return this.adapter.setVolume(t);
+  }
+  setMuted(t) {
+    return this.adapter.setMuted(t);
+  }
+  setPlaybackRate(t) {
+    return this.adapter.setPlaybackRate(t);
+  }
+  setSource(t) {
+    return this.adapter.setSource(t);
+  }
+  getState() {
+    return this.adapter.getState();
+  }
   destroy() {
     var t, e, i, r, a, n;
     this.destroyed || (this.destroyed = !0, (t = this.observer) == null || t.disconnect(), (e = this.resizeObserver) == null || e.disconnect(), this.resizeController.abort(), this.lifecycleController.abort(), (i = this.controls) == null || i.destroy(), this.adapter.destroy(), document.removeEventListener("fullscreenchange", this.handleFullscreenChange), this.activityTimer && window.clearTimeout(this.activityTimer), this.wrapper.classList.remove("is-ready"), this.wrapper.classList.remove("has-poster", "is-poster-visible"), this.element.removeAttribute("data-fideo-ready"), this.element.classList.remove("fideo__media"), (r = this.posterImage) == null || r.remove(), (a = this.clickTarget) == null || a.remove(), this.element.parentElement === this.wrapper && this.wrapper.before(this.element), this.wrapper.remove(), (n = this.onDestroy) == null || n.call(this, this.element, this));
@@ -1173,11 +1191,29 @@ class ve {
   pause() {
     return this.player.pause();
   }
+  seek(t) {
+    return this.player.seek(t);
+  }
+  setVolume(t) {
+    return this.player.setVolume(t);
+  }
+  setMuted(t) {
+    return this.player.setMuted(t);
+  }
+  setPlaybackRate(t) {
+    return this.player.setPlaybackRate(t);
+  }
+  setSource(t) {
+    return this.player.setSource(t);
+  }
+  getState() {
+    return this.player.getState();
+  }
   destroy() {
     this.player.destroy();
   }
   static init(t = {}) {
-    return L(t);
+    return P(t);
   }
   static mount(t, e = {}) {
     return g(t, e);
@@ -1186,7 +1222,7 @@ class ve {
 function ge(s, t = {}) {
   return g(U(s), t);
 }
-function L(s = {}) {
+function P(s = {}) {
   const t = s.selector ?? I, i = Array.from(document.querySelectorAll(t)).filter(
     (r) => r instanceof HTMLVideoElement || r instanceof HTMLIFrameElement
   ).map((r) => g(r, s));
@@ -1211,9 +1247,9 @@ function U(s) {
     return t;
   throw new Error("Fideo target must resolve to a <video> or <iframe> element.");
 }
-typeof window < "u" && (Object.assign(window, { Fideo: ve, createFideo: ge, initFideo: L, mountFideo: g }), be() || document.addEventListener("DOMContentLoaded", () => {
+typeof window < "u" && (Object.assign(window, { Fideo: ve, createFideo: ge, initFideo: P, mountFideo: g }), be() || document.addEventListener("DOMContentLoaded", () => {
   const s = window.__fideoAutoInit || {};
-  L(s);
+  P(s);
 }));
 function be() {
   return typeof document < "u" && document.currentScript == null;
@@ -1221,7 +1257,7 @@ function be() {
 export {
   ve as Fideo,
   ge as createFideo,
-  L as initFideo,
+  P as initFideo,
   g as mountFideo
 };
 //# sourceMappingURL=fideo.js.map

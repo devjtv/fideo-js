@@ -1,4 +1,4 @@
-import type { FideoAdapter, FideoPlayerInstance, FideoResolvedOptions } from './types';
+import type { FideoAdapter, FideoPlayerInstance, FideoResolvedOptions, FideoState } from './types';
 export declare class FideoPlayer implements FideoPlayerInstance {
     private onDestroy?;
     readonly element: HTMLVideoElement | HTMLIFrameElement;
@@ -19,6 +19,12 @@ export declare class FideoPlayer implements FideoPlayerInstance {
     constructor(element: HTMLVideoElement | HTMLIFrameElement, options: FideoResolvedOptions, onDestroy?: ((element: HTMLVideoElement | HTMLIFrameElement, player: FideoPlayer) => void) | undefined);
     play(): Promise<void>;
     pause(): Promise<void>;
+    seek(time: number): Promise<void>;
+    setVolume(volume: number): Promise<void>;
+    setMuted(muted: boolean): Promise<void>;
+    setPlaybackRate(rate: number): Promise<void>;
+    setSource(source: string): Promise<void>;
+    getState(): FideoState;
     destroy(): void;
     private wrapElement;
     private configureElement;

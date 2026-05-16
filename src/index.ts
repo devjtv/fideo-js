@@ -1,6 +1,14 @@
 import './styles.css';
 import { FideoPlayer } from './fideo-player';
-import type { FideoAdapter, FideoInitResult, FideoOptions, FideoPlayerInstance, FideoResolvedOptions, FideoTarget } from './types';
+import type {
+  FideoAdapter,
+  FideoInitResult,
+  FideoOptions,
+  FideoPlayerInstance,
+  FideoResolvedOptions,
+  FideoState,
+  FideoTarget,
+} from './types';
 import { DEFAULT_SELECTOR, resolveOptions } from './utils/dom';
 
 const instances = new WeakMap<Element, FideoPlayer>();
@@ -34,6 +42,30 @@ export class Fideo implements FideoPlayerInstance {
 
   pause(): Promise<void> {
     return this.player.pause();
+  }
+
+  seek(time: number): Promise<void> {
+    return this.player.seek(time);
+  }
+
+  setVolume(volume: number): Promise<void> {
+    return this.player.setVolume(volume);
+  }
+
+  setMuted(muted: boolean): Promise<void> {
+    return this.player.setMuted(muted);
+  }
+
+  setPlaybackRate(rate: number): Promise<void> {
+    return this.player.setPlaybackRate(rate);
+  }
+
+  setSource(source: string): Promise<void> {
+    return this.player.setSource(source);
+  }
+
+  getState(): FideoState {
+    return this.player.getState();
   }
 
   destroy(): void {

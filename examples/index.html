@@ -785,7 +785,7 @@
             <img src="favicon.svg" alt="" />
           </span>
           <span>fideo-js</span>
-          <span class="badge mono" style="margin-left:6px" data-version>v0.4.0</span>
+          <span class="badge mono" style="margin-left:6px" data-version>v0.5.2</span>
         </a>
         <ul>
           <li><a href="#providers">Providers</a></li>
@@ -800,7 +800,7 @@
     <!-- ============== HERO ============== -->
     <header class="hero" id="top">
       <div class="container hero-inner">
-        <span class="badge-pill"><span class="dot"></span>~12 kB · zero dependencies · <span data-version>v0.4.0</span></span>
+        <span class="badge-pill"><span class="dot"></span>~12 kB · zero dependencies · <span data-version>v0.5.2</span></span>
         <h1>One video API for <span class="accent">every provider</span>.</h1>
         <p class="lede">
           A tiny, framework-free video UI that wraps HTML5, YouTube, Vimeo, and Wistia behind a
@@ -1399,9 +1399,10 @@ initFideo();
           <h2>Drive the player from anywhere.</h2>
           <p class="section-lede">
             Construct a <code>Fideo</code> instance and call <code>play()</code>,
-            <code>pause()</code>, <code>adapter.seek()</code>, <code>setPlaybackRate()</code>,
-            <code>setSource()</code>. State is also dispatched as normalized
-            <code>fideo:*</code> DOM events.
+            <code>pause()</code>, <code>seek()</code>, <code>setVolume()</code>,
+            <code>setMuted()</code>, <code>setPlaybackRate()</code>,
+            <code>setSource()</code>, and <code>getState()</code>. State is also dispatched as
+            normalized <code>fideo:*</code> DOM events.
           </p>
         </div>
         <div class="api-grid">
@@ -1430,7 +1431,7 @@ initFideo();
                 <button class="btn btn-sm" data-api="rate-onefive">1.5×</button>
                 <button class="btn btn-sm" data-api="rate-two">2×</button>
               </div>
-              <div class="muted" style="font-size:12px; margin-bottom:6px">Swap source (<code>adapter.setSource</code>)</div>
+              <div class="muted" style="font-size:12px; margin-bottom:6px">Swap source (<code>player.setSource</code>)</div>
               <div class="api-buttons">
                 <button class="btn btn-sm" data-src="turtle">Sea turtle</button>
                 <button class="btn btn-sm" data-src="elephants">Elephants</button>
@@ -1443,7 +1444,7 @@ initFideo();
               <div class="card-header">
                 <div>
                   <h3 class="card-title">Live state</h3>
-                  <p class="card-description"><code>player.adapter.getState()</code></p>
+                  <p class="card-description"><code>player.getState()</code></p>
                 </div>
               </div>
               <div class="card-content">
@@ -2003,7 +2004,7 @@ initFideo();
           return String(v);
         }
         function paintState() {
-          const s = apiPlayer.adapter?.getState?.() ?? {};
+          const s = apiPlayer.getState();
           stateBox.querySelectorAll('[data-k]').forEach((el) => {
             el.textContent = fmt(s[el.dataset.k]);
           });
@@ -2013,18 +2014,17 @@ initFideo();
 
         document.querySelectorAll('[data-api]').forEach((btn) => {
           btn.addEventListener('click', () => {
-            const a = apiPlayer.adapter;
-            const s = a?.getState?.() ?? {};
+            const s = apiPlayer.getState();
             switch (btn.dataset.api) {
               case 'play': apiPlayer.play(); break;
               case 'pause': apiPlayer.pause(); break;
-              case 'seek-back': a?.seek?.(Math.max(0, (s.currentTime || 0) - 10)); break;
-              case 'seek-fwd':  a?.seek?.((s.currentTime || 0) + 10); break;
-              case 'rate-half':    a?.setPlaybackRate?.(0.5); break;
-              case 'rate-one':     a?.setPlaybackRate?.(1); break;
-              case 'rate-onefive': a?.setPlaybackRate?.(1.5); break;
-              case 'rate-two':     a?.setPlaybackRate?.(2); break;
-              case 'mute': a?.setMuted?.(!s.muted); break;
+              case 'seek-back': apiPlayer.seek(Math.max(0, (s.currentTime || 0) - 10)).catch(() => undefined); break;
+              case 'seek-fwd':  apiPlayer.seek((s.currentTime || 0) + 10).catch(() => undefined); break;
+              case 'rate-half':    apiPlayer.setPlaybackRate(0.5).catch(() => undefined); break;
+              case 'rate-one':     apiPlayer.setPlaybackRate(1).catch(() => undefined); break;
+              case 'rate-onefive': apiPlayer.setPlaybackRate(1.5).catch(() => undefined); break;
+              case 'rate-two':     apiPlayer.setPlaybackRate(2).catch(() => undefined); break;
+              case 'mute': apiPlayer.setMuted(!s.muted).catch(() => undefined); break;
             }
           });
         });
@@ -2032,7 +2032,7 @@ initFideo();
         document.querySelectorAll('[data-src]').forEach((btn) => {
           btn.addEventListener('click', () => {
             const url = SOURCES[btn.dataset.src];
-            if (url) apiPlayer.adapter?.setSource?.(url);
+            if (url) apiPlayer.setSource(url).catch(() => undefined);
           });
         });
 

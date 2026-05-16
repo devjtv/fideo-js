@@ -121,5 +121,11 @@ export interface FideoPlayerInstance {
     readonly adapter: FideoAdapter;
     play(): Promise<void>;
     pause(): Promise<void>;
+    seek(time: number): Promise<void>;
+    setVolume(volume: number): Promise<void>;
+    setMuted(muted: boolean): Promise<void>;
+    setPlaybackRate(rate: number): Promise<void>;
+    setSource(source: string): Promise<void>;
+    getState(): FideoState;
     destroy(): void;
 }

@@ -211,19 +211,19 @@
       }
 
       function seekTo(seconds) {
-        player.adapter.seek(seconds).catch(() => undefined);
+        player.seek(seconds).catch(() => undefined);
       }
 
       async function toggleMute() {
-        const state = player.adapter.getState();
-        await player.adapter.setMuted(!state.muted).catch(() => undefined);
+        const state = player.getState();
+        await player.setMuted(!state.muted).catch(() => undefined);
       }
 
       async function setVolume(value) {
         const v = parseFloat(value);
-        await player.adapter.setVolume(v).catch(() => undefined);
-        if (v > 0) await player.adapter.setMuted(false).catch(() => undefined);
-        if (v === 0) await player.adapter.setMuted(true).catch(() => undefined);
+        await player.setVolume(v).catch(() => undefined);
+        if (v > 0) await player.setMuted(false).catch(() => undefined);
+        if (v === 0) await player.setMuted(true).catch(() => undefined);
         document.getElementById('volume-value').textContent = `${Math.round(v * 100)}%`;
       }
 
@@ -236,7 +236,7 @@
       }
 
       function logCurrentState() {
-        const state = player.adapter.getState();
+        const state = player.getState();
         console.log('Current Fideo state:', state);
         logEvent('manual:state', { state });
       }
