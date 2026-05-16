@@ -774,7 +774,7 @@
         <p class="lede">
           A tiny, framework-free video UI that wraps HTML5, YouTube, Vimeo, and Wistia behind a
           single set of data attributes. Responsive sources, background loops, viewport triggers,
-          themable controls — without shipping a player runtime.
+          themable controls — without the heavyweight player bundle.
         </p>
         <div class="cta-row">
           <a class="btn btn-primary" href="https://github.com/devjtv/fideo-js">
@@ -827,7 +827,7 @@
       <div class="container">
         <div class="section-head">
           <span class="eyebrow">Quick start</span>
-          <h2>Two lines of HTML. That's the player.</h2>
+          <h2>From plain markup to polished player.</h2>
           <p class="section-lede">
             Drop in the CDN bundle, mark up a <code>&lt;video&gt;</code> or
             <code>&lt;iframe&gt;</code> with <code>data-fideo</code>, and the library
@@ -903,7 +903,7 @@ initFideo();
       <div class="container">
         <div class="section-head">
           <span class="eyebrow">Provider gallery</span>
-          <h2>Same markup. Four different runtimes.</h2>
+          <h2>Same markup. Four different providers.</h2>
           <p class="section-lede">
             Each card below uses identical data attributes — only the source URL changes.
             Provider SDKs are lazy-loaded on demand.
@@ -1124,7 +1124,7 @@ initFideo();
             ></iframe>
             <div class="banner-content">
               <span class="badge accent" style="margin-bottom:8px">data-fideo-background</span>
-              <h3>Cinematic, without the bloat.</h3>
+              <h3>Hero video. Zero config.</h3>
               <p>Hides controls, mutes audio, autoplays, loops, and cover-fills the container.</p>
             </div>
           </div>
@@ -1364,7 +1364,7 @@ initFideo();
     <section id="api">
       <div class="container">
         <div class="section-head">
-          <span class="eyebrow">Imperative JS API</span>
+          <span class="eyebrow">JavaScript API</span>
           <h2>Drive the player from anywhere.</h2>
           <p class="section-lede">
             Construct a <code>Fideo</code> instance and call <code>play()</code>,
@@ -1378,7 +1378,7 @@ initFideo();
             <div class="card-header">
               <div>
                 <h3 class="card-title">Live player</h3>
-                <p class="card-description">Constructed in JS — no <code>data-fideo</code> attribute.</p>
+                <p class="card-description">Mounted from JS without <code>data-fideo</code>.</p>
               </div>
             </div>
             <div class="card-content">
@@ -1528,7 +1528,7 @@ initFideo();
           <div class="card">
             <div class="card-header">
               <h3 class="card-title">No controls</h3>
-              <span class="badge">controls="false"</span>
+              <span class="badge">data-fideo-controls="false"</span>
             </div>
             <div class="card-tabs" role="tablist">
               <button class="card-tab" type="button" data-panel="preview" aria-selected="true">Preview</button>
@@ -1595,7 +1595,7 @@ initFideo();
       <div class="container">
         <div class="section-head">
           <span class="eyebrow">Theming</span>
-          <h2>Themed with CSS variables and <code>::part()</code>.</h2>
+          <h2>Theme every pixel.</h2>
           <p class="section-lede">
             Override <code>--fideo-*</code> variables globally, per element via
             <code>data-fideo-accent</code>, or in JS with <code>cssVars</code>. Deep customisation
@@ -1890,6 +1890,11 @@ initFideo();
               e.preventDefault();
               lenis.scrollTo(target, { offset: -64 });
             });
+          });
+          // Inner scroll containers: opt them out of Lenis so wheel events scroll
+          // the container itself rather than the page.
+          document.querySelectorAll('.card-panel pre, .log').forEach((el) => {
+            el.setAttribute('data-lenis-prevent', '');
           });
         }
 
