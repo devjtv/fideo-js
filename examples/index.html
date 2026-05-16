@@ -142,10 +142,14 @@
         place-items: center;
         width: 24px; height: 24px;
         border-radius: 6px;
-        background: var(--primary);
-        color: var(--primary-foreground);
-        font-size: 11px;
-        font-weight: 700;
+        background: transparent;
+        border: 1px solid var(--border);
+        overflow: hidden;
+      }
+      .brand-mark img {
+        width: 16px;
+        height: 16px;
+        display: block;
       }
       nav ul {
         display: flex;
@@ -253,10 +257,30 @@
       .btn-sm { height: 30px; padding: 0 12px; font-size: 13px; }
       .btn svg { width: 14px; height: 14px; }
 
+      .skip-link {
+        position: fixed;
+        top: 12px;
+        left: 12px;
+        z-index: 100;
+        transform: translateY(-180%);
+        opacity: 0;
+        pointer-events: none;
+        transition: transform 0.18s ease, opacity 0.18s ease;
+      }
+      .skip-link:focus,
+      .skip-link:focus-visible {
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: auto;
+      }
+
       /* ---------- section ---------- */
       section {
         padding: 80px 0;
         border-bottom: 1px solid var(--border);
+      }
+      section[id] {
+        scroll-margin-top: 80px;
       }
       .section-head { max-width: 720px; margin-bottom: 40px; }
       .eyebrow {
@@ -751,11 +775,15 @@
     </style>
   </head>
   <body>
+    <a class="btn btn-primary skip-link" href="#quick-start">Skip to main content</a>
+
     <!-- ============== NAV ============== -->
     <nav>
       <div class="container">
         <a class="brand" href="#top">
-          <span class="brand-mark">F</span>
+          <span class="brand-mark" aria-hidden="true">
+            <img src="favicon.svg" alt="" />
+          </span>
           <span>fideo-js</span>
           <span class="badge mono" style="margin-left:6px" data-version>v0.4.0</span>
         </a>
@@ -826,7 +854,7 @@
     </section>
 
     <!-- ============== QUICK START ============== -->
-    <section id="quick-start">
+    <section id="quick-start" tabindex="-1">
       <div class="container">
         <div class="section-head">
           <span class="eyebrow">Quick start</span>
@@ -1892,6 +1920,7 @@ initFideo();
               if (!target) return;
               e.preventDefault();
               lenis.scrollTo(target, { offset: -64 });
+              if (typeof target.focus === 'function') target.focus({ preventScroll: true });
             });
           });
           // Inner scroll containers: opt them out of Lenis so wheel events scroll
