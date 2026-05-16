@@ -101,6 +101,7 @@ export class FideoPlayer implements FideoPlayerInstance {
   private configureElement(): void {
     this.wrapper.classList.add(`fideo--${this.options.provider}`);
     if (this.options.background) this.wrapper.classList.add('fideo--background');
+    if (!this.options.controls) this.wrapper.classList.add('fideo--no-controls');
     this.wrapper.classList.add('is-ready');
     this.wrapper.classList.add('is-paused');
     this.element.classList.add('fideo__media');

@@ -7,9 +7,12 @@
   --fideo-track: rgba(255, 255, 255, 0.46);
   --fideo-track-fill: rgba(255, 255, 255, 0.9);
   --fideo-track-size: 5px;
+  --fideo-thumb-size: 13px;
   --fideo-radius: 8px;
   --fideo-button-size: 26px;
-  --fideo-gap: 12px;
+  --fideo-button-radius: 4px;
+  --fideo-icon-size: 17px;
+  --fideo-gap: 10px;
   position: relative;
   display: block;
   overflow: hidden;
@@ -78,7 +81,8 @@
   border-radius: inherit;
 }
 
-.fideo--background::after {
+.fideo--background::after,
+.fideo--no-controls::after {
   display: none;
 }
 
@@ -177,13 +181,12 @@
   color: var(--fideo-control-color);
   background: transparent;
   border: 0;
-  border-radius: 4px;
+  border-radius: var(--fideo-button-radius);
   cursor: pointer;
   line-height: 0;
   transition:
     opacity 140ms ease,
-    color 140ms ease,
-    transform 140ms ease;
+    color 140ms ease;
 }
 
 .fideo__button:hover,
@@ -192,20 +195,16 @@
   background: transparent;
 }
 
-.fideo__button:active {
-  transform: scale(0.96);
-}
-
 .fideo__button svg {
   display: block;
-  width: 17px;
-  height: 17px;
+  width: var(--fideo-icon-size);
+  height: var(--fideo-icon-size);
   pointer-events: none;
 }
 
 .fideo__control-row {
   display: flex;
-  gap: 10px;
+  gap: var(--fideo-gap);
   align-items: center;
   min-width: 0;
 }
@@ -305,9 +304,9 @@
 
 .fideo__track::-webkit-slider-thumb,
 .fideo__volume::-webkit-slider-thumb {
-  width: 13px;
-  height: 13px;
-  margin-top: -4px;
+  width: var(--fideo-thumb-size);
+  height: var(--fideo-thumb-size);
+  margin-top: calc((var(--fideo-thumb-size) - var(--fideo-track-size)) / -2);
   background: var(--fideo-control-color);
   border: 0;
   border-radius: 999px;
@@ -316,7 +315,7 @@
 
 .fideo__volume::-webkit-slider-thumb {
   margin-top: 0;
-  margin-left: -4px;
+  margin-left: calc((var(--fideo-thumb-size) - var(--fideo-track-size)) / -2);
 }
 
 .fideo__track::-webkit-slider-thumb {
@@ -330,8 +329,8 @@
 
 .fideo__track::-moz-range-thumb,
 .fideo__volume::-moz-range-thumb {
-  width: 13px;
-  height: 13px;
+  width: var(--fideo-thumb-size);
+  height: var(--fideo-thumb-size);
   background: var(--fideo-control-color);
   border: 0;
   border-radius: 999px;

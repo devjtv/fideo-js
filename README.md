@@ -123,8 +123,8 @@ When poster images are configured, Fideo renders them as a visual cover while th
 Because the compiled files are committed in `dist/`, Fideo JS can be loaded directly from jsDelivr. Pin a release tag for production:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.3.7/dist/fideo.css" />
-<script src="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.3.7/dist/fideo.global.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.4.0/dist/fideo.css" />
+<script src="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.4.0/dist/fideo.global.js"></script>
 <script>
   Fideo.init();
 </script>
@@ -133,9 +133,9 @@ Because the compiled files are committed in `dist/`, Fideo JS can be loaded dire
 ES module usage is also available:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.3.7/dist/fideo.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.4.0/dist/fideo.css" />
 <script type="module">
-  import { initFideo } from 'https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.3.7/dist/fideo.js';
+  import { initFideo } from 'https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.4.0/dist/fideo.js';
 
   initFideo();
 </script>
@@ -519,9 +519,12 @@ Every visible UI element is styled with CSS variables. Override globally, per wr
   --fideo-track: rgba(255, 255, 255, 0.46);
   --fideo-track-fill: rgba(255, 255, 255, 0.9);
   --fideo-track-size: 5px;
+  --fideo-thumb-size: 13px;
   --fideo-radius: 8px;
   --fideo-button-size: 26px;
-  --fideo-gap: 12px;
+  --fideo-button-radius: 4px;
+  --fideo-icon-size: 17px;
+  --fideo-gap: 10px;
 }
 ```
 
@@ -577,6 +580,7 @@ Controls render inside a Shadow DOM so internal styles can't leak in or out. For
 | `current-time` | Current-time text span. |
 | `duration` | Duration text span. |
 | `settings-button` | Settings (playback rate) toggle. |
+| `settings-menu` | Playback-rate dropdown container. |
 | `speed-button` | Individual playback-rate option button. |
 | `fullscreen-button` | Fullscreen toggle. |
 

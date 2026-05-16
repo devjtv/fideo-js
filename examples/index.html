@@ -11,350 +11,436 @@
     <link rel="preconnect" href="https://rsms.me/" />
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
     <style>
+      /* ---------- shadcn-style design tokens ---------- */
       :root {
-        --bg: #08090c;
-        --surface: #11141a;
-        --surface-2: #181c25;
-        --border: #232936;
-        --text: #e7ecf3;
-        --muted: #8a93a3;
-        --dim: #5b6373;
+        --background: hsl(240 10% 3.9%);
+        --foreground: hsl(0 0% 98%);
+        --card: hsl(240 6% 7%);
+        --card-elevated: hsl(240 5% 10%);
+        --muted: hsl(240 4% 13%);
+        --muted-foreground: hsl(240 5% 64.9%);
+        --border: hsl(240 4% 16%);
+        --border-strong: hsl(240 4% 22%);
+        --input: hsl(240 4% 16%);
+        --primary: hsl(0 0% 98%);
+        --primary-foreground: hsl(240 6% 10%);
         --accent: #6cf2c0;
-        --accent-2: #7ab8ff;
-        --warn: #ffb454;
-        --danger: #ff7a7a;
-        --radius: 14px;
+        --accent-foreground: hsl(160 60% 10%);
+        --ring: hsl(240 5% 64.9%);
+        --radius: 0.5rem;
       }
 
       * { box-sizing: border-box; }
-
       html, body { margin: 0; padding: 0; }
 
       body {
-        background: var(--bg);
-        color: var(--text);
+        background: var(--background);
+        color: var(--foreground);
         font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
         font-feature-settings: "cv11", "ss01", "ss03";
         -webkit-font-smoothing: antialiased;
         line-height: 1.55;
       }
 
-      a { color: var(--accent-2); text-decoration: none; }
-      a:hover { color: var(--accent); }
+      ::selection { background: var(--accent); color: var(--accent-foreground); }
 
-      code, pre, kbd { font-family: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace; }
+      a { color: var(--foreground); text-decoration: none; }
+      a:hover { color: var(--muted-foreground); }
 
-      .wrap {
-        width: min(1180px, calc(100% - 40px));
+      code, pre, kbd, .mono {
+        font-family: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+      }
+
+      code:not(pre code) {
+        background: var(--muted);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 1px 6px;
+        font-size: 0.85em;
+      }
+
+      .container {
+        width: min(1200px, calc(100% - 32px));
         margin: 0 auto;
       }
 
-      /* ============ NAV ============ */
+      /* ---------- nav ---------- */
       nav {
         position: sticky;
         top: 0;
         z-index: 50;
-        backdrop-filter: blur(14px);
-        background: rgba(8, 9, 12, 0.72);
+        backdrop-filter: blur(8px);
+        background: hsla(240, 10%, 3.9%, 0.7);
         border-bottom: 1px solid var(--border);
       }
-      nav .wrap {
+      nav .container {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        height: 60px;
+        height: 56px;
       }
       .brand {
-        display: flex;
+        display: inline-flex;
         align-items: center;
-        gap: 10px;
-        font-weight: 700;
-        font-size: 17px;
+        gap: 8px;
+        font-weight: 600;
+        font-size: 14px;
         letter-spacing: -0.01em;
-        color: var(--text);
       }
-      .brand-dot {
-        width: 10px; height: 10px; border-radius: 50%;
-        background: var(--accent);
-        box-shadow: 0 0 18px var(--accent);
+      .brand-mark {
+        display: inline-grid;
+        place-items: center;
+        width: 24px; height: 24px;
+        border-radius: 6px;
+        background: var(--primary);
+        color: var(--primary-foreground);
+        font-size: 11px;
+        font-weight: 700;
       }
       nav ul {
         display: flex;
-        gap: 26px;
+        gap: 24px;
         list-style: none;
         margin: 0; padding: 0;
-        font-size: 14px;
+        font-size: 13px;
       }
-      nav ul a { color: var(--muted); }
-      nav ul a:hover { color: var(--text); }
+      nav ul a { color: var(--muted-foreground); }
+      nav ul a:hover { color: var(--foreground); }
       @media (max-width: 720px) { nav ul { display: none; } }
 
-      /* ============ HERO ============ */
-      .hero {
+      /* ---------- hero ---------- */
+      header.hero {
+        padding: 96px 0 64px;
+        border-bottom: 1px solid var(--border);
         position: relative;
-        min-height: 78vh;
-        display: flex;
-        align-items: center;
         overflow: hidden;
-        isolation: isolate;
       }
-      .hero-bg-wrap {
-        position: absolute; inset: 0;
-        z-index: 0;
-      }
-      .hero-bg-wrap::after {
+      header.hero::before {
         content: "";
-        position: absolute; inset: 0;
-        background:
-          radial-gradient(ellipse at 30% 20%, rgba(108, 242, 192, 0.12), transparent 55%),
-          linear-gradient(100deg, rgba(8, 9, 12, 0.75) 0%, rgba(8, 9, 12, 0.45) 55%, rgba(8, 9, 12, 0.15) 100%),
-          linear-gradient(180deg, transparent 60%, var(--bg) 100%);
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(var(--border) 1px, transparent 1px),
+          linear-gradient(90deg, var(--border) 1px, transparent 1px);
+        background-size: 48px 48px;
+        background-position: center;
+        mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
+        opacity: 0.4;
         pointer-events: none;
-        z-index: 1;
       }
-      .hero-bg-wrap .fideo { position: absolute; inset: 0; }
-      .hero-content {
-        position: relative;
-        z-index: 2;
-        padding: 100px 0 80px;
-      }
-      .pill {
-        display: inline-flex; align-items: center; gap: 8px;
-        padding: 6px 12px;
-        background: rgba(108, 242, 192, 0.1);
-        border: 1px solid rgba(108, 242, 192, 0.25);
-        border-radius: 999px;
+      .hero-inner { position: relative; z-index: 1; max-width: 720px; }
+      .badge-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
         font-size: 12px;
-        color: var(--accent);
-        font-weight: 500;
+        color: var(--muted-foreground);
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        margin-bottom: 20px;
+      }
+      .badge-pill .dot {
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 10px var(--accent);
       }
       h1 {
-        font-size: clamp(40px, 6.5vw, 76px);
-        line-height: 1.02;
-        letter-spacing: -0.03em;
-        margin: 18px 0 18px;
-        font-weight: 800;
-        max-width: 14ch;
+        font-size: clamp(36px, 5.5vw, 56px);
+        line-height: 1.05;
+        letter-spacing: -0.035em;
+        font-weight: 700;
+        margin: 0 0 18px;
       }
-      h1 em {
-        font-style: normal;
-        background: linear-gradient(120deg, var(--accent) 20%, var(--accent-2) 80%);
+      h1 .accent {
+        background: linear-gradient(120deg, var(--accent), #7ab8ff);
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent;
       }
       .lede {
-        font-size: clamp(17px, 1.6vw, 20px);
-        color: var(--muted);
-        max-width: 56ch;
-        margin: 0 0 30px;
+        font-size: 17px;
+        color: var(--muted-foreground);
+        max-width: 60ch;
+        margin: 0 0 28px;
       }
       .cta-row {
         display: flex;
-        gap: 12px;
+        gap: 8px;
         flex-wrap: wrap;
       }
+
+      /* ---------- buttons ---------- */
       .btn {
-        display: inline-flex; align-items: center; gap: 8px;
-        padding: 12px 20px;
-        border-radius: 10px;
-        font-size: 15px;
-        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        height: 36px;
+        padding: 0 16px;
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: var(--radius);
         border: 1px solid var(--border);
-        background: var(--surface);
-        color: var(--text);
+        background: transparent;
+        color: var(--foreground);
         cursor: pointer;
-        transition: transform 0.1s, border-color 0.15s, background 0.15s;
+        transition: background 0.15s, border-color 0.15s, color 0.15s;
+        font-family: inherit;
+        text-decoration: none;
       }
-      .btn:hover { border-color: var(--dim); }
-      .btn:active { transform: translateY(1px); }
+      .btn:hover { background: var(--muted); color: var(--foreground); }
       .btn-primary {
-        background: var(--accent);
-        color: #042018;
-        border-color: var(--accent);
+        background: var(--primary);
+        color: var(--primary-foreground);
+        border-color: var(--primary);
       }
       .btn-primary:hover {
-        background: #8af8d2;
-        border-color: #8af8d2;
-        color: #042018;
+        background: hsl(0 0% 88%);
+        color: var(--primary-foreground);
       }
+      .btn-sm { height: 30px; padding: 0 12px; font-size: 13px; }
+      .btn svg { width: 14px; height: 14px; }
 
-      /* ============ SECTION ============ */
-      section.block {
-        padding: 96px 0;
-        border-top: 1px solid var(--border);
+      /* ---------- section ---------- */
+      section {
+        padding: 80px 0;
+        border-bottom: 1px solid var(--border);
       }
+      .section-head { max-width: 720px; margin-bottom: 40px; }
       .eyebrow {
+        display: inline-block;
         font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: 0.14em;
-        color: var(--accent);
-        font-weight: 600;
-        margin-bottom: 12px;
+        font-weight: 500;
+        color: var(--muted-foreground);
+        margin-bottom: 8px;
       }
       h2 {
-        font-size: clamp(28px, 3.5vw, 42px);
-        letter-spacing: -0.02em;
-        font-weight: 700;
-        margin: 0 0 14px;
-        max-width: 22ch;
+        font-size: clamp(24px, 3vw, 32px);
+        letter-spacing: -0.025em;
+        font-weight: 600;
+        margin: 0 0 10px;
       }
       .section-lede {
-        color: var(--muted);
-        max-width: 60ch;
-        font-size: 17px;
-        margin: 0 0 40px;
+        color: var(--muted-foreground);
+        max-width: 65ch;
+        font-size: 15px;
+        margin: 0;
       }
 
-      /* ============ FEATURE GRID ============ */
-      .features {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 16px;
+      /* ---------- cards ---------- */
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
       }
-      @media (max-width: 900px) { .features { grid-template-columns: repeat(2, 1fr); } }
-      @media (max-width: 540px) { .features { grid-template-columns: 1fr; } }
-      .feature {
-        padding: 22px;
-        background: var(--surface);
+      .card-header {
+        padding: 14px 18px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .card-title {
+        font-size: 14px;
+        font-weight: 600;
+        margin: 0;
+        letter-spacing: -0.01em;
+      }
+      .card-description {
+        font-size: 13px;
+        color: var(--muted-foreground);
+        margin: 4px 0 0;
+      }
+      .card-content { padding: 16px; }
+      .card-footer {
+        padding: 12px 16px;
+        border-top: 1px solid var(--border);
+        font-size: 13px;
+        color: var(--muted-foreground);
+      }
+
+      /* ---------- badges ---------- */
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        font-size: 11px;
+        font-weight: 500;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: var(--muted);
+        color: var(--muted-foreground);
+        border: 1px solid var(--border);
+        white-space: nowrap;
+      }
+      .badge.accent { color: var(--accent); border-color: hsla(160, 80%, 70%, 0.3); background: hsla(160, 80%, 70%, 0.08); }
+      .badge.red    { color: #ff8a8a; border-color: hsla(0, 80%, 75%, 0.3); }
+      .badge.blue   { color: #7ab8ff; border-color: hsla(215, 80%, 75%, 0.3); }
+      .badge.violet { color: #c98aff; border-color: hsla(275, 80%, 78%, 0.3); }
+
+      /* ---------- grids ---------- */
+      .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+      .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+      .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+      @media (max-width: 900px) {
+        .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+      }
+      @media (min-width: 600px) and (max-width: 900px) {
+        .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); }
+      }
+
+      /* ---------- feature cards ---------- */
+      .feature-card {
+        padding: 20px;
+        background: var(--card);
         border: 1px solid var(--border);
         border-radius: var(--radius);
       }
       .feature-icon {
-        width: 36px; height: 36px;
-        display: grid; place-items: center;
-        background: rgba(108, 242, 192, 0.1);
-        border-radius: 9px;
-        margin-bottom: 14px;
-        color: var(--accent);
+        display: inline-grid;
+        place-items: center;
+        width: 32px; height: 32px;
+        background: var(--muted);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin-bottom: 12px;
+        color: var(--foreground);
       }
-      .feature h3 {
-        margin: 0 0 6px;
-        font-size: 16px;
-        font-weight: 600;
-      }
-      .feature p {
-        margin: 0;
-        font-size: 14px;
-        color: var(--muted);
-        line-height: 1.5;
-      }
+      .feature-icon svg { width: 16px; height: 16px; }
+      .feature-card h3 { margin: 0 0 4px; font-size: 14px; font-weight: 600; }
+      .feature-card p { margin: 0; font-size: 13px; color: var(--muted-foreground); }
 
-      /* ============ CODE ============ */
-      .code-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-      }
-      @media (max-width: 820px) { .code-grid { grid-template-columns: 1fr; } }
-      .code-card {
-        background: var(--surface);
+      /* ---------- code blocks ---------- */
+      .code {
+        background: var(--card);
         border: 1px solid var(--border);
         border-radius: var(--radius);
         overflow: hidden;
       }
       .code-head {
-        padding: 12px 18px;
+        padding: 10px 14px;
         border-bottom: 1px solid var(--border);
-        font-size: 13px;
-        color: var(--muted);
-        display: flex; justify-content: space-between; align-items: center;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 12px;
+        color: var(--muted-foreground);
       }
-      .code-head .label { color: var(--text); font-weight: 500; }
-      pre {
+      .code pre {
         margin: 0;
-        padding: 20px;
-        font-size: 13.5px;
-        line-height: 1.6;
+        padding: 16px;
+        font-size: 12.5px;
+        line-height: 1.65;
         overflow-x: auto;
-        color: var(--text);
-        background: var(--surface);
+        color: var(--foreground);
       }
       .tk-kw { color: #c98aff; }
       .tk-str { color: #6cf2c0; }
       .tk-tag { color: #7ab8ff; }
       .tk-attr { color: #ffb454; }
-      .tk-com { color: var(--dim); font-style: italic; }
+      .tk-com { color: var(--muted-foreground); font-style: italic; }
       .tk-num { color: #ff9d7a; }
 
-      /* ============ PROVIDER GRID ============ */
-      .grid-2 {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 24px;
-      }
-      @media (max-width: 860px) { .grid-2 { grid-template-columns: 1fr; } }
-      .provider-card {
-        background: var(--surface);
+      /* ---------- top-level tabs (quick start) ---------- */
+      .tabs-list {
+        display: inline-flex;
+        gap: 2px;
+        padding: 3px;
+        background: var(--muted);
         border: 1px solid var(--border);
         border-radius: var(--radius);
-        overflow: hidden;
-        display: flex; flex-direction: column;
+        margin-bottom: 16px;
       }
-      .provider-head {
-        padding: 16px 20px;
-        display: flex; justify-content: space-between; align-items: center;
+      .tab-trigger {
+        padding: 5px 12px;
+        font-size: 13px;
+        font-weight: 500;
+        border: 0;
+        border-radius: calc(var(--radius) - 3px);
+        background: transparent;
+        color: var(--muted-foreground);
+        cursor: pointer;
+        font-family: inherit;
+        transition: background 0.15s, color 0.15s;
+      }
+      .tab-trigger[data-state="active"] {
+        background: var(--background);
+        color: var(--foreground);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+      }
+      .tab-content { display: none; }
+      .tab-content[data-state="active"] { display: block; }
+
+      /* ---------- per-card preview/code tabs ---------- */
+      .card-tabs {
+        display: flex;
+        padding: 0 12px;
+        background: var(--card-elevated);
         border-bottom: 1px solid var(--border);
       }
-      .provider-head h4 {
+      .card-tab {
+        padding: 8px 12px;
+        font-size: 12px;
+        font-weight: 500;
+        background: transparent;
+        border: 0;
+        border-bottom: 2px solid transparent;
+        color: var(--muted-foreground);
+        cursor: pointer;
+        font-family: inherit;
+        margin-bottom: -1px;
+        transition: color 0.15s, border-color 0.15s;
+      }
+      .card-tab:hover { color: var(--foreground); }
+      .card-tab[aria-selected="true"] {
+        color: var(--foreground);
+        border-bottom-color: var(--foreground);
+      }
+      .card-panel { display: none; }
+      .card-panel[data-state="active"] { display: block; }
+      .card-panel pre {
         margin: 0;
-        font-size: 15px;
-        font-weight: 600;
+        padding: 14px 16px;
+        font-size: 11.5px;
+        line-height: 1.7;
+        overflow: auto;
+        max-height: 360px;
+        background: var(--background);
+        color: var(--foreground);
       }
-      .badge {
-        font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        padding: 4px 10px;
-        border-radius: 999px;
-        background: var(--surface-2);
-        color: var(--muted);
-        border: 1px solid var(--border);
-      }
-      .badge.html5 { color: var(--accent); border-color: rgba(108, 242, 192, 0.3); }
-      .badge.youtube { color: #ff7a7a; border-color: rgba(255, 122, 122, 0.3); }
-      .badge.vimeo { color: var(--accent-2); border-color: rgba(122, 184, 255, 0.3); }
-      .badge.wistia { color: #c98aff; border-color: rgba(201, 138, 255, 0.3); }
-      .provider-body { padding: 16px; }
 
-      /* ============ RESPONSIVE DEMO ============ */
-      .responsive-frame {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        padding: 18px;
-      }
+      /* ---------- responsive bp indicator ---------- */
       .bp-indicator {
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        margin-bottom: 16px;
-        padding: 8px 14px;
-        background: var(--surface-2);
+        padding: 5px 12px;
+        background: var(--card);
         border: 1px solid var(--border);
         border-radius: 999px;
-        font-size: 13px;
-        color: var(--muted);
+        font-size: 12px;
+        color: var(--muted-foreground);
       }
-      .bp-indicator strong { color: var(--accent); font-weight: 600; }
+      .bp-indicator strong { color: var(--foreground); font-weight: 600; }
       .bp-dot {
-        width: 8px; height: 8px; border-radius: 50%;
+        width: 6px; height: 6px;
+        border-radius: 50%;
         background: var(--accent);
-        box-shadow: 0 0 10px var(--accent);
         animation: pulse 2s infinite;
       }
-      @keyframes pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.4; }
-      }
+      @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
 
-      /* ============ BACKGROUND BANNER ============ */
+      /* ---------- banner ---------- */
       .banner {
         position: relative;
-        min-height: 460px;
+        min-height: 380px;
         border-radius: var(--radius);
         overflow: hidden;
-        display: flex; align-items: center;
+        display: flex;
+        align-items: flex-end;
         border: 1px solid var(--border);
         isolation: isolate;
       }
@@ -362,398 +448,491 @@
       .banner::after {
         content: "";
         position: absolute; inset: 0;
-        background: linear-gradient(110deg, rgba(8, 9, 12, 0.78) 0%, rgba(8, 9, 12, 0.4) 60%, rgba(8, 9, 12, 0) 100%);
+        background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.85) 100%);
         z-index: 1;
         pointer-events: none;
       }
       .banner-content {
         position: relative;
-        padding: 50px;
-        max-width: 540px;
+        padding: 28px;
         z-index: 2;
       }
       .banner-content h3 {
-        font-size: 32px;
-        margin: 0 0 10px;
+        font-size: 22px;
+        margin: 0 0 4px;
         letter-spacing: -0.02em;
+        font-weight: 600;
       }
-      .banner-content p { color: var(--muted); margin: 0; }
-      @media (max-width: 600px) { .banner-content { padding: 30px; } }
+      .banner-content p { color: hsl(0 0% 80%); margin: 0; font-size: 14px; }
 
-      /* ============ MASONRY ============ */
-      .masonry-block {
-        padding: 64px 0 96px;
-      }
-      .masonry-head {
-        margin-bottom: 32px;
-        max-width: 760px;
-      }
-      .masonry-head h2 {
-        max-width: 28ch;
-      }
-      .masonry {
-        column-count: 4;
-        column-gap: 14px;
-      }
-      @media (max-width: 1000px) { .masonry { column-count: 3; } }
-      @media (max-width: 700px) { .masonry { column-count: 2; } }
-      @media (max-width: 420px) { .masonry { column-count: 1; } }
-      .tile {
-        position: relative;
-        margin: 0 0 14px;
-        break-inside: avoid;
-        border-radius: var(--radius);
-        overflow: hidden;
-        border: 1px solid var(--border);
-        background: var(--surface);
-        isolation: isolate;
-        display: block;
-      }
-      .tile .fideo {
-        position: absolute;
-        inset: 0;
-      }
-      .tile-portrait  { aspect-ratio: 9 / 16; }
-      .tile-landscape { aspect-ratio: 16 / 9; }
-      .tile-square    { aspect-ratio: 1 / 1; }
-      .tile-tall      { aspect-ratio: 4 / 7; }
-
-      /* ============ SHORTS GRID ============ */
-      .shorts-grid {
+      /* ---------- aspect ratio grid ---------- */
+      .ratio-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 24px;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
       }
-      @media (max-width: 820px) { .shorts-grid { grid-template-columns: repeat(2, 1fr); } }
-      @media (max-width: 520px) { .shorts-grid { grid-template-columns: 1fr; } }
-      .short-card {
+      @media (max-width: 900px) { .ratio-grid { grid-template-columns: repeat(2, 1fr); } }
+      .ratio-tile {
         position: relative;
-        aspect-ratio: 9 / 16;
         border-radius: var(--radius);
         overflow: hidden;
         border: 1px solid var(--border);
-        background: var(--surface);
+        background: var(--card);
         isolation: isolate;
       }
-      .short-card .fideo {
+      .ratio-tile .fideo { position: absolute; inset: 0; }
+      .ratio-tile .label {
         position: absolute;
-        inset: 0;
+        bottom: 8px; left: 8px;
+        z-index: 2;
+        font-size: 11px;
+        padding: 3px 8px;
+        background: rgba(0,0,0,0.7);
+        backdrop-filter: blur(6px);
+        border-radius: 999px;
+        color: var(--foreground);
+        border: 1px solid rgba(255,255,255,0.08);
       }
+      .ar-portrait  { aspect-ratio: 9 / 16; }
+      .ar-landscape { aspect-ratio: 16 / 9; }
+      .ar-square    { aspect-ratio: 1 / 1; }
+      .ar-classic   { aspect-ratio: 4 / 3; }
 
-      /* ============ JS API PANEL ============ */
+      /* ---------- JS API panel ---------- */
       .api-grid {
         display: grid;
         grid-template-columns: 1.4fr 1fr;
-        gap: 24px;
+        gap: 16px;
       }
       @media (max-width: 900px) { .api-grid { grid-template-columns: 1fr; } }
-      .api-panel {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        padding: 22px;
-      }
-      .api-panel h4 {
-        margin: 0 0 6px;
-        font-size: 14px;
-        font-weight: 600;
-      }
-      .api-panel p.small {
-        color: var(--muted);
-        font-size: 13px;
-        margin: 0 0 18px;
-      }
       .api-buttons {
         display: flex;
         flex-wrap: wrap;
-        gap: 8px;
-        margin-bottom: 20px;
+        gap: 6px;
       }
-      .api-buttons button {
-        font-size: 13px;
-        padding: 8px 14px;
-        background: var(--surface-2);
-        color: var(--text);
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        cursor: pointer;
-        font-family: ui-monospace, Menlo, monospace;
-        transition: border-color 0.15s, background 0.15s;
-      }
-      .api-buttons button:hover {
-        border-color: var(--accent);
-        background: rgba(108, 242, 192, 0.08);
-        color: var(--accent);
-      }
+      .state-table { width: 100%; font-size: 13px; }
       .state-row {
         display: flex;
         justify-content: space-between;
         padding: 8px 0;
-        font-size: 13px;
         border-bottom: 1px solid var(--border);
       }
       .state-row:last-child { border-bottom: none; }
-      .state-row .k { color: var(--muted); }
-      .state-row .v { color: var(--text); font-family: ui-monospace, Menlo, monospace; }
-
-      /* ============ EVENT LOG ============ */
-      .log {
+      .state-row .k { color: var(--muted-foreground); }
+      .state-row .v {
+        color: var(--foreground);
         font-family: ui-monospace, Menlo, monospace;
         font-size: 12.5px;
-        background: var(--surface-2);
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        height: 220px;
-        overflow-y: auto;
-        padding: 14px;
-        line-height: 1.6;
       }
-      .log .entry { display: flex; gap: 10px; }
-      .log .t { color: var(--dim); flex: 0 0 70px; }
-      .log .e { color: var(--accent); }
-      .log .d { color: var(--muted); }
-
-      /* ============ THEMES ============ */
-      .theme-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
-      }
-      @media (max-width: 900px) { .theme-grid { grid-template-columns: 1fr; } }
-      .theme-card {
-        background: var(--surface);
+      .log {
+        font-family: ui-monospace, Menlo, monospace;
+        font-size: 12px;
+        background: var(--background);
         border: 1px solid var(--border);
         border-radius: var(--radius);
-        padding: 18px;
+        height: 180px;
+        overflow-y: auto;
+        padding: 10px;
+        line-height: 1.7;
       }
-      .theme-card h4 {
-        margin: 14px 0 4px;
-        font-size: 15px;
-      }
-      .theme-card p { color: var(--muted); font-size: 13px; margin: 0; }
+      .log .entry { display: flex; gap: 10px; }
+      .log .t { color: var(--muted-foreground); flex: 0 0 64px; }
+      .log .e { color: var(--accent); }
+      .log .d { color: var(--muted-foreground); }
 
-      /* ============ FOOTER ============ */
-      footer {
-        padding: 60px 0 80px;
-        border-top: 1px solid var(--border);
-        color: var(--muted);
-        font-size: 14px;
+      /* ============================================================
+         THEME DEMOS
+         Applied via data-fideo-class on the source <video>.
+         Mixes CSS variables with light-DOM and ::part() overrides.
+         ============================================================ */
+
+      /* 1. Frosted glass */
+      .fideo-frosted {
+        --fideo-accent: #6cf2c0;
+        --fideo-track-fill: #ffffff;
+        --fideo-track: rgba(255, 255, 255, 0.22);
+        --fideo-track-size: 3px;
+        --fideo-control-color: #ffffff;
+        --fideo-muted-color: rgba(255, 255, 255, 0.78);
       }
-      footer .wrap {
+      .fideo-frosted .fideo__controls {
+        background: rgba(15, 18, 28, 0.55);
+        backdrop-filter: blur(22px) saturate(160%);
+        -webkit-backdrop-filter: blur(22px) saturate(160%);
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        border-radius: 14px;
+        padding: 6px 14px 8px;
+        bottom: 14px;
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+      }
+      .fideo-frosted .fideo__controls::part(play-button):hover,
+      .fideo-frosted .fideo__controls::part(mute-button):hover,
+      .fideo-frosted .fideo__controls::part(settings-button):hover,
+      .fideo-frosted .fideo__controls::part(fullscreen-button):hover {
+        color: #6cf2c0;
+      }
+
+      /* 2. CTA / filled play button — uses new vars from v0.4.0 */
+      .fideo-cta {
+        --fideo-accent: #ff5e5e;
+        --fideo-track-fill: #ff5e5e;
+        --fideo-track: rgba(255, 255, 255, 0.18);
+        --fideo-track-size: 4px;
+        --fideo-thumb-size: 14px;
+        --fideo-button-size: 32px;
+        --fideo-button-radius: 8px;
+        --fideo-icon-size: 16px;
+        --fideo-gap: 14px;
+        --fideo-control-color: #ffffff;
+        --fideo-muted-color: rgba(255, 255, 255, 0.86);
+      }
+      .fideo-cta .fideo__controls {
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 100%);
+        padding: 40px 16px 12px;
+        bottom: 0; left: 0; right: 0;
+        border-radius: 0;
+      }
+      .fideo-cta .fideo__controls::part(play-button) {
+        background: #ff5e5e;
+        color: #fff;
+        transition: background 0.15s;
+      }
+      .fideo-cta .fideo__controls::part(play-button):hover {
+        background: #ff7878;
+        color: #fff;
+      }
+      .fideo-cta .fideo__controls::part(settings-menu) {
+        background: #ff5e5e;
+        border: 0;
+        border-radius: 8px;
+        padding: 4px;
+      }
+      .fideo-cta .fideo__controls::part(speed-button) {
+        color: #fff;
+        font-weight: 600;
+      }
+
+      /* 3. Brutalist mono */
+      .fideo-brutalist {
+        --fideo-accent: #c98aff;
+        --fideo-track-fill: #c98aff;
+        --fideo-track: rgba(255, 255, 255, 0.1);
+        --fideo-track-size: 2px;
+        --fideo-radius: 0;
+        --fideo-control-color: #f3e8ff;
+        --fideo-muted-color: #b39be0;
+      }
+      .fideo-brutalist .fideo__controls {
+        background: #08060d;
+        border-top: 2px solid #c98aff;
+        padding: 8px 14px 10px;
+        bottom: 0; left: 0; right: 0;
+        border-radius: 0;
+      }
+      .fideo-brutalist .fideo__controls::part(play-button),
+      .fideo-brutalist .fideo__controls::part(mute-button),
+      .fideo-brutalist .fideo__controls::part(settings-button),
+      .fideo-brutalist .fideo__controls::part(fullscreen-button) {
+        border-radius: 0;
+      }
+      .fideo-brutalist .fideo__controls::part(current-time),
+      .fideo-brutalist .fideo__controls::part(duration) {
+        font-family: ui-monospace, "JetBrains Mono", "SF Mono", Menlo, monospace;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        font-size: 11px;
+      }
+
+      /* 4. Neon */
+      .fideo-neon {
+        --fideo-accent: #00d4ff;
+        --fideo-track-fill: #00d4ff;
+        --fideo-track: rgba(0, 212, 255, 0.18);
+        --fideo-track-size: 6px;
+        --fideo-control-color: #ffffff;
+        --fideo-muted-color: rgba(220, 245, 255, 0.85);
+      }
+      .fideo-neon .fideo__controls {
+        background: rgba(5, 10, 22, 0.65);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(0, 212, 255, 0.35);
+        border-radius: 10px;
+        padding: 6px 14px 8px;
+        bottom: 14px;
+        box-shadow: 0 0 24px rgba(0, 212, 255, 0.15);
+      }
+      .fideo-neon .fideo__controls::part(timeline) {
+        filter: drop-shadow(0 0 6px rgba(0, 212, 255, 0.6));
+      }
+      .fideo-neon .fideo__controls::part(play-button):hover,
+      .fideo-neon .fideo__controls::part(mute-button):hover,
+      .fideo-neon .fideo__controls::part(settings-button):hover,
+      .fideo-neon .fideo__controls::part(fullscreen-button):hover {
+        color: #00d4ff;
+        filter: drop-shadow(0 0 6px rgba(0, 212, 255, 0.7));
+      }
+      .fideo-neon .fideo__controls::part(current-time),
+      .fideo-neon .fideo__controls::part(duration) {
+        font-variant-numeric: tabular-nums;
+        font-weight: 600;
+        color: #00d4ff;
+      }
+
+      /* ---------- footer ---------- */
+      footer {
+        padding: 40px 0 60px;
+        color: var(--muted-foreground);
+        font-size: 13px;
+      }
+      footer .container {
         display: flex;
         justify-content: space-between;
         align-items: center;
         flex-wrap: wrap;
-        gap: 16px;
+        gap: 14px;
       }
-      footer .links { display: flex; gap: 22px; }
+      footer .links { display: flex; gap: 20px; }
 
-      /* ============ FIDEO TINTS ============ */
-      .fideo-mint {
-        --fideo-accent: #6cf2c0;
-        --fideo-track-fill: #6cf2c0;
-      }
-      .fideo-coral {
-        --fideo-accent: #ff7a7a;
-        --fideo-track-fill: #ff7a7a;
-      }
-      .fideo-violet {
-        --fideo-accent: #c98aff;
-        --fideo-track-fill: #c98aff;
-        --fideo-radius: 4px;
-      }
-      .fideo-minimal {
-        --fideo-accent: #111;
-        --fideo-control-bg: rgba(255, 255, 255, 0.94);
-        --fideo-control-color: #111;
-        --fideo-track: rgba(0, 0, 0, 0.18);
-        --fideo-track-fill: #111;
-      }
+      /* ---------- helpers ---------- */
+      .stack { display: flex; flex-direction: column; gap: 16px; }
+      .muted { color: var(--muted-foreground); }
+      .sep { height: 1px; background: var(--border); margin: 16px 0; }
     </style>
   </head>
   <body>
+    <!-- ============== NAV ============== -->
     <nav>
-      <div class="wrap">
+      <div class="container">
         <a class="brand" href="#top">
-          <span class="brand-dot"></span>
-          Fideo JS
+          <span class="brand-mark">F</span>
+          <span>fideo-js</span>
+          <span class="badge mono" style="margin-left:6px">v0.4.0</span>
         </a>
         <ul>
           <li><a href="#providers">Providers</a></li>
-          <li><a href="#responsive">Responsive</a></li>
+          <li><a href="#background">Background</a></li>
           <li><a href="#api">JS API</a></li>
+          <li><a href="#theming">Theming</a></li>
           <li><a href="https://github.com/devjtv/fideo-js">GitHub</a></li>
         </ul>
       </div>
     </nav>
 
-    <!-- ============================ HERO ============================ -->
+    <!-- ============== HERO ============== -->
     <header class="hero" id="top">
-      <div class="hero-bg-wrap">
-        <video
-          data-fideo
-          data-fideo-background
-          data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
-        ></video>
-      </div>
-      <div class="wrap hero-content">
-        <span class="pill">v0.3.2 · ~12&nbsp;kB gzipped · zero dependencies</span>
-        <h1>One video API for <em>every provider</em>.</h1>
+      <div class="container hero-inner">
+        <span class="badge-pill"><span class="dot"></span>~12 kB · zero dependencies · v0.4.0</span>
+        <h1>One video API for <span class="accent">every provider</span>.</h1>
         <p class="lede">
-          Fideo is a tiny, framework-free video UI that wraps HTML5, YouTube, Vimeo, and Wistia
-          behind a single set of data attributes. Responsive sources, background loops, viewport
-          triggers, and themable controls — without shipping a player runtime.
+          A tiny, framework-free video UI that wraps HTML5, YouTube, Vimeo, and Wistia behind a
+          single set of data attributes. Responsive sources, background loops, viewport triggers,
+          themable controls — without shipping a player runtime.
         </p>
         <div class="cta-row">
           <a class="btn btn-primary" href="https://github.com/devjtv/fideo-js">
-            Get started on GitHub
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.4-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2.9-.3 2-.4 3-.4s2.1.1 3 .4c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.9 1.2 3.1 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg>
+            GitHub
           </a>
-          <a class="btn" href="#providers">See it in action</a>
+          <a class="btn" href="#quick-start">Quick start</a>
+          <a class="btn" href="#api">Try the API →</a>
         </div>
       </div>
     </header>
 
-    <!-- ============================ FEATURES ============================ -->
-    <section class="block">
-      <div class="wrap">
-        <div class="features">
-          <div class="feature">
+    <!-- ============== FEATURES ============== -->
+    <section>
+      <div class="container">
+        <div class="grid-4">
+          <div class="feature-card">
             <div class="feature-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h7l-1 8 10-12h-7l1-8z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg>
             </div>
             <h3>Tiny + fast</h3>
-            <p>~12&nbsp;kB gzipped. No React, no Vue, no virtual DOM. Just the browser.</p>
+            <p>~12 kB gzipped. No framework runtime, no virtual DOM.</p>
           </div>
-          <div class="feature">
+          <div class="feature-card">
             <div class="feature-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/></svg>
             </div>
             <h3>Multi-provider</h3>
-            <p>HTML5, YouTube, Vimeo, Wistia — one identical API across all four.</p>
+            <p>HTML5, YouTube, Vimeo, Wistia. One identical API.</p>
           </div>
-          <div class="feature">
+          <div class="feature-card">
             <div class="feature-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="14" height="12" rx="2"/><rect x="18" y="8" width="4" height="8" rx="1"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="14" height="12" rx="2"/><rect x="18" y="8" width="4" height="8" rx="1"/></svg>
             </div>
             <h3>Responsive</h3>
-            <p>Per-breakpoint sources and posters, background-cover for iframes, no jank.</p>
+            <p>Per-breakpoint sources and posters. No jank on resize.</p>
           </div>
-          <div class="feature">
+          <div class="feature-card">
             <div class="feature-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
             </div>
             <h3>Drop-in</h3>
-            <p>Auto-mount with <code>data-fideo</code> attributes, or drive imperatively from JS.</p>
+            <p>Auto-mount via <code>data-fideo</code>, or drive from JS.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ============================ QUICK START ============================ -->
-    <section class="block">
-      <div class="wrap">
-        <div class="eyebrow">Quick start</div>
-        <h2>Two lines of HTML. That's the player.</h2>
-        <p class="section-lede">
-          Drop in the CDN bundle, mark up a <code>&lt;video&gt;</code> or <code>&lt;iframe&gt;</code>
-          with the right attributes, and Fideo auto-discovers it on load. Same markup pattern for
-          every provider.
-        </p>
-        <div class="code-grid">
-          <div class="code-card">
-            <div class="code-head"><span class="label">Install via CDN</span><span>HTML</span></div>
-<pre><span class="tk-com">&lt;!-- styles + library --&gt;</span>
+    <!-- ============== QUICK START ============== -->
+    <section id="quick-start">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">Quick start</span>
+          <h2>Two lines of HTML. That's the player.</h2>
+          <p class="section-lede">
+            Drop in the CDN bundle, mark up a <code>&lt;video&gt;</code> or
+            <code>&lt;iframe&gt;</code> with <code>data-fideo</code>, and the library
+            auto-discovers it on load.
+          </p>
+        </div>
+
+        <div class="tabs-list" role="tablist">
+          <button class="tab-trigger" data-tab="html" data-state="active">HTML</button>
+          <button class="tab-trigger" data-tab="js">JavaScript</button>
+          <button class="tab-trigger" data-tab="iframe">iframe</button>
+        </div>
+
+        <div class="tab-content" data-tab="html" data-state="active">
+          <div class="grid-2">
+            <div class="code">
+              <div class="code-head"><span>Install</span><span class="mono">html</span></div>
+<pre><span class="tk-com">&lt;!-- via CDN --&gt;</span>
 <span class="tk-tag">&lt;link</span> <span class="tk-attr">rel</span>=<span class="tk-str">"stylesheet"</span>
-      <span class="tk-attr">href</span>=<span class="tk-str">"https://cdn.jsdelivr.net/npm/fideo-js/dist/fideo.css"</span><span class="tk-tag">&gt;</span>
+  <span class="tk-attr">href</span>=<span class="tk-str">"https://cdn.jsdelivr.net/npm/fideo-js/dist/fideo.css"</span><span class="tk-tag">&gt;</span>
 <span class="tk-tag">&lt;script</span> <span class="tk-attr">src</span>=<span class="tk-str">"https://cdn.jsdelivr.net/npm/fideo-js/dist/fideo.global.js"</span><span class="tk-tag">&gt;&lt;/script&gt;</span></pre>
-          </div>
-          <div class="code-card">
-            <div class="code-head"><span class="label">Drop in a player</span><span>HTML</span></div>
-<pre><span class="tk-tag">&lt;iframe</span>
+            </div>
+            <div class="code">
+              <div class="code-head"><span>Mark up a player</span><span class="mono">html</span></div>
+<pre><span class="tk-tag">&lt;video</span>
   <span class="tk-attr">data-fideo</span>
-  <span class="tk-attr">src</span>=<span class="tk-str">"https://youtu.be/dQw4w9WgXcQ"</span>
+  <span class="tk-attr">data-fideo-src</span>=<span class="tk-str">"/clip.mp4"</span>
   <span class="tk-attr">data-fideo-poster</span>=<span class="tk-str">"/poster.jpg"</span>
-<span class="tk-tag">&gt;&lt;/iframe&gt;</span></pre>
+  <span class="tk-attr">data-fideo-muted</span>
+<span class="tk-tag">&gt;&lt;/video&gt;</span></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-content" data-tab="js">
+          <div class="code">
+            <div class="code-head"><span>Programmatic init</span><span class="mono">ts</span></div>
+<pre><span class="tk-kw">import</span> { Fideo, initFideo } <span class="tk-kw">from</span> <span class="tk-str">'fideo-js'</span>;
+<span class="tk-kw">import</span> <span class="tk-str">'fideo-js/fideo.css'</span>;
+
+<span class="tk-com">// auto-mount every [data-fideo] on the page</span>
+initFideo();
+
+<span class="tk-com">// or construct a single player</span>
+<span class="tk-kw">const</span> player = <span class="tk-kw">new</span> Fideo(<span class="tk-str">'#hero'</span>, {
+  muted: <span class="tk-num">true</span>,
+  loop: <span class="tk-num">true</span>,
+  sources: { desktop: <span class="tk-str">'/hero.mp4'</span>, mobile: <span class="tk-str">'/hero-m.mp4'</span> },
+});
+
+<span class="tk-kw">await</span> player.play();</pre>
+          </div>
+        </div>
+
+        <div class="tab-content" data-tab="iframe">
+          <div class="code">
+            <div class="code-head"><span>YouTube / Vimeo / Wistia</span><span class="mono">html</span></div>
+<pre><span class="tk-com">&lt;!-- YouTube --&gt;</span>
+<span class="tk-tag">&lt;iframe</span> <span class="tk-attr">data-fideo</span> <span class="tk-attr">src</span>=<span class="tk-str">"https://youtu.be/M7lc1UVf-VE"</span><span class="tk-tag">&gt;&lt;/iframe&gt;</span>
+
+<span class="tk-com">&lt;!-- Vimeo (with hash for unlisted videos) --&gt;</span>
+<span class="tk-tag">&lt;iframe</span> <span class="tk-attr">data-fideo</span> <span class="tk-attr">src</span>=<span class="tk-str">"https://vimeo.com/76979871"</span><span class="tk-tag">&gt;&lt;/iframe&gt;</span>
+
+<span class="tk-com">&lt;!-- Wistia --&gt;</span>
+<span class="tk-tag">&lt;iframe</span> <span class="tk-attr">data-fideo</span> <span class="tk-attr">src</span>=<span class="tk-str">"https://fast.wistia.com/embed/medias/358edhd4og"</span><span class="tk-tag">&gt;&lt;/iframe&gt;</span></pre>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ============================ PROVIDERS ============================ -->
-    <section class="block" id="providers">
-      <div class="wrap">
-        <div class="eyebrow">Provider gallery</div>
-        <h2>Same markup. Four different runtimes.</h2>
-        <p class="section-lede">
-          Each of these uses identical Fideo controls and identical data attributes — only the
-          element type and source URL change. Provider SDKs are lazy-loaded on demand.
-        </p>
+    <!-- ============== PROVIDER GALLERY ============== -->
+    <section id="providers">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">Provider gallery</span>
+          <h2>Same markup. Four different runtimes.</h2>
+          <p class="section-lede">
+            Each card below uses identical data attributes — only the source URL changes.
+            Provider SDKs are lazy-loaded on demand.
+          </p>
+        </div>
         <div class="grid-2">
-          <div class="provider-card">
-            <div class="provider-head">
-              <h4>HTML5 Video</h4>
-              <span class="badge html5">native</span>
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">HTML5 video</h3>
+                <p class="card-description">Native <code>&lt;video&gt;</code> with custom shadow-DOM controls.</p>
+              </div>
+              <span class="badge accent">native</span>
             </div>
-            <div class="provider-body">
+            <div class="card-content">
               <video
                 data-fideo
                 data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
                 data-fideo-poster="https://picsum.photos/id/1018/1280/720"
-                data-fideo-muted
-                data-fideo-loop
-                data-fideo-autoplay
+                data-fideo-muted data-fideo-loop data-fideo-autoplay
               ></video>
             </div>
           </div>
 
-          <div class="provider-card">
-            <div class="provider-head">
-              <h4>YouTube</h4>
-              <span class="badge youtube">youtube</span>
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">YouTube</h3>
+                <p class="card-description">Normalized to <code>youtube-nocookie.com</code>.</p>
+              </div>
+              <span class="badge red">youtube</span>
             </div>
-            <div class="provider-body">
+            <div class="card-content">
               <iframe
                 data-fideo
                 src="https://www.youtube.com/watch?v=pb-j3svRQLI"
                 data-fideo-poster="https://img.youtube.com/vi/pb-j3svRQLI/maxresdefault.jpg"
-                data-fideo-muted
-                data-fideo-loop
-                data-fideo-autoplay
+                data-fideo-muted data-fideo-loop data-fideo-autoplay
                 allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
               ></iframe>
             </div>
           </div>
 
-          <div class="provider-card">
-            <div class="provider-head">
-              <h4>Vimeo</h4>
-              <span class="badge vimeo">vimeo</span>
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Vimeo</h3>
+                <p class="card-description">Public, private, and unlisted URLs supported.</p>
+              </div>
+              <span class="badge blue">vimeo</span>
             </div>
-            <div class="provider-body">
+            <div class="card-content">
               <iframe
                 data-fideo
                 src="https://vimeo.com/347119375"
                 data-fideo-poster="https://picsum.photos/id/1019/1280/720"
-                data-fideo-muted
-                data-fideo-loop
-                data-fideo-autoplay
+                data-fideo-muted data-fideo-loop data-fideo-autoplay
                 allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
               ></iframe>
             </div>
           </div>
 
-          <div class="provider-card">
-            <div class="provider-head">
-              <h4>Wistia</h4>
-              <span class="badge wistia">wistia</span>
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Wistia</h3>
+                <p class="card-description">Swaps the iframe for <code>&lt;wistia-player&gt;</code>.</p>
+              </div>
+              <span class="badge violet">wistia</span>
             </div>
-            <div class="provider-body">
+            <div class="card-content">
               <iframe
                 data-fideo
                 src="https://fast.wistia.com/embed/medias/358edhd4og"
-                data-fideo-muted
-                data-fideo-loop
-                data-fideo-autoplay
+                data-fideo-muted data-fideo-loop data-fideo-autoplay
                 allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
               ></iframe>
             </div>
@@ -762,100 +941,20 @@
       </div>
     </section>
 
-    <!-- ============================ RESPONSIVE ============================ -->
-    <section class="block" id="responsive">
-      <div class="wrap">
-        <div class="eyebrow">Responsive sources</div>
-        <h2>Different videos. Different posters. Same player.</h2>
-        <p class="section-lede">
-          Specify desktop / tablet / mobile variants and Fideo picks the right asset at each
-          breakpoint. Resize your browser to watch the source swap.
-        </p>
-        <div class="responsive-frame">
-          <span class="bp-indicator">
-            <span class="bp-dot"></span>
-            Current breakpoint: <strong id="bp-label">desktop</strong>
-          </span>
-          <video
-            data-fideo
-            data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
-            data-fideo-src-tablet="https://videos.pexels.com/video-files/3209828/3209828-hd_1920_1080_25fps.mp4"
-            data-fideo-src-mobile="https://res.cloudinary.com/demo/video/upload/elephants.mp4"
-            data-fideo-poster="https://picsum.photos/id/1018/1600/900"
-            data-fideo-poster-tablet="https://picsum.photos/id/1015/1200/900"
-            data-fideo-poster-mobile="https://picsum.photos/id/1019/720/1280"
-            data-fideo-muted
-            data-fideo-loop
-          ></video>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============================ BACKGROUND MODE ============================ -->
-    <section class="block">
-      <div class="wrap">
-        <div class="eyebrow">Background mode</div>
-        <h2>Hero videos that just behave.</h2>
-        <p class="section-lede">
-          One attribute turns any provider into a silent, looping, container-filling background —
-          even when the source is a YouTube or Vimeo iframe.
-        </p>
-        <div class="banner">
-          <iframe
-            data-fideo
-            data-fideo-background
-            src="https://player.vimeo.com/video/347119375?background=1&autoplay=1&muted=1&loop=1"
-            allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-          ></iframe>
-          <div class="banner-content">
-            <h3>Cinematic, without the bloat.</h3>
-            <p>
-              <code>data-fideo-background</code> hides controls, mutes audio, autoplays, loops,
-              and object-fit covers the container — across every supported provider.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============================ MASONRY SHOWCASE ============================ -->
-    <section class="masonry-block">
-      <div class="wrap">
-        <div class="masonry-head">
-          <div class="eyebrow">Background mode in the wild</div>
-          <h2>Eight clips. Eight providers and ratios. One attribute.</h2>
+    <!-- ============== BACKGROUND MODE ============== -->
+    <section id="background">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">Background mode</span>
+          <h2>Hero videos that just behave.</h2>
           <p class="section-lede">
-            Every tile below is a Fideo player in background mode — autoplay, muted, looping,
-            cover-filling its container. Mix HTML5, YouTube Shorts, and Vimeo at any aspect ratio.
+            One attribute turns any provider into a silent, looping, container-filling background —
+            even when the source is an iframe. Fideo computes cover-fill math for embeds that
+            can't use <code>object-fit</code>.
           </p>
         </div>
-        <div class="masonry">
-          <div class="tile tile-portrait">
-            <iframe
-              data-fideo
-              data-fideo-background
-              data-fideo-background-aspect-ratio="9:16"
-              src="https://www.youtube.com/shorts/ot-vAzEBxlI"
-              allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-            ></iframe>
-          </div>
-          <div class="tile tile-landscape">
-            <video
-              data-fideo
-              data-fideo-background
-              data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
-            ></video>
-          </div>
-          <div class="tile tile-portrait">
-            <iframe
-              data-fideo
-              data-fideo-background
-              data-fideo-background-aspect-ratio="9:16"
-              src="https://www.youtube.com/shorts/jyosrYXFzZA"
-              allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-            ></iframe>
-          </div>
-          <div class="tile tile-landscape">
+        <div class="stack">
+          <div class="banner">
             <iframe
               data-fideo
               data-fideo-background
@@ -863,241 +962,644 @@
               src="https://player.vimeo.com/video/347119375?background=1&autoplay=1&muted=1&loop=1"
               allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
             ></iframe>
+            <div class="banner-content">
+              <span class="badge accent" style="margin-bottom:8px">data-fideo-background</span>
+              <h3>Cinematic, without the bloat.</h3>
+              <p>Hides controls, mutes audio, autoplays, loops, and cover-fills the container.</p>
+            </div>
           </div>
-          <div class="tile tile-square">
-            <video
-              data-fideo
-              data-fideo-background
-              data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
-            ></video>
-          </div>
-          <div class="tile tile-portrait">
-            <iframe
-              data-fideo
-              data-fideo-background
-              data-fideo-background-aspect-ratio="9:16"
-              src="https://www.youtube.com/shorts/JSS_IcFOsfM"
-              allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-            ></iframe>
-          </div>
-          <div class="tile tile-landscape">
-            <video
-              data-fideo
-              data-fideo-background
-              data-fideo-src="https://videos.pexels.com/video-files/3209828/3209828-hd_1920_1080_25fps.mp4"
-            ></video>
-          </div>
-          <div class="tile tile-tall">
-            <video
-              data-fideo
-              data-fideo-background
-              data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
-            ></video>
-          </div>
-        </div>
-      </div>
-    </section>
 
-    <!-- ============================ SHORTS ============================ -->
-    <section class="block">
-      <div class="wrap">
-        <div class="eyebrow">Vertical / Shorts</div>
-        <h2>Portrait videos? Same attribute.</h2>
-        <p class="section-lede">
-          Pass a <code>/shorts/</code> URL and Fideo normalizes it to the embed format automatically.
-          Set <code>data-fideo-background-aspect-ratio="9:16"</code> so the iframe covers a
-          portrait container without letterboxing — perfect for mobile-first hero modules and
-          social cards.
-        </p>
-        <div class="shorts-grid">
-          <div class="short-card">
-            <iframe
-              data-fideo
-              data-fideo-background
-              data-fideo-background-aspect-ratio="9:16"
-              src="https://www.youtube.com/shorts/ot-vAzEBxlI"
-              allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-            ></iframe>
-          </div>
-          <div class="short-card">
-            <iframe
-              data-fideo
-              data-fideo-background
-              data-fideo-background-aspect-ratio="9:16"
-              src="https://www.youtube.com/shorts/jyosrYXFzZA"
-              allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-            ></iframe>
-          </div>
-          <div class="short-card">
-            <iframe
-              data-fideo
-              data-fideo-background
-              data-fideo-background-aspect-ratio="9:16"
-              src="https://www.youtube.com/shorts/JSS_IcFOsfM"
-              allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-            ></iframe>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============================ VIEWPORT ============================ -->
-    <section class="block">
-      <div class="wrap">
-        <div class="eyebrow">Viewport playback</div>
-        <h2>Plays when seen. Pauses when not.</h2>
-        <p class="section-lede">
-          Tie playback to an IntersectionObserver with a single attribute. Great for autoplaying
-          card grids without burning CPU off-screen.
-        </p>
-        <div class="grid-2">
-          <div class="provider-card">
-            <div class="provider-head">
-              <h4>Scroll into view to start</h4>
-              <span class="badge html5">viewport="play-pause"</span>
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Any aspect ratio</h3>
+                <p class="card-description">
+                  Use <code>data-fideo-background-aspect-ratio</code> to describe the source
+                  video's shape — Fideo handles the cover math.
+                </p>
+              </div>
+              <span class="badge">background-aspect-ratio</span>
             </div>
-            <div class="provider-body">
-              <video
-                data-fideo
-                data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
-                data-fideo-poster="https://picsum.photos/id/1018/1280/720"
-                data-fideo-viewport="play-pause"
-                data-fideo-viewport-threshold="0.5"
-                data-fideo-muted
-                data-fideo-loop
-              ></video>
-            </div>
-          </div>
-          <div class="provider-card">
-            <div class="provider-head">
-              <h4>Pause-only on exit</h4>
-              <span class="badge html5">viewport="pause"</span>
-            </div>
-            <div class="provider-body">
-              <video
-                data-fideo
-                data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
-                data-fideo-poster="https://picsum.photos/id/1018/1280/720"
-                data-fideo-viewport="pause"
-                data-fideo-muted
-              ></video>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============================ JS API + EVENTS ============================ -->
-    <section class="block" id="api">
-      <div class="wrap">
-        <div class="eyebrow">Imperative JS API</div>
-        <h2>Drive the player from anywhere.</h2>
-        <p class="section-lede">
-          Skip auto-init when you need finer control. Construct a Fideo instance, call
-          <code>play()</code>, <code>pause()</code>, seek, mute, change rate — and listen to a
-          normalized set of DOM events that fire across every provider.
-        </p>
-        <div class="api-grid">
-          <div class="api-panel">
-            <video id="p-api"></video>
-            <div class="api-buttons" style="margin-top: 16px;">
-              <button data-api="play">player.play()</button>
-              <button data-api="pause">player.pause()</button>
-              <button data-api="seek-back">seek -10s</button>
-              <button data-api="seek-fwd">seek +10s</button>
-              <button data-api="rate-half">0.5×</button>
-              <button data-api="rate-one">1×</button>
-              <button data-api="rate-two">2×</button>
-              <button data-api="mute">toggle mute</button>
-            </div>
-          </div>
-          <div>
-            <div class="api-panel" style="margin-bottom: 20px;">
-              <h4>Live state</h4>
-              <p class="small">Read from <code>adapter.getState()</code></p>
-              <div id="state">
-                <div class="state-row"><span class="k">paused</span><span class="v" data-k="paused">—</span></div>
-                <div class="state-row"><span class="k">currentTime</span><span class="v" data-k="currentTime">—</span></div>
-                <div class="state-row"><span class="k">duration</span><span class="v" data-k="duration">—</span></div>
-                <div class="state-row"><span class="k">volume</span><span class="v" data-k="volume">—</span></div>
-                <div class="state-row"><span class="k">muted</span><span class="v" data-k="muted">—</span></div>
-                <div class="state-row"><span class="k">playbackRate</span><span class="v" data-k="playbackRate">—</span></div>
+            <div class="card-content">
+              <div class="ratio-grid">
+                <div class="ratio-tile ar-landscape">
+                  <span class="label">16:9</span>
+                  <video data-fideo data-fideo-background
+                    data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"></video>
+                </div>
+                <div class="ratio-tile ar-portrait">
+                  <span class="label">9:16 · YT Short</span>
+                  <iframe data-fideo data-fideo-background data-fideo-background-aspect-ratio="9:16"
+                    src="https://www.youtube.com/shorts/ot-vAzEBxlI"
+                    allow="autoplay; encrypted-media; fullscreen; picture-in-picture"></iframe>
+                </div>
+                <div class="ratio-tile ar-square">
+                  <span class="label">1:1</span>
+                  <video data-fideo data-fideo-background
+                    data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"></video>
+                </div>
+                <div class="ratio-tile ar-classic">
+                  <span class="label">4:3</span>
+                  <video data-fideo data-fideo-background
+                    data-fideo-src="https://videos.pexels.com/video-files/3209828/3209828-hd_1920_1080_25fps.mp4"></video>
+                </div>
               </div>
             </div>
-            <div class="api-panel">
-              <h4>Event stream</h4>
-              <p class="small">Normalized <code>fideo:*</code> DOM events</p>
-              <div class="log" id="log"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== RESPONSIVE ============== -->
+    <section id="responsive">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">Responsive sources</span>
+          <h2>Different videos. Different posters. Same player.</h2>
+          <p class="section-lede">
+            Specify desktop / tablet / mobile variants and Fideo picks the right asset per
+            breakpoint. Resize your browser to watch the source swap.
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Breakpoint-aware sources &amp; posters</h3>
+              <p class="card-description">
+                Defaults: mobile ≤ 767px, tablet ≤ 1024px. Override with
+                <code>data-fideo-breakpoint-*</code>.
+              </p>
+            </div>
+            <span class="bp-indicator"><span class="bp-dot"></span><strong id="bp-label">desktop</strong></span>
+          </div>
+          <div class="card-content">
+            <video
+              data-fideo
+              data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
+              data-fideo-src-tablet="https://videos.pexels.com/video-files/3209828/3209828-hd_1920_1080_25fps.mp4"
+              data-fideo-src-mobile="https://res.cloudinary.com/demo/video/upload/elephants.mp4"
+              data-fideo-poster="https://picsum.photos/id/1018/1600/900"
+              data-fideo-poster-tablet="https://picsum.photos/id/1015/1200/900"
+              data-fideo-poster-mobile="https://picsum.photos/id/1019/720/1280"
+              data-fideo-muted data-fideo-loop
+            ></video>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== VIEWPORT ============== -->
+    <section>
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">Viewport playback</span>
+          <h2>Plays when seen. Pauses when not.</h2>
+          <p class="section-lede">
+            Tie playback to an <code>IntersectionObserver</code> with a single attribute. Useful
+            for autoplaying card grids without burning CPU off-screen.
+          </p>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Play-pause on scroll</h3>
+                <p class="card-description">Threshold 0.5 — half the player must be visible.</p>
+              </div>
+              <span class="badge accent mono">"play-pause"</span>
+            </div>
+            <div class="card-content">
+              <video data-fideo
+                data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
+                data-fideo-poster="https://picsum.photos/id/1018/1280/720"
+                data-fideo-viewport="play-pause" data-fideo-viewport-threshold="0.5"
+                data-fideo-muted data-fideo-loop></video>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Pause-only on exit</h3>
+                <p class="card-description">User starts it, viewport pauses it when scrolled away.</p>
+              </div>
+              <span class="badge mono">"pause"</span>
+            </div>
+            <div class="card-content">
+              <video data-fideo
+                data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
+                data-fideo-poster="https://picsum.photos/id/1018/1280/720"
+                data-fideo-viewport="pause" data-fideo-muted></video>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ============================ CONTROLS VISIBILITY ============================ -->
-    <section class="block">
-      <div class="wrap">
-        <div class="eyebrow">Control configurations</div>
-        <h2>Show only what you need.</h2>
-        <p class="section-lede">
-          Toggle individual controls — play, timeline, volume, settings, fullscreen — to match
-          context. Below: a minimal player, a no-timeline ambient player, and a fully loaded one.
-        </p>
-        <div class="theme-grid">
-          <div class="theme-card">
-            <video
-              data-fideo
-              data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
-              data-fideo-poster="https://picsum.photos/id/1019/1280/720"
-              data-fideo-show-timeline="false"
-              data-fideo-show-volume="false"
-              data-fideo-show-settings="false"
-              data-fideo-show-current-time="false"
-              data-fideo-show-duration="false"
-              data-fideo-muted
-            ></video>
-            <h4>Minimal</h4>
-            <p>Play + fullscreen only. Great for galleries and cards.</p>
+    <!-- ============== JS API ============== -->
+    <section id="api">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">Imperative JS API</span>
+          <h2>Drive the player from anywhere.</h2>
+          <p class="section-lede">
+            Construct a <code>Fideo</code> instance and call <code>play()</code>,
+            <code>pause()</code>, <code>adapter.seek()</code>, <code>setPlaybackRate()</code>,
+            <code>setSource()</code>. State is also dispatched as normalized
+            <code>fideo:*</code> DOM events.
+          </p>
+        </div>
+        <div class="api-grid">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Live player</h3>
+                <p class="card-description">Constructed in JS — no <code>data-fideo</code> attribute.</p>
+              </div>
+            </div>
+            <div class="card-content">
+              <video id="p-api"></video>
+              <div class="sep"></div>
+              <div class="muted" style="font-size:12px; margin-bottom:6px">Playback</div>
+              <div class="api-buttons" style="margin-bottom:12px">
+                <button class="btn btn-sm" data-api="play">play</button>
+                <button class="btn btn-sm" data-api="pause">pause</button>
+                <button class="btn btn-sm" data-api="seek-back">−10s</button>
+                <button class="btn btn-sm" data-api="seek-fwd">+10s</button>
+                <button class="btn btn-sm" data-api="mute">toggle mute</button>
+              </div>
+              <div class="muted" style="font-size:12px; margin-bottom:6px">Playback rate</div>
+              <div class="api-buttons" style="margin-bottom:12px">
+                <button class="btn btn-sm" data-api="rate-half">0.5×</button>
+                <button class="btn btn-sm" data-api="rate-one">1×</button>
+                <button class="btn btn-sm" data-api="rate-onefive">1.5×</button>
+                <button class="btn btn-sm" data-api="rate-two">2×</button>
+              </div>
+              <div class="muted" style="font-size:12px; margin-bottom:6px">Swap source (<code>adapter.setSource</code>)</div>
+              <div class="api-buttons">
+                <button class="btn btn-sm" data-src="turtle">Sea turtle</button>
+                <button class="btn btn-sm" data-src="elephants">Elephants</button>
+                <button class="btn btn-sm" data-src="pexels">Pexels clip</button>
+              </div>
+            </div>
           </div>
-          <div class="theme-card">
-            <video
-              data-fideo
-              data-fideo-src="https://videos.pexels.com/video-files/3209828/3209828-hd_1920_1080_25fps.mp4"
-              data-fideo-poster="https://picsum.photos/id/1018/1280/720"
-              data-fideo-show-timeline="false"
-              data-fideo-show-settings="false"
-              data-fideo-muted
-            ></video>
-            <h4>Ambient</h4>
-            <p>No timeline. Keeps focus on the visual.</p>
-          </div>
-          <div class="theme-card">
-            <video
-              data-fideo
-              data-fideo-src="https://res.cloudinary.com/demo/video/upload/elephants.mp4"
-              data-fideo-poster="https://picsum.photos/id/1043/1280/720"
-              data-fideo-playback-rates="0.5, 1, 1.5, 2"
-              data-fideo-muted
-            ></video>
-            <h4>Full controls</h4>
-            <p>All defaults, with custom playback rates.</p>
+          <div class="stack">
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h3 class="card-title">Live state</h3>
+                  <p class="card-description"><code>player.adapter.getState()</code></p>
+                </div>
+              </div>
+              <div class="card-content">
+                <div class="state-table" id="state">
+                  <div class="state-row"><span class="k">paused</span><span class="v" data-k="paused">—</span></div>
+                  <div class="state-row"><span class="k">currentTime</span><span class="v" data-k="currentTime">—</span></div>
+                  <div class="state-row"><span class="k">duration</span><span class="v" data-k="duration">—</span></div>
+                  <div class="state-row"><span class="k">volume</span><span class="v" data-k="volume">—</span></div>
+                  <div class="state-row"><span class="k">muted</span><span class="v" data-k="muted">—</span></div>
+                  <div class="state-row"><span class="k">playbackRate</span><span class="v" data-k="playbackRate">—</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h3 class="card-title">Event stream</h3>
+                  <p class="card-description">Normalized <code>fideo:*</code> DOM events</p>
+                </div>
+              </div>
+              <div class="card-content">
+                <div class="log" id="log"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ============================ FOOTER ============================ -->
-    <footer>
-      <div class="wrap">
-        <div>
-          Fideo JS · MIT licensed · Built by
-          <a href="https://github.com/devjtv">@devjtv</a>
+    <!-- ============== CONTROL VISIBILITY ============== -->
+    <section id="controls">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">Control configurations</span>
+          <h2>Show only what you need.</h2>
+          <p class="section-lede">
+            Toggle individual controls — play, timeline, volume, settings, fullscreen — or hide
+            everything for an ambient look.
+          </p>
         </div>
+        <div class="grid-2">
+          <!-- Minimal -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Minimal</h3>
+              <span class="badge">play + fullscreen</span>
+            </div>
+            <div class="card-tabs" role="tablist">
+              <button class="card-tab" type="button" data-panel="preview" aria-selected="true">Preview</button>
+              <button class="card-tab" type="button" data-panel="code" aria-selected="false">Code</button>
+            </div>
+            <div class="card-panel" data-panel="preview" data-state="active">
+              <div class="card-content">
+                <video data-fideo
+                  data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
+                  data-fideo-poster="https://picsum.photos/id/1019/1280/720"
+                  data-fideo-show-timeline="false"
+                  data-fideo-show-volume="false"
+                  data-fideo-show-settings="false"
+                  data-fideo-show-time="false"
+                  data-fideo-muted></video>
+              </div>
+            </div>
+            <div class="card-panel" data-panel="code">
+<pre><span class="tk-tag">&lt;video</span>
+  <span class="tk-attr">data-fideo</span>
+  <span class="tk-attr">data-fideo-src</span>=<span class="tk-str">"/sea_turtle.mp4"</span>
+  <span class="tk-attr">data-fideo-poster</span>=<span class="tk-str">"/poster.jpg"</span>
+  <span class="tk-attr">data-fideo-show-timeline</span>=<span class="tk-str">"false"</span>
+  <span class="tk-attr">data-fideo-show-volume</span>=<span class="tk-str">"false"</span>
+  <span class="tk-attr">data-fideo-show-settings</span>=<span class="tk-str">"false"</span>
+  <span class="tk-attr">data-fideo-show-time</span>=<span class="tk-str">"false"</span>
+  <span class="tk-attr">data-fideo-muted</span>
+<span class="tk-tag">&gt;&lt;/video&gt;</span></pre>
+            </div>
+            <div class="card-footer">Great for galleries.</div>
+          </div>
+
+          <!-- Ambient -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Ambient</h3>
+              <span class="badge">no timeline</span>
+            </div>
+            <div class="card-tabs" role="tablist">
+              <button class="card-tab" type="button" data-panel="preview" aria-selected="true">Preview</button>
+              <button class="card-tab" type="button" data-panel="code" aria-selected="false">Code</button>
+            </div>
+            <div class="card-panel" data-panel="preview" data-state="active">
+              <div class="card-content">
+                <video data-fideo
+                  data-fideo-src="https://videos.pexels.com/video-files/3209828/3209828-hd_1920_1080_25fps.mp4"
+                  data-fideo-poster="https://picsum.photos/id/1018/1280/720"
+                  data-fideo-show-timeline="false"
+                  data-fideo-show-settings="false"
+                  data-fideo-muted></video>
+              </div>
+            </div>
+            <div class="card-panel" data-panel="code">
+<pre><span class="tk-tag">&lt;video</span>
+  <span class="tk-attr">data-fideo</span>
+  <span class="tk-attr">data-fideo-src</span>=<span class="tk-str">"/clip.mp4"</span>
+  <span class="tk-attr">data-fideo-poster</span>=<span class="tk-str">"/poster.jpg"</span>
+  <span class="tk-attr">data-fideo-show-timeline</span>=<span class="tk-str">"false"</span>
+  <span class="tk-attr">data-fideo-show-settings</span>=<span class="tk-str">"false"</span>
+  <span class="tk-attr">data-fideo-muted</span>
+<span class="tk-tag">&gt;&lt;/video&gt;</span></pre>
+            </div>
+            <div class="card-footer">Keeps focus on the visual.</div>
+          </div>
+
+          <!-- No controls -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">No controls</h3>
+              <span class="badge">controls="false"</span>
+            </div>
+            <div class="card-tabs" role="tablist">
+              <button class="card-tab" type="button" data-panel="preview" aria-selected="true">Preview</button>
+              <button class="card-tab" type="button" data-panel="code" aria-selected="false">Code</button>
+            </div>
+            <div class="card-panel" data-panel="preview" data-state="active">
+              <div class="card-content">
+                <video data-fideo
+                  data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
+                  data-fideo-poster="https://picsum.photos/id/1043/1280/720"
+                  data-fideo-controls="false"
+                  data-fideo-muted data-fideo-loop data-fideo-autoplay></video>
+              </div>
+            </div>
+            <div class="card-panel" data-panel="code">
+<pre><span class="tk-tag">&lt;video</span>
+  <span class="tk-attr">data-fideo</span>
+  <span class="tk-attr">data-fideo-src</span>=<span class="tk-str">"/loop.mp4"</span>
+  <span class="tk-attr">data-fideo-controls</span>=<span class="tk-str">"false"</span>
+  <span class="tk-attr">data-fideo-muted</span>
+  <span class="tk-attr">data-fideo-loop</span>
+  <span class="tk-attr">data-fideo-autoplay</span>
+<span class="tk-tag">&gt;&lt;/video&gt;</span></pre>
+            </div>
+            <div class="card-footer">Silent loop. No UI.</div>
+          </div>
+
+          <!-- Full + rates -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Full + rates</h3>
+              <span class="badge">custom speeds</span>
+            </div>
+            <div class="card-tabs" role="tablist">
+              <button class="card-tab" type="button" data-panel="preview" aria-selected="true">Preview</button>
+              <button class="card-tab" type="button" data-panel="code" aria-selected="false">Code</button>
+            </div>
+            <div class="card-panel" data-panel="preview" data-state="active">
+              <div class="card-content">
+                <video data-fideo
+                  data-fideo-src="https://res.cloudinary.com/demo/video/upload/elephants.mp4"
+                  data-fideo-poster="https://picsum.photos/id/1043/1280/720"
+                  data-fideo-playback-rates="0.5, 1, 1.5, 2, 3"
+                  data-fideo-muted></video>
+              </div>
+            </div>
+            <div class="card-panel" data-panel="code">
+<pre><span class="tk-tag">&lt;video</span>
+  <span class="tk-attr">data-fideo</span>
+  <span class="tk-attr">data-fideo-src</span>=<span class="tk-str">"/elephants.mp4"</span>
+  <span class="tk-attr">data-fideo-poster</span>=<span class="tk-str">"/poster.jpg"</span>
+  <span class="tk-attr">data-fideo-playback-rates</span>=<span class="tk-str">"0.5, 1, 1.5, 2, 3"</span>
+  <span class="tk-attr">data-fideo-muted</span>
+<span class="tk-tag">&gt;&lt;/video&gt;</span></pre>
+            </div>
+            <div class="card-footer">All defaults + 0.5 → 3× speeds.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== THEMING ============== -->
+    <section id="theming">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">Theming</span>
+          <h2>Themed with CSS variables and <code>::part()</code>.</h2>
+          <p class="section-lede">
+            Override <code>--fideo-*</code> variables globally, per element via
+            <code>data-fideo-accent</code>, or in JS with <code>cssVars</code>. Deep customisation
+            uses Shadow DOM <code>::part()</code> selectors. v0.4.0 adds
+            <code>--fideo-button-radius</code>, <code>--fideo-icon-size</code>,
+            <code>--fideo-thumb-size</code>, and a <code>settings-menu</code> part.
+          </p>
+        </div>
+        <div class="grid-2">
+          <!-- Frosted glass -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Frosted glass</h3>
+              <span class="badge accent">backdrop-filter</span>
+            </div>
+            <div class="card-tabs" role="tablist">
+              <button class="card-tab" type="button" data-panel="preview" aria-selected="true">Preview</button>
+              <button class="card-tab" type="button" data-panel="code" aria-selected="false">Code</button>
+            </div>
+            <div class="card-panel" data-panel="preview" data-state="active">
+              <div class="card-content">
+                <video data-fideo data-fideo-class="fideo-frosted"
+                  data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
+                  data-fideo-poster="https://picsum.photos/id/1018/1280/720"
+                  data-fideo-muted></video>
+              </div>
+            </div>
+            <div class="card-panel" data-panel="code">
+<pre><span class="tk-com">/* CSS */</span>
+<span class="tk-tag">.fideo-frosted</span> {
+  <span class="tk-attr">--fideo-accent</span>: <span class="tk-str">#6cf2c0</span>;
+  <span class="tk-attr">--fideo-track-fill</span>: <span class="tk-str">#ffffff</span>;
+  <span class="tk-attr">--fideo-track</span>: <span class="tk-str">rgba(255,255,255,.22)</span>;
+  <span class="tk-attr">--fideo-track-size</span>: <span class="tk-num">3px</span>;
+}
+<span class="tk-tag">.fideo-frosted</span> <span class="tk-tag">.fideo__controls</span> {
+  <span class="tk-attr">background</span>: <span class="tk-str">rgba(15,18,28,.55)</span>;
+  <span class="tk-attr">backdrop-filter</span>: <span class="tk-str">blur(22px) saturate(160%)</span>;
+  <span class="tk-attr">border</span>: <span class="tk-str">1px solid rgba(255,255,255,.10)</span>;
+  <span class="tk-attr">border-radius</span>: <span class="tk-num">14px</span>;
+  <span class="tk-attr">padding</span>: <span class="tk-num">6px 14px 8px</span>;
+  <span class="tk-attr">bottom</span>: <span class="tk-num">14px</span>;
+  <span class="tk-attr">box-shadow</span>: <span class="tk-str">0 6px 24px rgba(0,0,0,.35)</span>;
+}
+<span class="tk-tag">.fideo-frosted</span> <span class="tk-tag">.fideo__controls</span>::part(play-button):hover {
+  <span class="tk-attr">color</span>: <span class="tk-str">#6cf2c0</span>;
+}
+
+<span class="tk-com">&lt;!-- HTML --&gt;</span>
+<span class="tk-tag">&lt;video</span> <span class="tk-attr">data-fideo</span> <span class="tk-attr">data-fideo-class</span>=<span class="tk-str">"fideo-frosted"</span>
+       <span class="tk-attr">data-fideo-src</span>=<span class="tk-str">"/clip.mp4"</span> <span class="tk-attr">data-fideo-muted</span><span class="tk-tag">&gt;&lt;/video&gt;</span></pre>
+            </div>
+            <div class="card-footer">Floating frosted bar, blurred background, mint hover accent.</div>
+          </div>
+
+          <!-- CTA -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">CTA · filled play</h3>
+              <span class="badge red">::part(play-button)</span>
+            </div>
+            <div class="card-tabs" role="tablist">
+              <button class="card-tab" type="button" data-panel="preview" aria-selected="true">Preview</button>
+              <button class="card-tab" type="button" data-panel="code" aria-selected="false">Code</button>
+            </div>
+            <div class="card-panel" data-panel="preview" data-state="active">
+              <div class="card-content">
+                <video data-fideo data-fideo-class="fideo-cta"
+                  data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
+                  data-fideo-poster="https://picsum.photos/id/1019/1280/720"
+                  data-fideo-muted></video>
+              </div>
+            </div>
+            <div class="card-panel" data-panel="code">
+<pre><span class="tk-com">/* CSS — uses new v0.4.0 vars */</span>
+<span class="tk-tag">.fideo-cta</span> {
+  <span class="tk-attr">--fideo-accent</span>: <span class="tk-str">#ff5e5e</span>;
+  <span class="tk-attr">--fideo-track-fill</span>: <span class="tk-str">#ff5e5e</span>;
+  <span class="tk-attr">--fideo-track-size</span>: <span class="tk-num">4px</span>;
+  <span class="tk-attr">--fideo-button-size</span>: <span class="tk-num">32px</span>;
+  <span class="tk-attr">--fideo-button-radius</span>: <span class="tk-num">8px</span>;
+  <span class="tk-attr">--fideo-icon-size</span>: <span class="tk-num">16px</span>;
+  <span class="tk-attr">--fideo-gap</span>: <span class="tk-num">14px</span>;
+}
+<span class="tk-tag">.fideo-cta</span> <span class="tk-tag">.fideo__controls</span> {
+  <span class="tk-attr">background</span>: <span class="tk-str">linear-gradient(to top, rgba(0,0,0,.85), transparent)</span>;
+  <span class="tk-attr">padding</span>: <span class="tk-num">40px 16px 12px</span>;
+  <span class="tk-attr">inset</span>: <span class="tk-str">auto 0 0 0</span>;
+}
+<span class="tk-tag">.fideo-cta</span> <span class="tk-tag">.fideo__controls</span>::part(play-button) {
+  <span class="tk-attr">background</span>: <span class="tk-str">#ff5e5e</span>;
+  <span class="tk-attr">color</span>: <span class="tk-str">#fff</span>;
+}
+<span class="tk-tag">.fideo-cta</span> <span class="tk-tag">.fideo__controls</span>::part(settings-menu) {
+  <span class="tk-attr">background</span>: <span class="tk-str">#ff5e5e</span>;
+  <span class="tk-attr">border</span>: <span class="tk-num">0</span>;
+  <span class="tk-attr">border-radius</span>: <span class="tk-num">8px</span>;
+}
+
+<span class="tk-com">&lt;!-- HTML --&gt;</span>
+<span class="tk-tag">&lt;video</span> <span class="tk-attr">data-fideo</span> <span class="tk-attr">data-fideo-class</span>=<span class="tk-str">"fideo-cta"</span>
+       <span class="tk-attr">data-fideo-src</span>=<span class="tk-str">"/clip.mp4"</span> <span class="tk-attr">data-fideo-muted</span><span class="tk-tag">&gt;&lt;/video&gt;</span></pre>
+            </div>
+            <div class="card-footer">Solid coral play button, gradient scrim, full-bleed bar.</div>
+          </div>
+
+          <!-- Brutalist -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Brutalist · mono</h3>
+              <span class="badge violet">sharp + uppercase</span>
+            </div>
+            <div class="card-tabs" role="tablist">
+              <button class="card-tab" type="button" data-panel="preview" aria-selected="true">Preview</button>
+              <button class="card-tab" type="button" data-panel="code" aria-selected="false">Code</button>
+            </div>
+            <div class="card-panel" data-panel="preview" data-state="active">
+              <div class="card-content">
+                <video data-fideo data-fideo-class="fideo-brutalist"
+                  data-fideo-src="https://res.cloudinary.com/demo/video/upload/elephants.mp4"
+                  data-fideo-poster="https://picsum.photos/id/1043/1280/720"
+                  data-fideo-muted></video>
+              </div>
+            </div>
+            <div class="card-panel" data-panel="code">
+<pre><span class="tk-com">/* CSS */</span>
+<span class="tk-tag">.fideo-brutalist</span> {
+  <span class="tk-attr">--fideo-accent</span>: <span class="tk-str">#c98aff</span>;
+  <span class="tk-attr">--fideo-track-fill</span>: <span class="tk-str">#c98aff</span>;
+  <span class="tk-attr">--fideo-track-size</span>: <span class="tk-num">2px</span>;
+  <span class="tk-attr">--fideo-radius</span>: <span class="tk-num">0</span>;
+}
+<span class="tk-tag">.fideo-brutalist</span> <span class="tk-tag">.fideo__controls</span> {
+  <span class="tk-attr">background</span>: <span class="tk-str">#08060d</span>;
+  <span class="tk-attr">border-top</span>: <span class="tk-str">2px solid #c98aff</span>;
+  <span class="tk-attr">padding</span>: <span class="tk-num">8px 14px 10px</span>;
+  <span class="tk-attr">inset</span>: <span class="tk-str">auto 0 0 0</span>;
+  <span class="tk-attr">border-radius</span>: <span class="tk-num">0</span>;
+}
+<span class="tk-tag">.fideo-brutalist</span> <span class="tk-tag">.fideo__controls</span>::part(play-button),
+<span class="tk-tag">.fideo-brutalist</span> <span class="tk-tag">.fideo__controls</span>::part(mute-button),
+<span class="tk-tag">.fideo-brutalist</span> <span class="tk-tag">.fideo__controls</span>::part(settings-button),
+<span class="tk-tag">.fideo-brutalist</span> <span class="tk-tag">.fideo__controls</span>::part(fullscreen-button) {
+  <span class="tk-attr">border-radius</span>: <span class="tk-num">0</span>;
+}
+<span class="tk-tag">.fideo-brutalist</span> <span class="tk-tag">.fideo__controls</span>::part(current-time),
+<span class="tk-tag">.fideo-brutalist</span> <span class="tk-tag">.fideo__controls</span>::part(duration) {
+  <span class="tk-attr">font-family</span>: <span class="tk-str">ui-monospace, monospace</span>;
+  <span class="tk-attr">font-weight</span>: <span class="tk-num">700</span>;
+  <span class="tk-attr">letter-spacing</span>: <span class="tk-num">.06em</span>;
+  <span class="tk-attr">text-transform</span>: <span class="tk-str">uppercase</span>;
+}
+
+<span class="tk-com">&lt;!-- HTML --&gt;</span>
+<span class="tk-tag">&lt;video</span> <span class="tk-attr">data-fideo</span> <span class="tk-attr">data-fideo-class</span>=<span class="tk-str">"fideo-brutalist"</span>
+       <span class="tk-attr">data-fideo-src</span>=<span class="tk-str">"/clip.mp4"</span> <span class="tk-attr">data-fideo-muted</span><span class="tk-tag">&gt;&lt;/video&gt;</span></pre>
+            </div>
+            <div class="card-footer">Zero-radius wrapper + buttons, accent border, mono uppercase time.</div>
+          </div>
+
+          <!-- Neon -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Neon</h3>
+              <span class="badge blue">heavy ::part()</span>
+            </div>
+            <div class="card-tabs" role="tablist">
+              <button class="card-tab" type="button" data-panel="preview" aria-selected="true">Preview</button>
+              <button class="card-tab" type="button" data-panel="code" aria-selected="false">Code</button>
+            </div>
+            <div class="card-panel" data-panel="preview" data-state="active">
+              <div class="card-content">
+                <video data-fideo data-fideo-class="fideo-neon"
+                  data-fideo-src="https://videos.pexels.com/video-files/3209828/3209828-hd_1920_1080_25fps.mp4"
+                  data-fideo-poster="https://picsum.photos/id/1015/1280/720"
+                  data-fideo-muted></video>
+              </div>
+            </div>
+            <div class="card-panel" data-panel="code">
+<pre><span class="tk-com">/* CSS */</span>
+<span class="tk-tag">.fideo-neon</span> {
+  <span class="tk-attr">--fideo-accent</span>: <span class="tk-str">#00d4ff</span>;
+  <span class="tk-attr">--fideo-track-fill</span>: <span class="tk-str">#00d4ff</span>;
+  <span class="tk-attr">--fideo-track</span>: <span class="tk-str">rgba(0,212,255,.18)</span>;
+  <span class="tk-attr">--fideo-track-size</span>: <span class="tk-num">6px</span>;
+}
+<span class="tk-tag">.fideo-neon</span> <span class="tk-tag">.fideo__controls</span> {
+  <span class="tk-attr">background</span>: <span class="tk-str">rgba(5,10,22,.65)</span>;
+  <span class="tk-attr">backdrop-filter</span>: <span class="tk-str">blur(10px)</span>;
+  <span class="tk-attr">border</span>: <span class="tk-str">1px solid rgba(0,212,255,.35)</span>;
+  <span class="tk-attr">border-radius</span>: <span class="tk-num">10px</span>;
+  <span class="tk-attr">box-shadow</span>: <span class="tk-str">0 0 24px rgba(0,212,255,.15)</span>;
+  <span class="tk-attr">padding</span>: <span class="tk-num">6px 14px 8px</span>;
+  <span class="tk-attr">bottom</span>: <span class="tk-num">14px</span>;
+}
+<span class="tk-tag">.fideo-neon</span> <span class="tk-tag">.fideo__controls</span>::part(timeline) {
+  <span class="tk-attr">filter</span>: <span class="tk-str">drop-shadow(0 0 6px rgba(0,212,255,.6))</span>;
+}
+<span class="tk-tag">.fideo-neon</span> <span class="tk-tag">.fideo__controls</span>::part(play-button):hover {
+  <span class="tk-attr">color</span>: <span class="tk-str">#00d4ff</span>;
+  <span class="tk-attr">filter</span>: <span class="tk-str">drop-shadow(0 0 6px rgba(0,212,255,.7))</span>;
+}
+<span class="tk-tag">.fideo-neon</span> <span class="tk-tag">.fideo__controls</span>::part(current-time),
+<span class="tk-tag">.fideo-neon</span> <span class="tk-tag">.fideo__controls</span>::part(duration) {
+  <span class="tk-attr">color</span>: <span class="tk-str">#00d4ff</span>;
+  <span class="tk-attr">font-variant-numeric</span>: <span class="tk-str">tabular-nums</span>;
+}
+
+<span class="tk-com">&lt;!-- HTML --&gt;</span>
+<span class="tk-tag">&lt;video</span> <span class="tk-attr">data-fideo</span> <span class="tk-attr">data-fideo-class</span>=<span class="tk-str">"fideo-neon"</span>
+       <span class="tk-attr">data-fideo-src</span>=<span class="tk-str">"/clip.mp4"</span> <span class="tk-attr">data-fideo-muted</span><span class="tk-tag">&gt;&lt;/video&gt;</span></pre>
+            </div>
+            <div class="card-footer">Cyan glow on timeline + buttons, tinted glass bar.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== CUSTOM ICONS ============== -->
+    <section id="icons">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">Custom icons</span>
+          <h2>Bring your own SVGs.</h2>
+          <p class="section-lede">
+            Pass inline SVG strings for any control icon. Supported keys:
+            <code>play</code>, <code>pause</code>, <code>volume</code>, <code>volumeLow</code>,
+            <code>muted</code>, <code>settings</code>, <code>fullscreen</code>,
+            <code>fullscreenExit</code>.
+          </p>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Lucide-style icons</h3>
+              <span class="badge">new Fideo({ icons })</span>
+            </div>
+            <div class="card-content">
+              <video id="p-icons"></video>
+            </div>
+          </div>
+          <div class="code">
+            <div class="code-head"><span>How it's wired up</span><span class="mono">ts</span></div>
+<pre><span class="tk-kw">import</span> { Fideo } <span class="tk-kw">from</span> <span class="tk-str">'fideo-js'</span>;
+
+<span class="tk-kw">new</span> Fideo(<span class="tk-str">'#p-icons'</span>, {
+  sources: { desktop: <span class="tk-str">'/clip.mp4'</span> },
+  icons: {
+    play:    <span class="tk-str">'&lt;svg ...&gt;&lt;polygon points="6 4 20 12 6 20"/&gt;&lt;/svg&gt;'</span>,
+    pause:   <span class="tk-str">'&lt;svg ...&gt;&lt;rect x="6" y="4" .../&gt;&lt;rect x="14" .../&gt;&lt;/svg&gt;'</span>,
+    volume:  <span class="tk-str">'&lt;svg ...&gt;...&lt;/svg&gt;'</span>,
+    muted:   <span class="tk-str">'&lt;svg ...&gt;...&lt;/svg&gt;'</span>,
+    settings:<span class="tk-str">'&lt;svg ...&gt;&lt;circle cx="12" cy="12" r="3"/&gt;...&lt;/svg&gt;'</span>,
+  },
+});</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============== FOOTER ============== -->
+    <footer>
+      <div class="container">
+        <div>fideo-js · MIT · built by <a href="https://github.com/devjtv">@devjtv</a></div>
         <div class="links">
           <a href="https://github.com/devjtv/fideo-js">GitHub</a>
           <a href="https://www.npmjs.com/package/fideo-js">npm</a>
           <a href="js-api.html">JS API demo</a>
-          <a href="part-styling.html">Theming demo</a>
+          <a href="part-styling.html">::part() demo</a>
         </div>
       </div>
     </footer>
@@ -1105,9 +1607,34 @@
     <script src="../dist/fideo.global.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', () => {
-        // Library auto-inits every [data-fideo] element on DOMContentLoaded.
-        // The JS API panel's <video id="p-api"> intentionally has no data-fideo
-        // so we can construct it manually below.
+        // ===== Quick-start tabs =====
+        const triggers = document.querySelectorAll('.tab-trigger');
+        const contents = document.querySelectorAll('.tab-content');
+        triggers.forEach((t) => {
+          t.addEventListener('click', () => {
+            const id = t.dataset.tab;
+            triggers.forEach((x) => x.dataset.state = x.dataset.tab === id ? 'active' : '');
+            contents.forEach((x) => x.dataset.state = x.dataset.tab === id ? 'active' : '');
+          });
+        });
+
+        // ===== Per-card Preview/Code tabs =====
+        document.querySelectorAll('.card-tabs').forEach((tablist) => {
+          const card = tablist.closest('.card');
+          if (!card) return;
+          const tabs = tablist.querySelectorAll('.card-tab');
+          const panels = card.querySelectorAll(':scope > .card-panel');
+          tabs.forEach((tab) => {
+            tab.addEventListener('click', () => {
+              const target = tab.dataset.panel;
+              tabs.forEach((t) => t.setAttribute('aria-selected', t.dataset.panel === target ? 'true' : 'false'));
+              panels.forEach((p) => {
+                if (p.dataset.panel === target) p.dataset.state = 'active';
+                else delete p.dataset.state;
+              });
+            });
+          });
+        });
 
         // ===== Breakpoint indicator =====
         const bpLabel = document.getElementById('bp-label');
@@ -1121,14 +1648,16 @@
         // ===== JS API panel =====
         const apiPlayer = new Fideo('#p-api', {
           provider: 'html5',
-          sources: {
-            desktop: 'https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4',
-          },
-          posters: {
-            desktop: 'https://picsum.photos/id/1018/1280/720',
-          },
+          sources: { desktop: 'https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4' },
+          posters: { desktop: 'https://picsum.photos/id/1018/1280/720' },
           muted: true,
         });
+
+        const SOURCES = {
+          turtle: 'https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4',
+          elephants: 'https://res.cloudinary.com/demo/video/upload/elephants.mp4',
+          pexels: 'https://videos.pexels.com/video-files/3209828/3209828-hd_1920_1080_25fps.mp4',
+        };
 
         const stateBox = document.getElementById('state');
         function fmt(v) {
@@ -1153,19 +1682,27 @@
               case 'play': apiPlayer.play(); break;
               case 'pause': apiPlayer.pause(); break;
               case 'seek-back': a?.seek?.(Math.max(0, (s.currentTime || 0) - 10)); break;
-              case 'seek-fwd': a?.seek?.((s.currentTime || 0) + 10); break;
-              case 'rate-half': a?.setPlaybackRate?.(0.5); break;
-              case 'rate-one': a?.setPlaybackRate?.(1); break;
-              case 'rate-two': a?.setPlaybackRate?.(2); break;
+              case 'seek-fwd':  a?.seek?.((s.currentTime || 0) + 10); break;
+              case 'rate-half':    a?.setPlaybackRate?.(0.5); break;
+              case 'rate-one':     a?.setPlaybackRate?.(1); break;
+              case 'rate-onefive': a?.setPlaybackRate?.(1.5); break;
+              case 'rate-two':     a?.setPlaybackRate?.(2); break;
               case 'mute': a?.setMuted?.(!s.muted); break;
             }
+          });
+        });
+
+        document.querySelectorAll('[data-src]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const url = SOURCES[btn.dataset.src];
+            if (url) apiPlayer.adapter?.setSource?.(url);
           });
         });
 
         // ===== Event log =====
         const log = document.getElementById('log');
         const apiEl = apiPlayer.element;
-        const events = ['fideo:play', 'fideo:pause', 'fideo:ended', 'fideo:volumechange', 'fideo:timeupdate'];
+        const events = ['fideo:play', 'fideo:pause', 'fideo:ended', 'fideo:volumechange', 'fideo:timeupdate', 'fideo:change'];
         let lastTimeLog = 0;
         events.forEach((name) => {
           apiEl.addEventListener(name, (e) => {
@@ -1187,6 +1724,25 @@
             log.prepend(row);
             while (log.children.length > 50) log.lastChild.remove();
           });
+        });
+
+        // ===== Custom icons demo =====
+        const stroke = 'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
+        new Fideo('#p-icons', {
+          provider: 'html5',
+          sources: { desktop: 'https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4' },
+          posters: { desktop: 'https://picsum.photos/id/1015/1280/720' },
+          muted: true,
+          icons: {
+            play:    `<svg viewBox="0 0 24 24" ${stroke}><polygon points="6 4 20 12 6 20 6 4"/></svg>`,
+            pause:   `<svg viewBox="0 0 24 24" ${stroke}><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>`,
+            volume:  `<svg viewBox="0 0 24 24" ${stroke}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>`,
+            volumeLow:`<svg viewBox="0 0 24 24" ${stroke}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>`,
+            muted:   `<svg viewBox="0 0 24 24" ${stroke}><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>`,
+            settings:`<svg viewBox="0 0 24 24" ${stroke}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.36.16.66.43.85.78.2.36.27.78.21 1.19"/></svg>`,
+            fullscreen:`<svg viewBox="0 0 24 24" ${stroke}><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>`,
+            fullscreenExit:`<svg viewBox="0 0 24 24" ${stroke}><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>`,
+          },
         });
       });
     </script>

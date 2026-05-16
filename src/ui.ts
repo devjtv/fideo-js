@@ -200,6 +200,7 @@ export class FideoControls {
 
   private createSpeedMenu(rates: number[]): HTMLElement {
     const menu = createElement('div', 'fideo__settings-menu');
+    menu.setAttribute('part', 'settings-menu');
     for (const rate of rates) {
       const button = this.button('fideo__speed', `${rate}x`, '', 'speed-button');
       button.textContent = `${rate}x`;
