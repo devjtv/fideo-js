@@ -59,7 +59,7 @@ Import the JavaScript and stylesheet:
 
 ```ts
 import { initFideo } from 'fideo-js';
-import 'fideo-js/styles.css';
+import 'fideo-js/fideo.css';
 
 initFideo();
 ```
@@ -67,7 +67,7 @@ initFideo();
 Or use the browser bundle:
 
 ```html
-<link rel="stylesheet" href="./dist/styles.css" />
+<link rel="stylesheet" href="./dist/fideo.css" />
 <script src="./dist/fideo.global.js"></script>
 <script>
   Fideo.init();
@@ -123,8 +123,8 @@ When poster images are configured, Fideo renders them as a visual cover while th
 Because the compiled files are committed in `dist/`, Fideo JS can be loaded directly from jsDelivr. Pin a release tag for production:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.3.5/dist/styles.css" />
-<script src="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.3.5/dist/fideo.global.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.3.6/dist/fideo.css" />
+<script src="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.3.6/dist/fideo.global.js"></script>
 <script>
   Fideo.init();
 </script>
@@ -133,9 +133,9 @@ Because the compiled files are committed in `dist/`, Fideo JS can be loaded dire
 ES module usage is also available:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.3.5/dist/styles.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.3.6/dist/fideo.css" />
 <script type="module">
-  import { initFideo } from 'https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.3.5/dist/fideo.js';
+  import { initFideo } from 'https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.3.6/dist/fideo.js';
 
   initFideo();
 </script>
@@ -147,7 +147,7 @@ If you do not want configuration in markup, initialize with a JS object:
 
 ```ts
 import { Fideo } from 'fideo-js';
-import 'fideo-js/styles.css';
+import 'fideo-js/fideo.css';
 
 const player = new Fideo('#player', {
   muted: true,
@@ -743,13 +743,14 @@ The compiled browser files are committed in `dist/` for users who want to downlo
 | `dist/fideo.global.js` | Browser global build. Adds `Fideo`, `initFideo`, `createFideo`, and `mountFideo` to `window`. Best for CDN or direct `<script>` usage. |
 | `dist/fideo.js` | ES module build. |
 | `dist/fideo.umd.cjs` | UMD/CommonJS-compatible build used by package tooling. |
-| `dist/styles.css` | Fideo control styles. |
+| `dist/fideo.css` | Fideo control styles. |
+| `dist/styles.css` | Legacy stylesheet alias kept for older direct-link snippets. |
 | `dist/index.d.ts` | TypeScript declarations. |
 
 For direct browser usage:
 
 ```html
-<link rel="stylesheet" href="./dist/styles.css" />
+<link rel="stylesheet" href="./dist/fideo.css" />
 <script src="./dist/fideo.global.js"></script>
 <script>
   Fideo.init();

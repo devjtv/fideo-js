@@ -1,6 +1,6 @@
 {
   "name": "fideo-js",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "description": "A lightweight, data-attribute driven video UI for HTML video, YouTube, Vimeo, and Wistia.",
   "type": "module",
   "license": "MIT",
@@ -22,7 +22,8 @@
       "import": "./dist/fideo.js",
       "require": "./dist/fideo.umd.cjs"
     },
-    "./styles.css": "./dist/styles.css"
+    "./fideo.css": "./dist/fideo.css",
+    "./styles.css": "./dist/fideo.css"
   },
   "files": [
     "dist",
@@ -32,6 +33,7 @@
   ],
   "sideEffects": [
     "./src/styles.css",
+    "./dist/fideo.css",
     "./dist/styles.css"
   ],
   "scripts": {

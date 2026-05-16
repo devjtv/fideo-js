@@ -11,7 +11,7 @@ export default defineConfig({
     },
     rollupOptions: {
       output: {
-        assetFileNames: 'styles.css',
+        assetFileNames: 'fideo.css',
       },
     },
     sourcemap: true,
