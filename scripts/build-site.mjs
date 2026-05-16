@@ -5,6 +5,9 @@ const SITE = 'site';
 const EXAMPLES = 'examples';
 const DIST = 'dist';
 
+const pkg = JSON.parse(await readFile('package.json', 'utf8'));
+const versionScript = `<script>window.__FIDEO_VERSION=${JSON.stringify(pkg.version)};</script>`;
+
 await rm(SITE, { recursive: true, force: true });
 await mkdir(SITE, { recursive: true });
 
@@ -20,7 +23,8 @@ for (const entry of entries) {
   const html = await readFile(src, 'utf8');
   await writeFile(dest, html
     .replaceAll('../dist/', './dist/')
-    .replaceAll('../assets/', './assets/'));
+    .replaceAll('../assets/', './assets/')
+    .replace('</head>', `  ${versionScript}\n  </head>`));
 }
 
-console.log(`Built ${SITE}/ for static deploy.`);
+console.log(`Built ${SITE}/ for static deploy (v${pkg.version}).`);

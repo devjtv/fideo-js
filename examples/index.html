@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="../dist/fideo.css" />
     <link rel="preconnect" href="https://rsms.me/" />
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.css" />
     <style>
       /* ---------- shadcn-style design tokens ---------- */
       :root {
@@ -707,7 +708,7 @@
         <a class="brand" href="#top">
           <span class="brand-mark">F</span>
           <span>fideo-js</span>
-          <span class="badge mono" style="margin-left:6px">v0.4.0</span>
+          <span class="badge mono" style="margin-left:6px" data-version>v0.4.0</span>
         </a>
         <ul>
           <li><a href="#providers">Providers</a></li>
@@ -722,7 +723,7 @@
     <!-- ============== HERO ============== -->
     <header class="hero" id="top">
       <div class="container hero-inner">
-        <span class="badge-pill"><span class="dot"></span>~12 kB · zero dependencies · v0.4.0</span>
+        <span class="badge-pill"><span class="dot"></span>~12 kB · zero dependencies · <span data-version>v0.4.0</span></span>
         <h1>One video API for <span class="accent">every provider</span>.</h1>
         <p class="lede">
           A tiny, framework-free video UI that wraps HTML5, YouTube, Vimeo, and Wistia behind a
@@ -1604,8 +1605,46 @@ initFideo();
     </footer>
 
     <script src="../dist/fideo.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', () => {
+        // ===== Lenis smooth scroll =====
+        if (window.Lenis && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          const lenis = new Lenis({ duration: 1.1, smoothWheel: true });
+          requestAnimationFrame(function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+          });
+          // Anchor links use lenis.scrollTo so the smooth scroll engine handles them.
+          document.querySelectorAll('a[href^="#"]').forEach((a) => {
+            a.addEventListener('click', (e) => {
+              const id = a.getAttribute('href');
+              if (!id || id === '#') return;
+              const target = document.querySelector(id);
+              if (!target) return;
+              e.preventDefault();
+              lenis.scrollTo(target, { offset: -64 });
+            });
+          });
+        }
+
+        // ===== Version injection =====
+        // Production: build-site.mjs sets window.__FIDEO_VERSION at build time.
+        // Dev (vite): fetch package.json directly.
+        (async () => {
+          let version = window.__FIDEO_VERSION;
+          if (!version) {
+            try {
+              const r = await fetch('../package.json');
+              if (r.ok) version = (await r.json()).version;
+            } catch {}
+          }
+          if (!version) return;
+          document.querySelectorAll('[data-version]').forEach((el) => {
+            el.textContent = 'v' + version;
+          });
+        })();
+
         // ===== Quick-start tabs =====
         const triggers = document.querySelectorAll('.tab-trigger');
         const contents = document.querySelectorAll('.tab-content');
