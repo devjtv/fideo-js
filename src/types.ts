@@ -62,8 +62,8 @@ export interface FideoOptions {
   volume?: number;
   playbackRates?: number[];
   backgroundAspectRatio?: number | string;
-  sources?: FideoSources;
-  posters?: FideoPosters;
+  sources?: string | FideoSources;
+  posters?: string | FideoPosters;
   breakpoints?: Partial<FideoBreakpoints>;
   icons?: FideoIcons;
   className?: string;

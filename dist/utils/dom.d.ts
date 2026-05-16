@@ -7,6 +7,7 @@ export declare function splitRates(value: string | null | undefined, fallback: n
 export declare function inferProvider(element: HTMLVideoElement | HTMLIFrameElement, sources?: FideoSources): FideoProviderName;
 export declare function parseViewportMode(value: string | null | undefined, fallback: FideoViewportMode): FideoViewportMode;
 export declare function parsePreload(value: string | null | undefined, fallback: FideoPreload): FideoPreload;
+export declare function normalizeMedia<T extends FideoSources | FideoPosters>(value: string | T | undefined): T;
 export declare function readSources(element: HTMLElement): FideoSources;
 export declare function readPosters(element: HTMLElement): FideoPosters;
 export declare function resolveOptions(element: HTMLVideoElement | HTMLIFrameElement, options?: FideoOptions): FideoResolvedOptions;

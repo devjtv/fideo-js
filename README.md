@@ -123,8 +123,8 @@ When poster images are configured, Fideo renders them as a visual cover while th
 Because the compiled files are committed in `dist/`, Fideo JS can be loaded directly from jsDelivr. Pin a release tag for production:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.4.0/dist/fideo.css" />
-<script src="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.4.0/dist/fideo.global.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.5.0/dist/fideo.css" />
+<script src="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.5.0/dist/fideo.global.js"></script>
 <script>
   Fideo.init();
 </script>
@@ -133,9 +133,9 @@ Because the compiled files are committed in `dist/`, Fideo JS can be loaded dire
 ES module usage is also available:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.4.0/dist/fideo.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.5.0/dist/fideo.css" />
 <script type="module">
-  import { initFideo } from 'https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.4.0/dist/fideo.js';
+  import { initFideo } from 'https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.5.0/dist/fideo.js';
 
   initFideo();
 </script>
@@ -164,6 +164,16 @@ const player = new Fideo('#player', {
 });
 
 player.play();
+```
+
+`sources` and `posters` accept either an object (for responsive variants) or a bare string when you only have one asset:
+
+```ts
+new Fideo('#player', {
+  sources: '/videos/showcase.mp4',   // shorthand for { desktop: '/videos/showcase.mp4' }
+  posters: '/posters/showcase.jpg',
+  muted: true,
+});
 ```
 
 You can also mount a single element or initialize a whole page:
@@ -695,8 +705,8 @@ When a disabled provider is requested, Fideo throws an error. Supported provider
 | `viewportThreshold` | `number` | `0.35` | Intersection ratio required for viewport playback. |
 | `volume` | `number` | `1` | Initial volume from `0` to `1`. |
 | `playbackRates` | `number[]` | `[0.5, 1, 1.25, 1.5, 2]` | Playback speed options. |
-| `sources` | `FideoSources` | `{}` | Responsive media sources. |
-| `posters` | `FideoPosters` | `{}` | Responsive poster images. Fideo keeps them visible while the player is paused or waiting, and fades them out once playback starts. |
+| `sources` | `string \| FideoSources` | `{}` | Media source. Pass a string for a single source (treated as `{ desktop: '...' }`), or an object with `desktop` / `tablet` / `mobile` keys for responsive switching. |
+| `posters` | `string \| FideoPosters` | `{}` | Poster image. Pass a string for a single poster, or an object for responsive variants. Posters stay visible while the player is paused/loading and fade out on play. |
 | `breakpoints` | `Partial<FideoBreakpoints>` | `{ mobile: 767, tablet: 1024 }` | Responsive cutoffs. |
 | `icons` | `FideoIcons` | `{}` | Custom SVG icons. |
 | `className` | `string` | `''` | Additional wrapper class. |

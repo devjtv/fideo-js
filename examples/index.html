@@ -910,6 +910,7 @@ initFideo();
           </p>
         </div>
         <div class="grid-2">
+          <!-- HTML5 -->
           <div class="card">
             <div class="card-header">
               <div>
@@ -918,16 +919,47 @@ initFideo();
               </div>
               <span class="badge accent">native</span>
             </div>
-            <div class="card-content">
-              <video
-                data-fideo
-                data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
-                data-fideo-poster="https://picsum.photos/id/1018/1280/720"
-                data-fideo-muted data-fideo-loop data-fideo-autoplay
-              ></video>
+            <div class="card-tabs" role="tablist">
+              <button class="card-tab" type="button" data-panel="preview" aria-selected="true">Preview</button>
+              <button class="card-tab" type="button" data-panel="html" aria-selected="false">HTML</button>
+              <button class="card-tab" type="button" data-panel="js" aria-selected="false">JS</button>
+            </div>
+            <div class="card-panel" data-panel="preview" data-state="active">
+              <div class="card-content">
+                <video
+                  data-fideo
+                  data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
+                  data-fideo-poster="https://picsum.photos/id/1018/1280/720"
+                  data-fideo-muted data-fideo-loop data-fideo-autoplay
+                ></video>
+              </div>
+            </div>
+            <div class="card-panel" data-panel="html">
+<pre><span class="tk-tag">&lt;video</span>
+  <span class="tk-attr">data-fideo</span>
+  <span class="tk-attr">data-fideo-src</span>=<span class="tk-str">"/sea_turtle.mp4"</span>
+  <span class="tk-attr">data-fideo-poster</span>=<span class="tk-str">"/poster.jpg"</span>
+  <span class="tk-attr">data-fideo-muted</span>
+  <span class="tk-attr">data-fideo-loop</span>
+  <span class="tk-attr">data-fideo-autoplay</span>
+<span class="tk-tag">&gt;&lt;/video&gt;</span></pre>
+            </div>
+            <div class="card-panel" data-panel="js">
+<pre><span class="tk-kw">import</span> { Fideo } <span class="tk-kw">from</span> <span class="tk-str">'fideo-js'</span>;
+
+<span class="tk-com">// Target must be a &lt;video&gt; element.</span>
+<span class="tk-com">// If it already has src="..." you can omit `sources`.</span>
+<span class="tk-kw">new</span> Fideo(<span class="tk-str">'#player'</span>, {
+  sources: <span class="tk-str">'/sea_turtle.mp4'</span>,  <span class="tk-com">// string shorthand for { desktop: '...' }</span>
+  posters: <span class="tk-str">'/poster.jpg'</span>,
+  muted: <span class="tk-num">true</span>,
+  loop: <span class="tk-num">true</span>,
+  autoplay: <span class="tk-num">true</span>,
+});</pre>
             </div>
           </div>
 
+          <!-- YouTube -->
           <div class="card">
             <div class="card-header">
               <div>
@@ -936,17 +968,46 @@ initFideo();
               </div>
               <span class="badge red">youtube</span>
             </div>
-            <div class="card-content">
-              <iframe
-                data-fideo
-                src="https://www.youtube.com/watch?v=pb-j3svRQLI"
-                data-fideo-poster="https://img.youtube.com/vi/pb-j3svRQLI/maxresdefault.jpg"
-                data-fideo-muted data-fideo-loop data-fideo-autoplay
-                allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-              ></iframe>
+            <div class="card-tabs" role="tablist">
+              <button class="card-tab" type="button" data-panel="preview" aria-selected="true">Preview</button>
+              <button class="card-tab" type="button" data-panel="html" aria-selected="false">HTML</button>
+              <button class="card-tab" type="button" data-panel="js" aria-selected="false">JS</button>
+            </div>
+            <div class="card-panel" data-panel="preview" data-state="active">
+              <div class="card-content">
+                <iframe
+                  data-fideo
+                  src="https://www.youtube.com/watch?v=pb-j3svRQLI"
+                  data-fideo-poster="https://img.youtube.com/vi/pb-j3svRQLI/maxresdefault.jpg"
+                  data-fideo-muted data-fideo-loop data-fideo-autoplay
+                  allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+                ></iframe>
+              </div>
+            </div>
+            <div class="card-panel" data-panel="html">
+<pre><span class="tk-tag">&lt;iframe</span>
+  <span class="tk-attr">data-fideo</span>
+  <span class="tk-attr">src</span>=<span class="tk-str">"https://youtu.be/pb-j3svRQLI"</span>
+  <span class="tk-attr">data-fideo-poster</span>=<span class="tk-str">"https://img.youtube.com/vi/pb-j3svRQLI/maxresdefault.jpg"</span>
+  <span class="tk-attr">data-fideo-muted</span>
+  <span class="tk-attr">data-fideo-loop</span>
+  <span class="tk-attr">data-fideo-autoplay</span>
+<span class="tk-tag">&gt;&lt;/iframe&gt;</span></pre>
+            </div>
+            <div class="card-panel" data-panel="js">
+<pre><span class="tk-kw">import</span> { Fideo } <span class="tk-kw">from</span> <span class="tk-str">'fideo-js'</span>;
+
+<span class="tk-com">// Target must be an &lt;iframe&gt;. Provider is inferred from the URL,</span>
+<span class="tk-com">// so you don't need `provider: 'youtube'`. If the iframe already has</span>
+<span class="tk-com">// src="..." you can omit `sources` entirely.</span>
+<span class="tk-kw">new</span> Fideo(<span class="tk-str">'#yt'</span>, {
+  posters: <span class="tk-str">'https://img.youtube.com/vi/pb-j3svRQLI/maxresdefault.jpg'</span>,
+  muted: <span class="tk-num">true</span>, loop: <span class="tk-num">true</span>, autoplay: <span class="tk-num">true</span>,
+});</pre>
             </div>
           </div>
 
+          <!-- Vimeo -->
           <div class="card">
             <div class="card-header">
               <div>
@@ -955,17 +1016,45 @@ initFideo();
               </div>
               <span class="badge blue">vimeo</span>
             </div>
-            <div class="card-content">
-              <iframe
-                data-fideo
-                src="https://vimeo.com/347119375"
-                data-fideo-poster="https://picsum.photos/id/1019/1280/720"
-                data-fideo-muted data-fideo-loop data-fideo-autoplay
-                allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-              ></iframe>
+            <div class="card-tabs" role="tablist">
+              <button class="card-tab" type="button" data-panel="preview" aria-selected="true">Preview</button>
+              <button class="card-tab" type="button" data-panel="html" aria-selected="false">HTML</button>
+              <button class="card-tab" type="button" data-panel="js" aria-selected="false">JS</button>
+            </div>
+            <div class="card-panel" data-panel="preview" data-state="active">
+              <div class="card-content">
+                <iframe
+                  data-fideo
+                  src="https://vimeo.com/347119375"
+                  data-fideo-poster="https://picsum.photos/id/1019/1280/720"
+                  data-fideo-muted data-fideo-loop data-fideo-autoplay
+                  allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+                ></iframe>
+              </div>
+            </div>
+            <div class="card-panel" data-panel="html">
+<pre><span class="tk-tag">&lt;iframe</span>
+  <span class="tk-attr">data-fideo</span>
+  <span class="tk-attr">src</span>=<span class="tk-str">"https://vimeo.com/347119375"</span>
+  <span class="tk-attr">data-fideo-poster</span>=<span class="tk-str">"/poster.jpg"</span>
+  <span class="tk-attr">data-fideo-muted</span>
+  <span class="tk-attr">data-fideo-loop</span>
+  <span class="tk-attr">data-fideo-autoplay</span>
+<span class="tk-tag">&gt;&lt;/iframe&gt;</span></pre>
+            </div>
+            <div class="card-panel" data-panel="js">
+<pre><span class="tk-kw">import</span> { Fideo } <span class="tk-kw">from</span> <span class="tk-str">'fideo-js'</span>;
+
+<span class="tk-com">// Target must be an &lt;iframe&gt;. Provider is auto-detected from the URL.</span>
+<span class="tk-com">// If the iframe already has src="..." you can omit `sources`.</span>
+<span class="tk-kw">new</span> Fideo(<span class="tk-str">'#vimeo'</span>, {
+  posters: <span class="tk-str">'/poster.jpg'</span>,
+  muted: <span class="tk-num">true</span>, loop: <span class="tk-num">true</span>, autoplay: <span class="tk-num">true</span>,
+});</pre>
             </div>
           </div>
 
+          <!-- Wistia -->
           <div class="card">
             <div class="card-header">
               <div>
@@ -974,13 +1063,38 @@ initFideo();
               </div>
               <span class="badge violet">wistia</span>
             </div>
-            <div class="card-content">
-              <iframe
-                data-fideo
-                src="https://fast.wistia.com/embed/medias/358edhd4og"
-                data-fideo-muted data-fideo-loop data-fideo-autoplay
-                allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-              ></iframe>
+            <div class="card-tabs" role="tablist">
+              <button class="card-tab" type="button" data-panel="preview" aria-selected="true">Preview</button>
+              <button class="card-tab" type="button" data-panel="html" aria-selected="false">HTML</button>
+              <button class="card-tab" type="button" data-panel="js" aria-selected="false">JS</button>
+            </div>
+            <div class="card-panel" data-panel="preview" data-state="active">
+              <div class="card-content">
+                <iframe
+                  data-fideo
+                  src="https://fast.wistia.com/embed/medias/358edhd4og"
+                  data-fideo-muted data-fideo-loop data-fideo-autoplay
+                  allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+                ></iframe>
+              </div>
+            </div>
+            <div class="card-panel" data-panel="html">
+<pre><span class="tk-tag">&lt;iframe</span>
+  <span class="tk-attr">data-fideo</span>
+  <span class="tk-attr">src</span>=<span class="tk-str">"https://fast.wistia.com/embed/medias/358edhd4og"</span>
+  <span class="tk-attr">data-fideo-muted</span>
+  <span class="tk-attr">data-fideo-loop</span>
+  <span class="tk-attr">data-fideo-autoplay</span>
+<span class="tk-tag">&gt;&lt;/iframe&gt;</span></pre>
+            </div>
+            <div class="card-panel" data-panel="js">
+<pre><span class="tk-kw">import</span> { Fideo } <span class="tk-kw">from</span> <span class="tk-str">'fideo-js'</span>;
+
+<span class="tk-com">// Target must be an &lt;iframe&gt;. Provider is auto-detected from the URL.</span>
+<span class="tk-com">// If the iframe already has src="..." you can omit `sources`.</span>
+<span class="tk-kw">new</span> Fideo(<span class="tk-str">'#wistia'</span>, {
+  muted: <span class="tk-num">true</span>, loop: <span class="tk-num">true</span>, autoplay: <span class="tk-num">true</span>,
+});</pre>
             </div>
           </div>
         </div>
@@ -1078,17 +1192,59 @@ initFideo();
             </div>
             <span class="bp-indicator"><span class="bp-dot"></span><strong id="bp-label">desktop</strong></span>
           </div>
-          <div class="card-content">
-            <video
-              data-fideo
-              data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
-              data-fideo-src-tablet="https://videos.pexels.com/video-files/3209828/3209828-hd_1920_1080_25fps.mp4"
-              data-fideo-src-mobile="https://res.cloudinary.com/demo/video/upload/elephants.mp4"
-              data-fideo-poster="https://picsum.photos/id/1018/1600/900"
-              data-fideo-poster-tablet="https://picsum.photos/id/1015/1200/900"
-              data-fideo-poster-mobile="https://picsum.photos/id/1019/720/1280"
-              data-fideo-muted data-fideo-loop
-            ></video>
+          <div class="card-tabs" role="tablist">
+            <button class="card-tab" type="button" data-panel="preview" aria-selected="true">Preview</button>
+            <button class="card-tab" type="button" data-panel="html" aria-selected="false">HTML</button>
+            <button class="card-tab" type="button" data-panel="js" aria-selected="false">JS</button>
+          </div>
+          <div class="card-panel" data-panel="preview" data-state="active">
+            <div class="card-content">
+              <video
+                data-fideo
+                data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
+                data-fideo-src-tablet="https://videos.pexels.com/video-files/3209828/3209828-hd_1920_1080_25fps.mp4"
+                data-fideo-src-mobile="https://res.cloudinary.com/demo/video/upload/elephants.mp4"
+                data-fideo-poster="https://picsum.photos/id/1018/1600/900"
+                data-fideo-poster-tablet="https://picsum.photos/id/1015/1200/900"
+                data-fideo-poster-mobile="https://picsum.photos/id/1019/720/1280"
+                data-fideo-muted data-fideo-loop
+              ></video>
+            </div>
+          </div>
+          <div class="card-panel" data-panel="html">
+<pre><span class="tk-tag">&lt;video</span>
+  <span class="tk-attr">data-fideo</span>
+  <span class="tk-attr">data-fideo-src</span>=<span class="tk-str">"/desktop.mp4"</span>
+  <span class="tk-attr">data-fideo-src-tablet</span>=<span class="tk-str">"/tablet.mp4"</span>
+  <span class="tk-attr">data-fideo-src-mobile</span>=<span class="tk-str">"/mobile.mp4"</span>
+  <span class="tk-attr">data-fideo-poster</span>=<span class="tk-str">"/poster-desktop.jpg"</span>
+  <span class="tk-attr">data-fideo-poster-tablet</span>=<span class="tk-str">"/poster-tablet.jpg"</span>
+  <span class="tk-attr">data-fideo-poster-mobile</span>=<span class="tk-str">"/poster-mobile.jpg"</span>
+  <span class="tk-attr">data-fideo-muted</span>
+  <span class="tk-attr">data-fideo-loop</span>
+<span class="tk-tag">&gt;&lt;/video&gt;</span></pre>
+          </div>
+          <div class="card-panel" data-panel="js">
+<pre><span class="tk-kw">import</span> { Fideo } <span class="tk-kw">from</span> <span class="tk-str">'fideo-js'</span>;
+
+<span class="tk-com">// Target a &lt;video&gt; (or &lt;iframe&gt; for embed providers).</span>
+<span class="tk-com">// Responsive swap requires the `sources` object — a native</span>
+<span class="tk-com">// src="..." only acts as the single fallback.</span>
+<span class="tk-kw">new</span> Fideo(<span class="tk-str">'#player'</span>, {
+  sources: {
+    desktop: <span class="tk-str">'/desktop.mp4'</span>,
+    tablet:  <span class="tk-str">'/tablet.mp4'</span>,
+    mobile:  <span class="tk-str">'/mobile.mp4'</span>,
+  },
+  posters: {
+    desktop: <span class="tk-str">'/poster-desktop.jpg'</span>,
+    tablet:  <span class="tk-str">'/poster-tablet.jpg'</span>,
+    mobile:  <span class="tk-str">'/poster-mobile.jpg'</span>,
+  },
+  <span class="tk-com">// breakpoints: { mobile: 767, tablet: 1024 } // override defaults if needed</span>
+  muted: <span class="tk-num">true</span>,
+  loop: <span class="tk-num">true</span>,
+});</pre>
           </div>
         </div>
       </div>
@@ -1106,6 +1262,7 @@ initFideo();
           </p>
         </div>
         <div class="grid-2">
+          <!-- Play-pause on scroll -->
           <div class="card">
             <div class="card-header">
               <div>
@@ -1114,14 +1271,48 @@ initFideo();
               </div>
               <span class="badge accent mono">"play-pause"</span>
             </div>
-            <div class="card-content">
-              <video data-fideo
-                data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
-                data-fideo-poster="https://picsum.photos/id/1018/1280/720"
-                data-fideo-viewport="play-pause" data-fideo-viewport-threshold="0.5"
-                data-fideo-muted data-fideo-loop></video>
+            <div class="card-tabs" role="tablist">
+              <button class="card-tab" type="button" data-panel="preview" aria-selected="true">Preview</button>
+              <button class="card-tab" type="button" data-panel="html" aria-selected="false">HTML</button>
+              <button class="card-tab" type="button" data-panel="js" aria-selected="false">JS</button>
+            </div>
+            <div class="card-panel" data-panel="preview" data-state="active">
+              <div class="card-content">
+                <video data-fideo
+                  data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
+                  data-fideo-poster="https://picsum.photos/id/1018/1280/720"
+                  data-fideo-viewport="play-pause" data-fideo-viewport-threshold="0.5"
+                  data-fideo-muted data-fideo-loop></video>
+              </div>
+            </div>
+            <div class="card-panel" data-panel="html">
+<pre><span class="tk-tag">&lt;video</span>
+  <span class="tk-attr">data-fideo</span>
+  <span class="tk-attr">data-fideo-src</span>=<span class="tk-str">"/clip.mp4"</span>
+  <span class="tk-attr">data-fideo-poster</span>=<span class="tk-str">"/poster.jpg"</span>
+  <span class="tk-attr">data-fideo-viewport</span>=<span class="tk-str">"play-pause"</span>
+  <span class="tk-attr">data-fideo-viewport-threshold</span>=<span class="tk-str">"0.5"</span>
+  <span class="tk-attr">data-fideo-muted</span>
+  <span class="tk-attr">data-fideo-loop</span>
+<span class="tk-tag">&gt;&lt;/video&gt;</span></pre>
+            </div>
+            <div class="card-panel" data-panel="js">
+<pre><span class="tk-kw">import</span> { Fideo } <span class="tk-kw">from</span> <span class="tk-str">'fideo-js'</span>;
+
+<span class="tk-com">// Target must be a &lt;video&gt; (or &lt;iframe&gt;).</span>
+<span class="tk-com">// If it already has src="..." you can omit `sources`.</span>
+<span class="tk-kw">new</span> Fideo(<span class="tk-str">'#player'</span>, {
+  sources: <span class="tk-str">'/clip.mp4'</span>,
+  posters: <span class="tk-str">'/poster.jpg'</span>,
+  viewport: <span class="tk-str">'play-pause'</span>,
+  viewportThreshold: <span class="tk-num">0.5</span>,
+  muted: <span class="tk-num">true</span>,
+  loop: <span class="tk-num">true</span>,
+});</pre>
             </div>
           </div>
+
+          <!-- Pause-only on exit -->
           <div class="card">
             <div class="card-header">
               <div>
@@ -1130,11 +1321,39 @@ initFideo();
               </div>
               <span class="badge mono">"pause"</span>
             </div>
-            <div class="card-content">
-              <video data-fideo
-                data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
-                data-fideo-poster="https://picsum.photos/id/1018/1280/720"
-                data-fideo-viewport="pause" data-fideo-muted></video>
+            <div class="card-tabs" role="tablist">
+              <button class="card-tab" type="button" data-panel="preview" aria-selected="true">Preview</button>
+              <button class="card-tab" type="button" data-panel="html" aria-selected="false">HTML</button>
+              <button class="card-tab" type="button" data-panel="js" aria-selected="false">JS</button>
+            </div>
+            <div class="card-panel" data-panel="preview" data-state="active">
+              <div class="card-content">
+                <video data-fideo
+                  data-fideo-src="https://res.cloudinary.com/demo/video/upload/q_auto/sea_turtle.mp4"
+                  data-fideo-poster="https://picsum.photos/id/1018/1280/720"
+                  data-fideo-viewport="pause" data-fideo-muted></video>
+              </div>
+            </div>
+            <div class="card-panel" data-panel="html">
+<pre><span class="tk-tag">&lt;video</span>
+  <span class="tk-attr">data-fideo</span>
+  <span class="tk-attr">data-fideo-src</span>=<span class="tk-str">"/clip.mp4"</span>
+  <span class="tk-attr">data-fideo-poster</span>=<span class="tk-str">"/poster.jpg"</span>
+  <span class="tk-attr">data-fideo-viewport</span>=<span class="tk-str">"pause"</span>
+  <span class="tk-attr">data-fideo-muted</span>
+<span class="tk-tag">&gt;&lt;/video&gt;</span></pre>
+            </div>
+            <div class="card-panel" data-panel="js">
+<pre><span class="tk-kw">import</span> { Fideo } <span class="tk-kw">from</span> <span class="tk-str">'fideo-js'</span>;
+
+<span class="tk-com">// Target must be a &lt;video&gt; (or &lt;iframe&gt;).</span>
+<span class="tk-com">// If it already has src="..." you can omit `sources`.</span>
+<span class="tk-kw">new</span> Fideo(<span class="tk-str">'#player'</span>, {
+  sources: <span class="tk-str">'/clip.mp4'</span>,
+  posters: <span class="tk-str">'/poster.jpg'</span>,
+  viewport: <span class="tk-str">'pause'</span>,
+  muted: <span class="tk-num">true</span>,
+});</pre>
             </div>
           </div>
         </div>

@@ -103,6 +103,11 @@ export function parsePreload(value: string | null | undefined, fallback: FideoPr
   return fallback;
 }
 
+export function normalizeMedia<T extends FideoSources | FideoPosters>(value: string | T | undefined): T {
+  if (typeof value === 'string') return { desktop: value } as T;
+  return (value ?? {}) as T;
+}
+
 export function readSources(element: HTMLElement): FideoSources {
   const data = element.dataset;
   return {
@@ -132,7 +137,7 @@ export function resolveOptions(
   };
   const providerAttr = data.fideoProvider as FideoProviderName | 'auto' | undefined;
   const requestedProvider = options.provider ?? providerAttr ?? 'auto';
-  const sources = { ...readSources(element), ...options.sources };
+  const sources = { ...readSources(element), ...normalizeMedia(options.sources) };
   const provider = requestedProvider === 'auto' ? inferProvider(element, sources) : requestedProvider;
   const viewportFallback = options.viewport ?? false;
   const background = boolFromAttr(data.fideoBackground, options.background ?? false);
@@ -157,7 +162,7 @@ export function resolveOptions(
     playbackRates: splitRates(data.fideoPlaybackRates, options.playbackRates ?? [0.5, 1, 1.25, 1.5, 2]),
     backgroundAspectRatio: ratioFromValue(data.fideoBackgroundAspectRatio ?? options.backgroundAspectRatio, 16 / 9),
     sources,
-    posters: { ...readPosters(element), ...options.posters },
+    posters: { ...readPosters(element), ...normalizeMedia(options.posters) },
     breakpoints,
     icons: options.icons ?? {},
     className: data.fideoClass || options.className || '',
