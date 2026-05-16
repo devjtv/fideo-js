@@ -21,7 +21,7 @@ class E extends EventTarget {
     this.state = { ...this.state, ...e }, this.dispatchEvent(new CustomEvent(i, { detail: this.getState() }));
   }
 }
-class $ extends E {
+class j extends E {
   constructor(e) {
     super();
     o(this, "provider", "html5");
@@ -39,7 +39,7 @@ class $ extends E {
     this.element.currentTime = e;
   }
   async setVolume(e) {
-    this.element.volume = j(e);
+    this.element.volume = $(e);
   }
   async setMuted(e) {
     this.element.muted = e;
@@ -83,7 +83,7 @@ class $ extends E {
     };
   }
 }
-function j(s) {
+function $(s) {
   return Math.min(1, Math.max(0, s));
 }
 const S = {
@@ -492,6 +492,10 @@ class se extends E {
       playsinline: 1,
       controls: 0,
       rel: 0,
+      iv_load_policy: 3,
+      cc_load_policy: 0,
+      disablekb: 1,
+      fs: 0,
       origin: window.location.origin
     };
     if (this.options.autoplay && (a.autoplay = 1), this.options.muted && (a.mute = 1), this.options.loop) {
@@ -558,7 +562,10 @@ class se extends E {
   async setSource(e) {
     var n;
     if (await this.ready, this.destroyed) return;
-    const i = M(e), r = V(i), a = this.options.loop && r ? _(i, { loop: 1, playlist: r }) : i;
+    const i = M(e), r = V(i), a = _(i, {
+      ...this.providerParams(),
+      ...this.options.loop && r ? { loop: 1, playlist: r } : {}
+    });
     (n = this.player) == null || n.loadVideoByUrl(a);
   }
   destroy() {
@@ -590,6 +597,21 @@ class se extends E {
   stopTimer() {
     this.state.paused = !0, this.timer && window.clearInterval(this.timer), this.timer = void 0;
   }
+  providerParams() {
+    return {
+      enablejsapi: 1,
+      playsinline: 1,
+      controls: 0,
+      rel: 0,
+      iv_load_policy: 3,
+      cc_load_policy: 0,
+      disablekb: 1,
+      fs: 0,
+      origin: window.location.origin,
+      ...this.options.autoplay ? { autoplay: 1 } : {},
+      ...this.options.muted ? { mute: 1 } : {}
+    };
+  }
 }
 function re() {
   var s;
@@ -616,7 +638,7 @@ function oe(s, t, e) {
   if (s === "html5") {
     if (!(t instanceof HTMLVideoElement))
       throw new Error("Fideo html5 provider needs a <video> element.");
-    return new $(t);
+    return new j(t);
   }
   if (!(t instanceof HTMLIFrameElement))
     throw new Error(`Fideo ${s} provider needs an <iframe> element.`);
@@ -845,7 +867,7 @@ class ce {
     const t = ["play", "pause", "ended", "timeupdate", "volumechange", "change"];
     for (const e of t)
       this.adapter.addEventListener(e, () => {
-        this.syncPosterVisibility(), this.syncPlaybackClasses(), this.element.dispatchEvent(
+        this.syncPosterVisibility(), this.syncPlaybackClasses(), e === "play" && this.clearActivity(), (e === "pause" || e === "ended") && this.wrapper.classList.remove("is-user-active"), this.element.dispatchEvent(
           new CustomEvent(`fideo:${e}`, {
             bubbles: !0,
             detail: {
@@ -874,7 +896,7 @@ class ce {
   }
   syncPlaybackClasses() {
     const t = this.adapter.getState().paused;
-    this.wrapper.classList.toggle("is-playing", !t), this.wrapper.classList.toggle("is-paused", t), t && this.activateControls(0);
+    this.wrapper.classList.toggle("is-playing", !t), this.wrapper.classList.toggle("is-paused", t);
   }
   activateControls(t = 1800) {
     this.wrapper.classList.add("is-user-active"), this.activityTimer && window.clearTimeout(this.activityTimer), !(!t || this.adapter.getState().paused) && (this.activityTimer = window.setTimeout(() => {

@@ -68,6 +68,10 @@ export class YouTubeProvider extends BaseProvider {
       playsinline: 1,
       controls: 0,
       rel: 0,
+      iv_load_policy: 3,
+      cc_load_policy: 0,
+      disablekb: 1,
+      fs: 0,
       origin: window.location.origin,
     };
     if (this.options.autoplay) params.autoplay = 1;
@@ -162,7 +166,10 @@ export class YouTubeProvider extends BaseProvider {
     if (this.destroyed) return;
     const normalizedUrl = normalizeYouTubeEmbedUrl(source);
     const videoId = getYouTubeEmbedId(normalizedUrl);
-    const url = this.options.loop && videoId ? addUrlParams(normalizedUrl, { loop: 1, playlist: videoId }) : normalizedUrl;
+    const url = addUrlParams(normalizedUrl, {
+      ...this.providerParams(),
+      ...(this.options.loop && videoId ? { loop: 1, playlist: videoId } : {}),
+    });
     this.player?.loadVideoByUrl(url);
   }
 
@@ -217,6 +224,22 @@ export class YouTubeProvider extends BaseProvider {
     this.state.paused = true;
     if (this.timer) window.clearInterval(this.timer);
     this.timer = undefined;
+  }
+
+  private providerParams(): Record<string, string | number | boolean> {
+    return {
+      enablejsapi: 1,
+      playsinline: 1,
+      controls: 0,
+      rel: 0,
+      iv_load_policy: 3,
+      cc_load_policy: 0,
+      disablekb: 1,
+      fs: 0,
+      origin: window.location.origin,
+      ...(this.options.autoplay ? { autoplay: 1 } : {}),
+      ...(this.options.muted ? { mute: 1 } : {}),
+    };
   }
 }
 

@@ -62,5 +62,6 @@ export declare class YouTubeProvider extends BaseProvider {
     private sync;
     private startTimer;
     private stopTimer;
+    private providerParams;
 }
 export {};

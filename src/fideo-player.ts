@@ -128,6 +128,8 @@ export class FideoPlayer implements FideoPlayerInstance {
       this.adapter.addEventListener(eventName, () => {
         this.syncPosterVisibility();
         this.syncPlaybackClasses();
+        if (eventName === 'play') this.clearActivity();
+        if (eventName === 'pause' || eventName === 'ended') this.wrapper.classList.remove('is-user-active');
         this.element.dispatchEvent(
           new CustomEvent(`fideo:${eventName}`, {
             bubbles: true,
@@ -172,7 +174,6 @@ export class FideoPlayer implements FideoPlayerInstance {
     const paused = this.adapter.getState().paused;
     this.wrapper.classList.toggle('is-playing', !paused);
     this.wrapper.classList.toggle('is-paused', paused);
-    if (paused) this.activateControls(0);
   }
 
   private activateControls(duration = 1800): void {

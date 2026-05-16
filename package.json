@@ -1,6 +1,6 @@
 {
   "name": "fideo-js",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "A lightweight, data-attribute driven video UI for HTML video, YouTube, Vimeo, and Wistia.",
   "type": "module",
   "license": "MIT",

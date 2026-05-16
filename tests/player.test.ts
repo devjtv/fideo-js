@@ -179,6 +179,10 @@ describe('Fideo player', () => {
     expect(src.searchParams.get('loop')).toBe('1');
     expect(src.searchParams.get('playlist')).toBe('M7lc1UVf-VE');
     expect(src.searchParams.get('controls')).toBe('0');
+    expect(src.searchParams.get('iv_load_policy')).toBe('3');
+    expect(src.searchParams.get('cc_load_policy')).toBe('0');
+    expect(src.searchParams.get('disablekb')).toBe('1');
+    expect(src.searchParams.get('fs')).toBe('0');
     expect(iframe.allow).toContain('autoplay');
     expect(iframe.allow).toContain('encrypted-media');
   });
@@ -234,6 +238,31 @@ describe('Fideo player', () => {
     (player as any).adapter.state.paused = true;
     (player as any).adapter.dispatchEvent(new Event('pause'));
     expect(player.wrapper.classList.contains('is-poster-visible')).toBe(true);
+  });
+
+  it('clears stale active controls when iframe providers start playing', () => {
+    document.body.innerHTML = `
+      <iframe
+        data-fideo
+        src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
+      ></iframe>
+    `;
+    const iframe = document.querySelector('iframe')!;
+    const player = mountFideo(iframe);
+
+    (player as any).adapter.state.paused = true;
+    player.wrapper.classList.add('is-user-active');
+    (player as any).adapter.dispatchEvent(new Event('change'));
+
+    expect(player.wrapper.classList.contains('is-paused')).toBe(true);
+    expect(player.wrapper.classList.contains('is-user-active')).toBe(true);
+
+    (player as any).adapter.state.paused = false;
+    (player as any).adapter.dispatchEvent(new Event('play'));
+
+    expect(player.wrapper.classList.contains('is-playing')).toBe(true);
+    expect(player.wrapper.classList.contains('is-paused')).toBe(false);
+    expect(player.wrapper.classList.contains('is-user-active')).toBe(false);
   });
 
   it('shows poster overlays for native video while paused and hides them during playback', () => {
