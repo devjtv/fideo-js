@@ -105,6 +105,23 @@ describe('data attribute options', () => {
     expect(options.playsInline).toBe(true);
     expect(options.controls).toBe(false);
     expect(options.backgroundAspectRatio).toBeCloseTo(16 / 9);
+    expect(options.preload).toBe('metadata');
+  });
+
+  it('defaults iframe providers to lazy loading and lets data attributes override it', () => {
+    document.body.innerHTML = `
+      <iframe data-fideo src="https://www.youtube.com/watch?v=M7lc1UVf-VE"></iframe>
+      <iframe data-fideo data-fideo-lazy="false" data-fideo-lazy-root-margin="1200px 0px" src="https://vimeo.com/123456789"></iframe>
+      <video data-fideo data-fideo-preload="none"></video>
+    `;
+    const [youtube, vimeo] = Array.from(document.querySelectorAll('iframe'));
+    const video = document.querySelector('video')!;
+
+    expect(resolveOptions(youtube).lazy).toBe(true);
+    expect(resolveOptions(vimeo).lazy).toBe(false);
+    expect(resolveOptions(vimeo).lazyRootMargin).toBe('1200px 0px');
+    expect(resolveOptions(video).lazy).toBe(false);
+    expect(resolveOptions(video).preload).toBe('none');
   });
 
   it('accepts slash, colon, and numeric background aspect ratios', () => {

@@ -16,4 +16,4 @@ export declare class Fideo implements FideoPlayerInstance {
 export declare function createFideo(target: FideoTarget, options?: FideoOptions): FideoPlayerInstance;
 export declare function initFideo(options?: FideoOptions): FideoInitResult;
 export declare function mountFideo(element: HTMLVideoElement | HTMLIFrameElement, options?: FideoOptions): FideoPlayerInstance;
-export type { FideoAdapter, FideoBreakpoints, FideoControlVisibility, FideoIcons, FideoInitResult, FideoOptions, FideoPlayerInstance, FideoPosters, FideoProviderName, FideoResolvedOptions, FideoSources, FideoState, FideoTarget, FideoViewportMode, } from './types';
+export type { FideoAdapter, FideoBreakpoints, FideoControlVisibility, FideoIcons, FideoInitResult, FideoOptions, FideoPlayerInstance, FideoPosters, FideoPreload, FideoProviderName, FideoResolvedOptions, FideoSources, FideoState, FideoTarget, FideoViewportMode, } from './types';

@@ -1,5 +1,6 @@
 export type FideoProviderName = 'html5' | 'youtube' | 'vimeo' | 'wistia';
 export type FideoViewportMode = false | 'play' | 'pause' | 'play-pause';
+export type FideoPreload = 'none' | 'metadata' | 'auto';
 export type FideoTarget = string | HTMLVideoElement | HTMLIFrameElement;
 export interface FideoBreakpoints {
     mobile: number;
@@ -43,6 +44,9 @@ export interface FideoOptions {
     playsInline?: boolean;
     controls?: boolean;
     background?: boolean;
+    lazy?: boolean;
+    lazyRootMargin?: string;
+    preload?: FideoPreload;
     controlVisibility?: Partial<FideoControlVisibility>;
     viewport?: FideoViewportMode;
     viewportThreshold?: number;
@@ -66,6 +70,9 @@ export interface FideoResolvedOptions extends Omit<FideoOptions, 'provider' | 'b
     playsInline: boolean;
     controls: boolean;
     background: boolean;
+    lazy: boolean;
+    lazyRootMargin: string;
+    preload: FideoPreload;
     controlVisibility: FideoControlVisibility;
     viewport: FideoViewportMode;
     viewportThreshold: number;

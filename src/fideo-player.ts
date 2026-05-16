@@ -49,7 +49,7 @@ export class FideoPlayer implements FideoPlayerInstance {
     this.adapter.setVolume(options.volume).catch(() => undefined);
     this.adapter.setMuted(options.muted).catch(() => undefined);
 
-    if (options.autoplay) {
+    if (options.autoplay && !options.background) {
       this.play().catch(() => undefined);
     }
   }
@@ -115,6 +115,7 @@ export class FideoPlayer implements FideoPlayerInstance {
       this.element.loop = this.options.loop;
       this.element.muted = this.options.muted;
       this.element.playsInline = this.options.playsInline;
+      this.element.preload = this.options.preload;
       this.element.setAttribute('playsinline', '');
     } else {
       this.element.allow = mergeAllow(this.element.allow, ['autoplay', 'fullscreen', 'picture-in-picture', 'encrypted-media']);
@@ -223,15 +224,20 @@ export class FideoPlayer implements FideoPlayerInstance {
   }
 
   private bindViewportPlayback(): void {
-    if (!this.options.viewport || !('IntersectionObserver' in window)) return;
+    const viewportMode = this.options.viewport || (this.options.background && this.options.autoplay ? 'play-pause' : false);
+    if (!viewportMode) return;
+    if (!('IntersectionObserver' in window)) {
+      if (viewportMode === 'play' || viewportMode === 'play-pause') this.play().catch(() => undefined);
+      return;
+    }
 
     this.observer = new IntersectionObserver(
       ([entry]) => {
         const visible = entry.isIntersecting && entry.intersectionRatio >= this.options.viewportThreshold;
-        if (visible && (this.options.viewport === 'play' || this.options.viewport === 'play-pause')) {
+        if (visible && (viewportMode === 'play' || viewportMode === 'play-pause')) {
           this.play().catch(() => undefined);
         }
-        if (!visible && (this.options.viewport === 'pause' || this.options.viewport === 'play-pause')) {
+        if (!visible && (viewportMode === 'pause' || viewportMode === 'play-pause')) {
           this.pause().catch(() => undefined);
         }
       },

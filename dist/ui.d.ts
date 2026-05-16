@@ -15,6 +15,9 @@ export declare class FideoControls {
     private volumePanel;
     private settingsGroup;
     private seeking;
+    private smoothFrame?;
+    private smoothStartState?;
+    private smoothStartMs;
     private lastAudibleVolume;
     private volumeQueue;
     private volumeMutationDepth;
@@ -44,6 +47,10 @@ export declare class FideoControls {
     private syncVolumeState;
     private enqueueVolumeMutation;
     private syncPlaybackState;
+    private setTrackProgress;
+    private startSmoothProgress;
+    private stopSmoothProgress;
+    private tickSmoothProgress;
     private renderFullscreenState;
 }
 export declare function formatTime(seconds: number): string;

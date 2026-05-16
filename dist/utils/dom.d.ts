@@ -1,4 +1,4 @@
-import type { FideoBreakpoints, FideoControlVisibility, FideoOptions, FideoPosters, FideoProviderName, FideoResolvedOptions, FideoSources, FideoViewportMode } from '../types';
+import type { FideoBreakpoints, FideoControlVisibility, FideoOptions, FideoPosters, FideoPreload, FideoProviderName, FideoResolvedOptions, FideoSources, FideoViewportMode } from '../types';
 export declare const DEFAULT_SELECTOR = "[data-fideo]";
 export declare function boolFromAttr(value: string | null | undefined, fallback: boolean): boolean;
 export declare function numberFromAttr(value: string | null | undefined, fallback: number): number;
@@ -6,6 +6,7 @@ export declare function ratioFromValue(value: string | number | null | undefined
 export declare function splitRates(value: string | null | undefined, fallback: number[]): number[];
 export declare function inferProvider(element: HTMLVideoElement | HTMLIFrameElement, sources?: FideoSources): FideoProviderName;
 export declare function parseViewportMode(value: string | null | undefined, fallback: FideoViewportMode): FideoViewportMode;
+export declare function parsePreload(value: string | null | undefined, fallback: FideoPreload): FideoPreload;
 export declare function readSources(element: HTMLElement): FideoSources;
 export declare function readPosters(element: HTMLElement): FideoPosters;
 export declare function resolveOptions(element: HTMLVideoElement | HTMLIFrameElement, options?: FideoOptions): FideoResolvedOptions;

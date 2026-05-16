@@ -17,22 +17,48 @@ export class FideoControls {
   private volumePanel: HTMLElement;
   private settingsGroup: HTMLElement;
   private seeking = false;
+  private smoothFrame?: number;
+  private smoothStartState?: FideoState;
+  private smoothStartMs = 0;
   private lastAudibleVolume = 1;
   private volumeQueue = Promise.resolve();
   private volumeMutationDepth = 0;
   private icons: Required<NonNullable<FideoResolvedOptions['icons']>>;
   private handleFullscreenChange = () => this.renderFullscreenState();
 
-  private onAdapterPlay = () => this.syncPlayState(this.adapter.getState());
-  private onAdapterPause = () => this.syncPlayState(this.adapter.getState());
-  private onAdapterEnded = () => this.syncPlayState(this.adapter.getState());
+  private onAdapterPlay = () => {
+    const state = this.adapter.getState();
+    this.syncPlayState(state);
+    this.startSmoothProgress(state);
+  };
+  private onAdapterPause = () => {
+    const state = this.adapter.getState();
+    this.syncPlayState(state);
+    this.stopSmoothProgress();
+    this.syncPlaybackState(state, true);
+  };
+  private onAdapterEnded = () => {
+    const state = this.adapter.getState();
+    this.syncPlayState(state);
+    this.stopSmoothProgress();
+    this.syncPlaybackState(state, true);
+  };
   private onAdapterVolumeChange = () => {
     if (this.volumeMutationDepth > 0) return;
     this.syncVolumeState(this.adapter.getState());
   };
   private onAdapterDurationChange = () => this.syncPlaybackState(this.adapter.getState(), true);
-  private onAdapterTimeUpdate = () => this.syncPlaybackState(this.adapter.getState());
-  private onAdapterChange = () => this.syncPlaybackState(this.adapter.getState());
+  private onAdapterTimeUpdate = () => {
+    const state = this.adapter.getState();
+    this.syncPlaybackState(state);
+    if (!state.paused) this.startSmoothProgress(state);
+  };
+  private onAdapterChange = () => {
+    const state = this.adapter.getState();
+    this.syncPlaybackState(state);
+    if (state.paused) this.stopSmoothProgress();
+    else this.startSmoothProgress(state);
+  };
   private onDocumentClick = (e: MouseEvent) => this.closeMenus(e);
 
   constructor(private adapter: FideoAdapter, private wrapper: HTMLElement, options: FideoResolvedOptions) {
@@ -146,6 +172,7 @@ export class FideoControls {
     this.adapter.removeEventListener('durationchange', this.onAdapterDurationChange);
     this.adapter.removeEventListener('timeupdate', this.onAdapterTimeUpdate);
     this.adapter.removeEventListener('change', this.onAdapterChange);
+    this.stopSmoothProgress();
     this.element.remove();
   }
 
@@ -234,6 +261,7 @@ export class FideoControls {
   private previewSeek(): void {
     this.wrapper.classList.add('is-user-active');
     const state = this.adapter.getState();
+    this.setTrackProgress(Number(this.track.value));
     if (!state.duration) return;
     this.currentTime.textContent = formatTime((Number(this.track.value) / 1000) * state.duration);
   }
@@ -244,6 +272,7 @@ export class FideoControls {
     this.seeking = false;
     if (!state.duration) return;
     this.adapter.seek((Number(this.track.value) / 1000) * state.duration).catch(() => undefined);
+    this.startSmoothProgress(this.adapter.getState());
   }
 
   private toggleFullscreen(): void {
@@ -314,8 +343,47 @@ export class FideoControls {
     if (!force && this.seeking) return;
     this.currentTime.textContent = formatTime(state.currentTime);
     this.duration.textContent = formatTime(state.duration);
-    this.track.value = state.duration ? String((state.currentTime / state.duration) * 1000) : '0';
-    this.track.style.setProperty('--fideo-progress', `${Number(this.track.value) / 10}%`);
+    this.setTrackProgress(state.duration ? (state.currentTime / state.duration) * 1000 : 0);
+  }
+
+  private setTrackProgress(value: number): void {
+    const clamped = Number.isFinite(value) ? Math.min(1000, Math.max(0, value)) : 0;
+    this.track.value = String(clamped);
+    this.track.style.setProperty('--fideo-progress', `${clamped / 10}%`);
+  }
+
+  private startSmoothProgress(state = this.adapter.getState()): void {
+    if (state.paused || !state.duration || this.seeking) return;
+    this.stopSmoothProgress();
+    this.smoothStartState = state;
+    this.smoothStartMs = performance.now();
+    this.smoothFrame = requestAnimationFrame(() => this.tickSmoothProgress());
+  }
+
+  private stopSmoothProgress(): void {
+    if (this.smoothFrame !== undefined) cancelAnimationFrame(this.smoothFrame);
+    this.smoothFrame = undefined;
+    this.smoothStartState = undefined;
+  }
+
+  private tickSmoothProgress(): void {
+    const startState = this.smoothStartState;
+    if (!startState || this.seeking) {
+      this.stopSmoothProgress();
+      return;
+    }
+
+    const currentState = this.adapter.getState();
+    if (currentState.paused || !currentState.duration) {
+      this.stopSmoothProgress();
+      this.syncPlaybackState(currentState, true);
+      return;
+    }
+
+    const elapsedSeconds = ((performance.now() - this.smoothStartMs) / 1000) * (currentState.playbackRate || 1);
+    const currentTime = Math.min(currentState.duration, startState.currentTime + elapsedSeconds);
+    this.syncPlaybackState({ ...currentState, currentTime }, true);
+    this.smoothFrame = requestAnimationFrame(() => this.tickSmoothProgress());
   }
 
   private renderFullscreenState(): void {

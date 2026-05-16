@@ -9,6 +9,7 @@ beforeEach(() => {
   document.head.innerHTML = '';
   delete (window as any).YT;
   delete (window as any).onYouTubeIframeAPIReady;
+  delete (window as any).IntersectionObserver;
   Object.defineProperty(window, 'innerWidth', { configurable: true, writable: true, value: 1200 });
   Object.defineProperty(HTMLMediaElement.prototype, 'play', {
     configurable: true,
@@ -88,6 +89,39 @@ describe('Fideo player', () => {
     expect(video.muted).toBe(true);
     expect(video.loop).toBe(true);
     expect(video.controls).toBe(false);
+  });
+
+  it('defers background autoplay until the player is visible', () => {
+    const observers: Array<{ callback: IntersectionObserverCallback; observed?: Element }> = [];
+    class MockIntersectionObserver {
+      constructor(callback: IntersectionObserverCallback) {
+        observers.push({ callback });
+      }
+
+      observe(element: Element) {
+        observers[observers.length - 1].observed = element;
+      }
+
+      disconnect() {}
+    }
+    Object.defineProperty(window, 'IntersectionObserver', {
+      configurable: true,
+      value: MockIntersectionObserver,
+    });
+
+    document.body.innerHTML = '<video data-fideo data-fideo-background="true" data-fideo-src="/one.mp4"></video>';
+    const video = document.querySelector('video')!;
+    mountFideo(video);
+
+    expect(HTMLMediaElement.prototype.play).not.toHaveBeenCalled();
+    expect(video.preload).toBe('metadata');
+
+    observers[0].callback(
+      [{ isIntersecting: true, intersectionRatio: 1, target: video.parentElement! } as unknown as IntersectionObserverEntry],
+      observers[0] as unknown as IntersectionObserver,
+    );
+
+    expect(HTMLMediaElement.prototype.play).toHaveBeenCalledTimes(1);
   });
 
   it('cover-sizes background iframe embeds from the configured aspect ratio', () => {
@@ -187,6 +221,46 @@ describe('Fideo player', () => {
     expect(iframe.allow).toContain('encrypted-media');
   });
 
+  it('lazy loads iframe providers until they are near the viewport', async () => {
+    const observers: Array<{ callback: IntersectionObserverCallback; observed?: Element }> = [];
+    class MockIntersectionObserver {
+      constructor(callback: IntersectionObserverCallback) {
+        observers.push({ callback });
+      }
+
+      observe(element: Element) {
+        observers[observers.length - 1].observed = element;
+      }
+
+      disconnect() {}
+    }
+    Object.defineProperty(window, 'IntersectionObserver', {
+      configurable: true,
+      value: MockIntersectionObserver,
+    });
+
+    document.body.innerHTML = `
+      <iframe
+        data-fideo
+        src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
+      ></iframe>
+    `;
+    const iframe = document.querySelector('iframe')!;
+    mountFideo(iframe);
+
+    expect(iframe.getAttribute('src')).toBeNull();
+    expect(iframe.dataset.fideoLazySrc).toBe('https://www.youtube.com/watch?v=M7lc1UVf-VE');
+    expect(document.querySelector('script[src="https://www.youtube.com/iframe_api"]')).toBeNull();
+
+    observers[0].callback(
+      [{ isIntersecting: true, intersectionRatio: 0.01, target: iframe } as unknown as IntersectionObserverEntry],
+      observers[0] as unknown as IntersectionObserver,
+    );
+    await Promise.resolve();
+
+    expect(iframe.src).toContain('www.youtube-nocookie.com/embed/M7lc1UVf-VE');
+  });
+
   it('keeps Vimeo background autoplay paused until real playback starts', () => {
     document.body.innerHTML = `
       <iframe
@@ -209,6 +283,7 @@ describe('Fideo player', () => {
     document.body.innerHTML = `
       <iframe
         data-fideo
+        data-fideo-lazy="false"
         data-fideo-poster="/desktop-poster.jpg"
         data-fideo-poster-tablet="/tablet-poster.jpg"
         data-fideo-poster-mobile="/mobile-poster.jpg"
@@ -244,6 +319,7 @@ describe('Fideo player', () => {
     document.body.innerHTML = `
       <iframe
         data-fideo
+        data-fideo-lazy="false"
         src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
       ></iframe>
     `;
@@ -317,6 +393,84 @@ describe('Fideo player', () => {
     expect(muteButton.getAttribute('aria-pressed')).toBe('false');
     expect(volume.value).toBe('0.75');
     expect(volume.style.getPropertyValue('--fideo-progress')).toBe('75%');
+  });
+
+  it('smoothly advances the timeline between timeupdate events', () => {
+    const originalNow = performance.now;
+    const originalRequestAnimationFrame = window.requestAnimationFrame;
+    const originalCancelAnimationFrame = window.cancelAnimationFrame;
+    let now = 0;
+    let frame: FrameRequestCallback | undefined;
+
+    Object.defineProperty(performance, 'now', {
+      configurable: true,
+      value: () => now,
+    });
+    Object.defineProperty(window, 'requestAnimationFrame', {
+      configurable: true,
+      value: (callback: FrameRequestCallback) => {
+        frame = callback;
+        return 1;
+      },
+    });
+    Object.defineProperty(window, 'cancelAnimationFrame', {
+      configurable: true,
+      value: vi.fn(),
+    });
+
+    document.body.innerHTML = '<video data-fideo data-fideo-src="/one.mp4"></video>';
+    const video = document.querySelector('video')!;
+    const player = mountFideo(video);
+    const controls = player.wrapper.querySelector('.fideo__controls')!;
+    const track = controls.shadowRoot!.querySelector('.fideo__track') as HTMLInputElement;
+    const adapter = (player as any).adapter;
+
+    adapter.state.duration = 10;
+    adapter.state.currentTime = 2;
+    adapter.state.paused = false;
+    adapter.dispatchEvent(new Event('play'));
+
+    now = 500;
+    frame?.(now);
+
+    expect(Number(track.value)).toBeCloseTo(250);
+    expect(track.style.getPropertyValue('--fideo-progress')).toBe('25%');
+
+    Object.defineProperty(performance, 'now', {
+      configurable: true,
+      value: originalNow,
+    });
+    Object.defineProperty(window, 'requestAnimationFrame', {
+      configurable: true,
+      value: originalRequestAnimationFrame,
+    });
+    Object.defineProperty(window, 'cancelAnimationFrame', {
+      configurable: true,
+      value: originalCancelAnimationFrame,
+    });
+  });
+
+  it('updates the timeline fill while dragging before seek commits', () => {
+    document.body.innerHTML = '<video data-fideo data-fideo-src="/one.mp4"></video>';
+    const video = document.querySelector('video')!;
+    const player = mountFideo(video);
+    const controls = player.wrapper.querySelector('.fideo__controls')!;
+    const root = controls.shadowRoot!;
+    const track = root.querySelector('.fideo__track') as HTMLInputElement;
+    const currentTime = root.querySelector('[part="current-time"]') as HTMLElement;
+    const adapter = (player as any).adapter;
+
+    adapter.state.duration = 60;
+    adapter.state.currentTime = 3;
+    adapter.dispatchEvent(new Event('durationchange'));
+
+    track.dispatchEvent(new Event('pointerdown'));
+    track.value = '500';
+    track.dispatchEvent(new Event('input'));
+
+    expect(track.value).toBe('500');
+    expect(track.style.getPropertyValue('--fideo-progress')).toBe('50%');
+    expect(currentTime.textContent).toBe('0:30');
   });
 
   it('emits volumechange after YouTube SDK volume mutations', async () => {

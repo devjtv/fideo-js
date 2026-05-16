@@ -104,6 +104,7 @@ export type {
   FideoOptions,
   FideoPlayerInstance,
   FideoPosters,
+  FideoPreload,
   FideoProviderName,
   FideoResolvedOptions,
   FideoSources,

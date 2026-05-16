@@ -3,6 +3,7 @@ import type {
   FideoControlVisibility,
   FideoOptions,
   FideoPosters,
+  FideoPreload,
   FideoProviderName,
   FideoResolvedOptions,
   FideoSources,
@@ -95,6 +96,13 @@ export function parseViewportMode(value: string | null | undefined, fallback: Fi
   return fallback;
 }
 
+export function parsePreload(value: string | null | undefined, fallback: FideoPreload): FideoPreload {
+  if (!value) return fallback;
+  const normalized = value.trim().toLowerCase();
+  if (normalized === 'none' || normalized === 'metadata' || normalized === 'auto') return normalized;
+  return fallback;
+}
+
 export function readSources(element: HTMLElement): FideoSources {
   const data = element.dataset;
   return {
@@ -128,6 +136,7 @@ export function resolveOptions(
   const provider = requestedProvider === 'auto' ? inferProvider(element, sources) : requestedProvider;
   const viewportFallback = options.viewport ?? false;
   const background = boolFromAttr(data.fideoBackground, options.background ?? false);
+  const lazyFallback = provider !== 'html5';
 
   return {
     selector: options.selector ?? DEFAULT_SELECTOR,
@@ -138,6 +147,9 @@ export function resolveOptions(
     playsInline: background || boolFromAttr(data.fideoPlaysinline ?? data.fideoPlaysInline, options.playsInline ?? true),
     controls: boolFromAttr(data.fideoControls, options.controls ?? !background),
     background,
+    lazy: boolFromAttr(data.fideoLazy, options.lazy ?? lazyFallback),
+    lazyRootMargin: data.fideoLazyRootMargin || options.lazyRootMargin || '800px 0px',
+    preload: parsePreload(data.fideoPreload, options.preload ?? 'metadata'),
     controlVisibility: resolveControlVisibility(element, options.controlVisibility),
     viewport: parseViewportMode(data.fideoViewport, viewportFallback),
     viewportThreshold: numberFromAttr(data.fideoViewportThreshold, options.viewportThreshold ?? 0.35),
