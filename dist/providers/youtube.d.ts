@@ -46,7 +46,9 @@ export declare class YouTubeProvider extends BaseProvider {
     private player?;
     private ready;
     private readyResolver?;
+    private readyRejecter?;
     private timer?;
+    private destroyed;
     constructor(element: HTMLIFrameElement, options: FideoResolvedOptions);
     play(): Promise<void>;
     pause(): Promise<void>;

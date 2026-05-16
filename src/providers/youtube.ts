@@ -52,7 +52,9 @@ export class YouTubeProvider extends BaseProvider {
   private player?: YouTubePlayer;
   private ready: Promise<void>;
   private readyResolver?: () => void;
+  private readyRejecter?: (error: unknown) => void;
   private timer?: number;
+  private destroyed = false;
 
   constructor(
     readonly element: HTMLIFrameElement,
@@ -78,47 +80,66 @@ export class YouTubeProvider extends BaseProvider {
     this.element.src = addUrlParams(normalizedUrl, params);
     const id = ensureElementId(this.element, 'fideo-youtube');
 
-    this.ready = new Promise((resolve) => {
+    this.ready = new Promise((resolve, reject) => {
       this.readyResolver = resolve;
+      this.readyRejecter = reject;
     });
 
     loadYouTubeApi().then(() => {
+      if (this.destroyed) {
+        this.readyResolver?.();
+        return;
+      }
       this.player = new window.YT!.Player(id, {
         events: {
           onReady: () => {
+            if (this.destroyed) {
+              this.player?.destroy();
+              this.readyResolver?.();
+              return;
+            }
             this.sync();
             this.readyResolver?.();
           },
-          onStateChange: ({ data }) => this.handleStateChange(data),
+          onStateChange: ({ data }) => {
+            if (!this.destroyed) this.handleStateChange(data);
+          },
         },
       });
+    }).catch((error) => {
+      this.readyRejecter?.(error);
     });
   }
 
   async play(): Promise<void> {
     await this.ready;
+    if (this.destroyed) return;
     this.player?.playVideo();
   }
 
   async pause(): Promise<void> {
     await this.ready;
+    if (this.destroyed) return;
     this.player?.pauseVideo();
   }
 
   async seek(time: number): Promise<void> {
     await this.ready;
+    if (this.destroyed) return;
     this.player?.seekTo(time, true);
     this.sync();
   }
 
   async setVolume(volume: number): Promise<void> {
     await this.ready;
+    if (this.destroyed) return;
     this.player?.setVolume(Math.round(clamp(volume) * 100));
     this.sync();
   }
 
   async setMuted(muted: boolean): Promise<void> {
     await this.ready;
+    if (this.destroyed) return;
     if (muted) this.player?.mute();
     else this.player?.unMute();
     this.sync();
@@ -126,12 +147,14 @@ export class YouTubeProvider extends BaseProvider {
 
   async setPlaybackRate(rate: number): Promise<void> {
     await this.ready;
+    if (this.destroyed) return;
     this.player?.setPlaybackRate(rate);
     this.sync();
   }
 
   async setSource(source: string): Promise<void> {
     await this.ready;
+    if (this.destroyed) return;
     const normalizedUrl = normalizeYouTubeEmbedUrl(source);
     const videoId = getYouTubeEmbedId(normalizedUrl);
     const url = this.options.loop && videoId ? addUrlParams(normalizedUrl, { loop: 1, playlist: videoId }) : normalizedUrl;
@@ -139,8 +162,10 @@ export class YouTubeProvider extends BaseProvider {
   }
 
   destroy(): void {
+    this.destroyed = true;
     if (this.timer) window.clearInterval(this.timer);
     this.player?.destroy();
+    this.readyResolver?.();
   }
 
   private handleStateChange(state: YouTubeState): void {

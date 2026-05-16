@@ -123,8 +123,8 @@ When poster images are configured, Fideo renders them as a visual cover while th
 Because the compiled files are committed in `dist/`, Fideo JS can be loaded directly from jsDelivr. Pin a release tag for production:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.3.2/dist/styles.css" />
-<script src="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.3.2/dist/fideo.global.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.3.3/dist/styles.css" />
+<script src="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.3.3/dist/fideo.global.js"></script>
 <script>
   Fideo.init();
 </script>
@@ -133,9 +133,9 @@ Because the compiled files are committed in `dist/`, Fideo JS can be loaded dire
 ES module usage is also available:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.3.2/dist/styles.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.3.3/dist/styles.css" />
 <script type="module">
-  import { initFideo } from 'https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.3.2/dist/fideo.js';
+  import { initFideo } from 'https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.3.3/dist/fideo.js';
 
   initFideo();
 </script>

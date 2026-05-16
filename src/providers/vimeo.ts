@@ -33,6 +33,7 @@ export class VimeoProvider extends BaseProvider {
   readonly provider = 'vimeo' as const;
   private player?: VimeoPlayer;
   private ready: Promise<void>;
+  private destroyed = false;
 
   constructor(
     readonly element: HTMLIFrameElement,
@@ -52,6 +53,7 @@ export class VimeoProvider extends BaseProvider {
     this.element.src = addUrlParams(normalizeVimeoEmbedUrl(this.element.src), params);
 
     this.ready = loadScript('https://player.vimeo.com/api/player.js').then(() => {
+      if (this.destroyed) return;
       this.player = new window.Vimeo!.Player(this.element);
       this.bind();
       return this.sync();
@@ -60,45 +62,53 @@ export class VimeoProvider extends BaseProvider {
 
   async play(): Promise<void> {
     await this.ready;
-    this.player?.play();
+    if (this.destroyed) return;
+    await this.player?.play();
   }
 
   async pause(): Promise<void> {
     await this.ready;
-    this.player?.pause();
+    if (this.destroyed) return;
+    await this.player?.pause();
   }
 
   async seek(time: number): Promise<void> {
     await this.ready;
+    if (this.destroyed) return;
     await this.player?.setCurrentTime(time);
     await this.sync();
   }
 
   async setVolume(volume: number): Promise<void> {
     await this.ready;
+    if (this.destroyed) return;
     await this.player?.setVolume(clamp(volume));
     await this.sync();
   }
 
   async setMuted(muted: boolean): Promise<void> {
     await this.ready;
+    if (this.destroyed) return;
     await this.player?.setMuted(muted);
     await this.sync();
   }
 
   async setPlaybackRate(rate: number): Promise<void> {
     await this.ready;
+    if (this.destroyed) return;
     await this.player?.setPlaybackRate(rate).catch(() => undefined);
     await this.sync();
   }
 
   async setSource(source: string): Promise<void> {
     await this.ready;
+    if (this.destroyed) return;
     await this.player?.loadVideo({ url: addUrlParams(normalizeVimeoEmbedUrl(source), this.providerParams()) });
     await this.sync();
   }
 
   destroy(): void {
+    this.destroyed = true;
     this.player?.destroy();
   }
 

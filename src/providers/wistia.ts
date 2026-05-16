@@ -24,6 +24,8 @@ export class WistiaProvider extends BaseProvider {
   private player?: HTMLElement;
   private ready: Promise<void>;
   private mediaId: string;
+  private destroyed = false;
+  private readyResolver?: () => void;
 
   constructor(iframe: HTMLIFrameElement, private options: FideoResolvedOptions) {
     super();
@@ -70,15 +72,25 @@ export class WistiaProvider extends BaseProvider {
     embedScript.src = `https://fast.wistia.com/embed/${this.mediaId}.js`;
     embedScript.type = 'module';
     embedScript.async = true;
-    const loadEmbed = new Promise<void>((resolve) => {
+    const loadEmbed = new Promise<void>((resolve, reject) => {
       embedScript.addEventListener('load', () => resolve());
+      embedScript.addEventListener('error', () => reject(new Error(`Could not load Wistia embed ${this.mediaId}.`)));
     });
     document.head.appendChild(embedScript);
 
     this.ready = Promise.all([loadScript('https://fast.wistia.com/player.js'), loadEmbed]).then(
       () =>
         new Promise<void>((resolve) => {
+          this.readyResolver = resolve;
+          if (this.destroyed) {
+            resolve();
+            return;
+          }
           player.addEventListener('api-ready', () => {
+            if (this.destroyed) {
+              resolve();
+              return;
+            }
             this.bind();
             this.sync();
             resolve();
@@ -89,39 +101,46 @@ export class WistiaProvider extends BaseProvider {
 
   async play(): Promise<void> {
     await this.ready;
+    if (this.destroyed) return;
     (this.player as any)?.play();
   }
 
   async pause(): Promise<void> {
     await this.ready;
+    if (this.destroyed) return;
     (this.player as any)?.pause();
   }
 
   async seek(time: number): Promise<void> {
     await this.ready;
+    if (this.destroyed) return;
     if (this.player) (this.player as any).currentTime = time;
     this.sync();
   }
 
   async setVolume(volume: number): Promise<void> {
     await this.ready;
+    if (this.destroyed) return;
     if (this.player) (this.player as any).volume = clamp(volume);
     this.sync();
   }
 
   async setMuted(muted: boolean): Promise<void> {
     await this.ready;
+    if (this.destroyed) return;
     if (this.player) (this.player as any).muted = muted;
     this.sync();
   }
 
   async setPlaybackRate(rate: number): Promise<void> {
     await this.ready;
+    if (this.destroyed) return;
     if (this.player) (this.player as any).playbackRate = rate;
     this.sync();
   }
 
   async setSource(source: string): Promise<void> {
+    if (this.destroyed) return;
     const newId = getWistiaMediaId(source);
     if (newId && this.player) {
       (this.player as any).mediaId = newId;
@@ -129,7 +148,9 @@ export class WistiaProvider extends BaseProvider {
   }
 
   destroy(): void {
+    this.destroyed = true;
     this.player?.remove();
+    this.readyResolver?.();
   }
 
   private bind(): void {

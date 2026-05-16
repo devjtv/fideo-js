@@ -3,6 +3,9 @@ import { Fideo, createFideo, initFideo, mountFideo } from '../src';
 
 beforeEach(() => {
   document.body.innerHTML = '';
+  document.head.innerHTML = '';
+  delete (window as any).YT;
+  delete (window as any).onYouTubeIframeAPIReady;
   Object.defineProperty(window, 'innerWidth', { configurable: true, writable: true, value: 1200 });
   Object.defineProperty(HTMLMediaElement.prototype, 'play', {
     configurable: true,
@@ -107,6 +110,48 @@ describe('Fideo player', () => {
     expect(iframe.style.height).toBe('500px');
     expect(parseFloat(iframe.style.left)).toBeCloseTo(-294.44, 1);
     expect(iframe.style.top).toBe('0px');
+  });
+
+  it('does not create a YouTube player after destroy if the SDK becomes ready later', async () => {
+    const playerInstances = {
+      created: 0,
+      destroyed: 0,
+    };
+
+    document.body.innerHTML = `
+      <iframe
+        data-fideo
+        src="https://www.youtube.com/watch?v=M7lc1UVf-VE"
+      ></iframe>
+    `;
+    const iframe = document.querySelector('iframe')!;
+    const player = mountFideo(iframe);
+
+    player.destroy();
+
+    (window as any).YT = {
+      Player: class {
+        constructor() {
+          playerInstances.created += 1;
+        }
+
+        destroy() {
+          playerInstances.destroyed += 1;
+        }
+      },
+      PlayerState: {
+        ENDED: 0,
+        PLAYING: 1,
+        PAUSED: 2,
+        BUFFERING: 3,
+        CUED: 5,
+      },
+    };
+    (window as any).onYouTubeIframeAPIReady();
+    await Promise.resolve();
+
+    expect(playerInstances.created).toBe(0);
+    expect(playerInstances.destroyed).toBe(0);
   });
 
   it('normalizes YouTube background embeds with no-cookie autoplay and loop params', () => {
@@ -238,6 +283,41 @@ describe('Fideo player', () => {
 
     expect(first).toBe(second);
     expect(document.querySelectorAll('.fideo')).toHaveLength(1);
+  });
+
+  it('can remount an element after destroy', () => {
+    document.body.innerHTML = '<video data-fideo data-fideo-src="/one.mp4"></video>';
+    const video = document.querySelector('video')!;
+
+    const first = mountFideo(video);
+    first.destroy();
+    const second = mountFideo(video);
+
+    expect(second).not.toBe(first);
+    expect(document.querySelectorAll('.fideo')).toHaveLength(1);
+    expect(second.wrapper.classList.contains('is-ready')).toBe(true);
+    expect(video.getAttribute('data-fideo-ready')).toBe('true');
+  });
+
+  it('cleans up generated wrapper and click target on destroy', () => {
+    document.body.innerHTML = '<video data-fideo data-fideo-src="/one.mp4"></video>';
+    const video = document.querySelector('video')!;
+    const player = mountFideo(video);
+
+    player.destroy();
+
+    expect(document.querySelector('.fideo')).toBeNull();
+    expect(document.querySelector('.fideo__click-target')).toBeNull();
+    expect(video.parentElement).toBe(document.body);
+    expect(video.classList.contains('fideo__media')).toBe(false);
+  });
+
+  it('does not auto-init data-fideo elements from the ESM import alone', () => {
+    document.body.innerHTML = '<video data-fideo data-fideo-src="/one.mp4"></video>';
+
+    document.dispatchEvent(new Event('DOMContentLoaded'));
+
+    expect(document.querySelector('.fideo')).toBeNull();
   });
 
   it('supports Plyr-style constructor initialization without data attributes', () => {

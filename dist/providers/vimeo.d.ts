@@ -32,6 +32,7 @@ export declare class VimeoProvider extends BaseProvider {
     readonly provider: "vimeo";
     private player?;
     private ready;
+    private destroyed;
     constructor(element: HTMLIFrameElement, options: FideoResolvedOptions);
     play(): Promise<void>;
     pause(): Promise<void>;

@@ -12,9 +12,12 @@ export class FideoPlayer implements FideoPlayerInstance {
   private observer?: IntersectionObserver;
   private currentSource?: string;
   private resizeController = new AbortController();
+  private lifecycleController = new AbortController();
   private activityTimer?: number;
   private resizeObserver?: ResizeObserver;
   private posterImage?: HTMLImageElement;
+  private clickTarget?: HTMLButtonElement;
+  private destroyed = false;
   private handleFullscreenChange = () => {
     const isFullscreen = document.fullscreenElement === this.wrapper;
     this.wrapper.classList.toggle('is-fullscreen', isFullscreen);
@@ -23,7 +26,11 @@ export class FideoPlayer implements FideoPlayerInstance {
     }
   };
 
-  constructor(element: HTMLVideoElement | HTMLIFrameElement, options: FideoResolvedOptions) {
+  constructor(
+    element: HTMLVideoElement | HTMLIFrameElement,
+    options: FideoResolvedOptions,
+    private onDestroy?: (element: HTMLVideoElement | HTMLIFrameElement, player: FideoPlayer) => void,
+  ) {
     this.element = element;
     this.options = options;
     this.wrapper = this.wrapElement(element, options);
@@ -39,8 +46,8 @@ export class FideoPlayer implements FideoPlayerInstance {
     this.bindViewportPlayback();
     document.addEventListener('fullscreenchange', this.handleFullscreenChange);
 
-    this.adapter.setVolume(options.volume);
-    this.adapter.setMuted(options.muted);
+    this.adapter.setVolume(options.volume).catch(() => undefined);
+    this.adapter.setMuted(options.muted).catch(() => undefined);
 
     if (options.autoplay) {
       this.play().catch(() => undefined);
@@ -56,9 +63,12 @@ export class FideoPlayer implements FideoPlayerInstance {
   }
 
   destroy(): void {
+    if (this.destroyed) return;
+    this.destroyed = true;
     this.observer?.disconnect();
     this.resizeObserver?.disconnect();
     this.resizeController.abort();
+    this.lifecycleController.abort();
     this.controls?.destroy();
     this.adapter.destroy();
     document.removeEventListener('fullscreenchange', this.handleFullscreenChange);
@@ -66,7 +76,14 @@ export class FideoPlayer implements FideoPlayerInstance {
     this.wrapper.classList.remove('is-ready');
     this.wrapper.classList.remove('has-poster', 'is-poster-visible');
     this.element.removeAttribute('data-fideo-ready');
+    this.element.classList.remove('fideo__media');
     this.posterImage?.remove();
+    this.clickTarget?.remove();
+    if (this.element.parentElement === this.wrapper) {
+      this.wrapper.before(this.element);
+    }
+    this.wrapper.remove();
+    this.onDestroy?.(this.element, this);
   }
 
   private wrapElement(element: HTMLVideoElement | HTMLIFrameElement, options: FideoResolvedOptions): HTMLElement {
@@ -120,7 +137,7 @@ export class FideoPlayer implements FideoPlayerInstance {
             },
           }),
         );
-      });
+      }, { signal: this.lifecycleController.signal });
     }
   }
 
@@ -131,6 +148,7 @@ export class FideoPlayer implements FideoPlayerInstance {
     clickTarget.className = 'fideo__click-target';
     clickTarget.type = 'button';
     clickTarget.ariaLabel = 'Play or pause video';
+    this.clickTarget = clickTarget;
     this.wrapper.prepend(clickTarget);
 
     clickTarget.addEventListener('click', () => {
@@ -138,10 +156,16 @@ export class FideoPlayer implements FideoPlayerInstance {
       this.activateControls();
       if (state.paused) this.play().catch(() => undefined);
       else this.pause().catch(() => undefined);
-    });
+    }, { signal: this.lifecycleController.signal });
 
-    this.wrapper.addEventListener('pointermove', () => this.activateControls(), { passive: true });
-    this.wrapper.addEventListener('pointerleave', () => this.clearActivity(), { passive: true });
+    this.wrapper.addEventListener('pointermove', () => this.activateControls(), {
+      passive: true,
+      signal: this.lifecycleController.signal,
+    });
+    this.wrapper.addEventListener('pointerleave', () => this.clearActivity(), {
+      passive: true,
+      signal: this.lifecycleController.signal,
+    });
   }
 
   private syncPlaybackClasses(): void {

@@ -1,5 +1,6 @@
 import type { FideoAdapter, FideoPlayerInstance, FideoResolvedOptions } from './types';
 export declare class FideoPlayer implements FideoPlayerInstance {
+    private onDestroy?;
     readonly element: HTMLVideoElement | HTMLIFrameElement;
     readonly wrapper: HTMLElement;
     readonly options: FideoResolvedOptions;
@@ -8,11 +9,14 @@ export declare class FideoPlayer implements FideoPlayerInstance {
     private observer?;
     private currentSource?;
     private resizeController;
+    private lifecycleController;
     private activityTimer?;
     private resizeObserver?;
     private posterImage?;
+    private clickTarget?;
+    private destroyed;
     private handleFullscreenChange;
-    constructor(element: HTMLVideoElement | HTMLIFrameElement, options: FideoResolvedOptions);
+    constructor(element: HTMLVideoElement | HTMLIFrameElement, options: FideoResolvedOptions, onDestroy?: ((element: HTMLVideoElement | HTMLIFrameElement, player: FideoPlayer) => void) | undefined);
     play(): Promise<void>;
     pause(): Promise<void>;
     destroy(): void;

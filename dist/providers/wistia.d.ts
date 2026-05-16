@@ -22,6 +22,8 @@ export declare class WistiaProvider extends BaseProvider {
     private player?;
     private ready;
     private mediaId;
+    private destroyed;
+    private readyResolver?;
     constructor(iframe: HTMLIFrameElement, options: FideoResolvedOptions);
     play(): Promise<void>;
     pause(): Promise<void>;

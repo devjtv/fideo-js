@@ -76,7 +76,11 @@ export function mountFideo(
   if (existing) return existing;
 
   const resolved = resolveOptions(element, options);
-  const player = new FideoPlayer(element, resolved);
+  const player = new FideoPlayer(element, resolved, (destroyedElement, destroyedPlayer) => {
+    if (instances.get(destroyedElement) === destroyedPlayer) {
+      instances.delete(destroyedElement);
+    }
+  });
   instances.set(element, player);
   return player;
 }
@@ -110,8 +114,14 @@ export type {
 
 if (typeof window !== 'undefined') {
   Object.assign(window, { Fideo, createFideo, initFideo, mountFideo });
-  document.addEventListener('DOMContentLoaded', () => {
-    const opts = (window as any).__fideoAutoInit || {};
-    initFideo(opts);
-  });
+  if (!isModuleScriptImport()) {
+    document.addEventListener('DOMContentLoaded', () => {
+      const opts = (window as any).__fideoAutoInit || {};
+      initFideo(opts);
+    });
+  }
+}
+
+function isModuleScriptImport(): boolean {
+  return typeof document !== 'undefined' && document.currentScript == null;
 }
