@@ -887,8 +887,8 @@
               <div class="code-head"><span>Install</span><span class="mono">html</span></div>
 <pre><span class="tk-com">&lt;!-- via CDN --&gt;</span>
 <span class="tk-tag">&lt;link</span> <span class="tk-attr">rel</span>=<span class="tk-str">"stylesheet"</span>
-  <span class="tk-attr">href</span>=<span class="tk-str">"https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.5.2/dist/fideo.css"</span><span class="tk-tag">&gt;</span>
-<span class="tk-tag">&lt;script</span> <span class="tk-attr">src</span>=<span class="tk-str">"https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.5.2/dist/fideo.global.js"</span><span class="tk-tag">&gt;&lt;/script&gt;</span></pre>
+  <span class="tk-attr">href</span>=<span class="tk-str">"https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v__FIDEO_VERSION__/dist/fideo.css"</span><span class="tk-tag">&gt;</span>
+<span class="tk-tag">&lt;script</span> <span class="tk-attr">src</span>=<span class="tk-str">"https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v__FIDEO_VERSION__/dist/fideo.global.js"</span><span class="tk-tag">&gt;&lt;/script&gt;</span></pre>
             </div>
             <div class="code">
               <div class="code-head"><span>Mark up a player</span><span class="mono">html</span></div>
@@ -1951,6 +1951,9 @@ initFideo();
           if (!version) return;
           document.querySelectorAll('[data-version]').forEach((el) => {
             el.textContent = 'v' + version;
+          });
+          document.querySelectorAll('pre').forEach((el) => {
+            el.innerHTML = el.innerHTML.replaceAll('v__FIDEO_VERSION__', 'v' + version);
           });
         })();
 

@@ -6,6 +6,7 @@ const EXAMPLES = 'examples';
 const DIST = 'dist';
 
 const pkg = JSON.parse(await readFile('package.json', 'utf8'));
+const versionTag = `v${pkg.version}`;
 const versionScript = `<script>window.__FIDEO_VERSION=${JSON.stringify(pkg.version)};</script>`;
 
 await rm(SITE, { recursive: true, force: true });
@@ -25,6 +26,7 @@ for (const entry of entries) {
     await writeFile(dest, html
       .replaceAll('../dist/', './dist/')
       .replaceAll('../assets/', './assets/')
+      .replaceAll('v__FIDEO_VERSION__', versionTag)
       .replace('</head>', `  ${versionScript}\n  </head>`));
   } else {
     // Favicons, manifest, verification files, etc. — copy as-is.
