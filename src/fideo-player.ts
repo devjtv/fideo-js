@@ -14,6 +14,7 @@ export class FideoPlayer implements FideoPlayerInstance {
   private resizeController = new AbortController();
   private lifecycleController = new AbortController();
   private activityTimer?: number;
+  private resizeFrame?: number;
   private resizeObserver?: ResizeObserver;
   private posterImage?: HTMLImageElement;
   private clickTarget?: HTMLButtonElement;
@@ -97,6 +98,7 @@ export class FideoPlayer implements FideoPlayerInstance {
     this.adapter.destroy();
     document.removeEventListener('fullscreenchange', this.handleFullscreenChange);
     if (this.activityTimer) window.clearTimeout(this.activityTimer);
+    if (this.resizeFrame !== undefined) cancelAnimationFrame(this.resizeFrame);
     this.wrapper.classList.remove('is-ready');
     this.wrapper.classList.remove('has-poster', 'is-poster-visible');
     this.element.removeAttribute('data-fideo-ready');
@@ -186,6 +188,10 @@ export class FideoPlayer implements FideoPlayerInstance {
       else this.pause().catch(() => undefined);
     }, { signal: this.lifecycleController.signal });
 
+    clickTarget.addEventListener('keydown', (event) => this.handleShortcut(event), {
+      signal: this.lifecycleController.signal,
+    });
+
     this.wrapper.addEventListener('pointermove', () => this.activateControls(), {
       passive: true,
       signal: this.lifecycleController.signal,
@@ -216,22 +222,70 @@ export class FideoPlayer implements FideoPlayerInstance {
     if (!this.adapter.getState().paused) this.wrapper.classList.remove('is-user-active');
   }
 
+  private handleShortcut(event: KeyboardEvent): void {
+    const state = this.adapter.getState();
+    switch (event.key) {
+      case 'ArrowLeft':
+        event.preventDefault();
+        this.seek(Math.max(0, state.currentTime - 5)).catch(() => undefined);
+        break;
+      case 'ArrowRight':
+        event.preventDefault();
+        this.seek(state.duration ? Math.min(state.duration, state.currentTime + 5) : state.currentTime + 5).catch(
+          () => undefined,
+        );
+        break;
+      case 'ArrowUp':
+        event.preventDefault();
+        if (state.muted) this.setMuted(false).catch(() => undefined);
+        this.setVolume(Math.min(1, state.volume + 0.1)).catch(() => undefined);
+        break;
+      case 'ArrowDown':
+        event.preventDefault();
+        this.setVolume(Math.max(0, state.volume - 0.1)).catch(() => undefined);
+        break;
+      case 'm':
+      case 'M':
+        event.preventDefault();
+        this.setMuted(!state.muted).catch(() => undefined);
+        break;
+      case 'f':
+      case 'F':
+        event.preventDefault();
+        this.toggleFullscreen();
+        break;
+      default:
+        return;
+    }
+    this.activateControls();
+  }
+
+  private toggleFullscreen(): void {
+    if (document.fullscreenElement === this.wrapper) {
+      document.exitFullscreen?.();
+      return;
+    }
+    this.wrapper.requestFullscreen?.();
+  }
+
   private bindResponsiveMedia(): void {
-    window.addEventListener('resize', () => this.applyResponsiveMedia(), {
+    const onViewportChange = () => this.scheduleResponsiveUpdate();
+    window.addEventListener('resize', onViewportChange, {
       passive: true,
       signal: this.resizeController.signal,
     });
-    window.addEventListener('orientationchange', () => this.applyResponsiveMedia(), {
+    window.addEventListener('orientationchange', onViewportChange, {
       passive: true,
       signal: this.resizeController.signal,
     });
-    window.addEventListener('resize', () => this.applyBackgroundCover(), {
-      passive: true,
-      signal: this.resizeController.signal,
-    });
-    window.addEventListener('orientationchange', () => this.applyBackgroundCover(), {
-      passive: true,
-      signal: this.resizeController.signal,
+  }
+
+  private scheduleResponsiveUpdate(): void {
+    if (this.resizeFrame !== undefined) return;
+    this.resizeFrame = requestAnimationFrame(() => {
+      this.resizeFrame = undefined;
+      this.applyResponsiveMedia();
+      this.applyBackgroundCover();
     });
   }
 
@@ -244,7 +298,7 @@ export class FideoPlayer implements FideoPlayerInstance {
     if (source && source !== this.currentSource) {
       this.currentSource = source;
       this.syncPosterVisibility();
-      this.adapter.setSource(source);
+      this.adapter.setSource(source).catch(() => undefined);
     }
   }
 

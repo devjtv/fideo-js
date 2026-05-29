@@ -43,10 +43,6 @@ export class Html5Provider extends BaseProvider {
     if (!wasPaused) await this.play().catch(() => undefined);
   }
 
-  setPoster(poster: string): void {
-    this.element.poster = poster;
-  }
-
   destroy(): void {
     this.element.pause();
     for (const type of this.boundEvents) {

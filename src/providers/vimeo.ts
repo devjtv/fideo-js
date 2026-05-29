@@ -146,11 +146,6 @@ export class VimeoProvider extends BaseProvider {
     this.update({ currentTime, duration, volume, muted, playbackRate }, eventName);
   }
 
-  private postMessage(method: string, value?: unknown): void {
-    const targetOrigin = new URL(this.element.src, window.location.href).origin;
-    this.element.contentWindow?.postMessage(JSON.stringify({ method, value }), targetOrigin);
-  }
-
   private providerParams(): Record<string, string | number | boolean> {
     const params: Record<string, string | number | boolean> = {
       api: 1,

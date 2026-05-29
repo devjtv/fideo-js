@@ -131,7 +131,10 @@ class LazyIframeProvider extends EventTarget implements FideoAdapter {
     this.destroyed = true;
     this.observer?.disconnect();
     this.adapter?.destroy();
-    if (!this.adapter) this.element.removeAttribute('src');
+    // Restore the original src when we never upgraded to a real provider, so the
+    // element can be cleanly remounted later. The eager adapters manage their own src.
+    if (!this.adapter && this.source) this.element.src = this.source;
+    delete this.element.dataset.fideoLazySrc;
   }
 
   private observe(): void {

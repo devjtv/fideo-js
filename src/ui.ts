@@ -13,6 +13,7 @@ export class FideoControls {
   private duration: HTMLElement;
   private fullscreenButton: HTMLButtonElement;
   private speedMenu: HTMLElement;
+  private settingsButton!: HTMLButtonElement;
   private volumeGroup: HTMLElement;
   private volumePanel: HTMLElement;
   private settingsGroup: HTMLElement;
@@ -71,7 +72,9 @@ export class FideoControls {
     this.playButton = this.button('fideo__button fideo__play', 'Play', this.icons.play, 'play-button');
     this.muteButton = this.button('fideo__button fideo__mute', 'Mute', this.icons.volume, 'mute-button');
     this.track = this.range('fideo__track', 0, 1000, 1, 'timeline');
+    this.track.setAttribute('aria-label', 'Seek');
     this.volume = this.range('fideo__volume', 0, 1, 0.01, 'volume-slider');
+    this.volume.setAttribute('aria-label', 'Volume');
     this.currentTime = createElement('span', 'fideo__time');
     this.currentTime.setAttribute('part', 'current-time');
     this.duration = createElement('span', 'fideo__time');
@@ -79,7 +82,10 @@ export class FideoControls {
     this.speedMenu = this.createSpeedMenu(options.playbackRates);
     this.fullscreenButton = this.button('fideo__button', 'Fullscreen', this.icons.fullscreen, 'fullscreen-button');
 
-    const settings = this.button('fideo__button fideo__settings-toggle', 'Settings', this.icons.settings, 'settings-button');
+    this.settingsButton = this.button('fideo__button fideo__settings-toggle', 'Settings', this.icons.settings, 'settings-button');
+    this.settingsButton.setAttribute('aria-haspopup', 'menu');
+    this.settingsButton.setAttribute('aria-expanded', 'false');
+    const settings = this.settingsButton;
     const timeline = createElement('div', 'fideo__timeline');
     timeline.append(this.track);
 
@@ -132,7 +138,9 @@ export class FideoControls {
     });
     settings.addEventListener('click', () => {
       this.wrapper.classList.add('is-user-active');
-      this.settingsGroup.classList.toggle('is-open');
+      const open = this.settingsGroup.classList.toggle('is-open');
+      this.settingsButton.setAttribute('aria-expanded', String(open));
+      if (open) this.speedMenu.querySelector<HTMLButtonElement>('.fideo__speed')?.focus();
     });
     this.volumeGroup.addEventListener('click', (e) => {
       if (e.target !== this.volume && e.target !== this.muteButton) {
@@ -202,27 +210,62 @@ export class FideoControls {
   private createSpeedMenu(rates: number[]): HTMLElement {
     const menu = createElement('div', 'fideo__settings-menu');
     menu.setAttribute('part', 'settings-menu');
+    menu.setAttribute('role', 'menu');
+    menu.setAttribute('aria-label', 'Playback speed');
     for (const rate of rates) {
       const button = this.button('fideo__speed', `${rate}x`, '', 'speed-button');
       button.textContent = `${rate}x`;
+      button.setAttribute('role', 'menuitem');
       button.addEventListener('click', () => {
         this.wrapper.classList.add('is-user-active');
         this.adapter.setPlaybackRate(rate).catch(() => undefined);
-        menu.parentElement?.classList.remove('is-open');
+        this.closeSettings();
+        this.settingsButton.focus();
       });
       menu.append(button);
     }
+    menu.addEventListener('keydown', (event) => this.onSpeedMenuKeydown(event));
     return menu;
+  }
+
+  private onSpeedMenuKeydown(event: KeyboardEvent): void {
+    const items = Array.from(this.speedMenu.querySelectorAll<HTMLButtonElement>('.fideo__speed'));
+    if (!items.length) return;
+    const active = this.element.shadowRoot?.activeElement;
+    const currentIndex = items.indexOf(active as HTMLButtonElement);
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      items[currentIndex < 0 ? 0 : (currentIndex + 1) % items.length].focus();
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      items[currentIndex < 0 ? items.length - 1 : (currentIndex - 1 + items.length) % items.length].focus();
+    } else if (event.key === 'Home') {
+      event.preventDefault();
+      items[0].focus();
+    } else if (event.key === 'End') {
+      event.preventDefault();
+      items[items.length - 1].focus();
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      this.closeSettings();
+      this.settingsButton.focus();
+    }
   }
 
   private closeMenus(event: MouseEvent): void {
     const path = event.composedPath();
     if (!path.some((el) => el instanceof Node && (this.settingsGroup === el || this.settingsGroup.contains(el)))) {
-      this.settingsGroup.classList.remove('is-open');
+      this.closeSettings();
     }
     if (!path.some((el) => el instanceof Node && (this.volumeGroup === el || this.volumeGroup.contains(el)))) {
       this.volumeGroup.classList.remove('is-open');
     }
+  }
+
+  private closeSettings(): void {
+    this.settingsGroup.classList.remove('is-open');
+    this.settingsButton.setAttribute('aria-expanded', 'false');
   }
 
   private togglePlay(): void {
@@ -304,6 +347,7 @@ export class FideoControls {
     if (!state.muted && volume > 0) this.lastAudibleVolume = volume;
     this.volume.value = String(state.muted ? 0 : volume);
     this.volume.style.setProperty('--fideo-progress', `${Number(this.volume.value) * 100}%`);
+    this.volume.setAttribute('aria-valuetext', `${Math.round(Number(this.volume.value) * 100)}%`);
 
     let muteIcon = state.muted || volume === 0 ? this.icons.muted : this.icons.volume;
     if (!state.muted && volume > 0 && volume <= 0.5) muteIcon = this.icons.volumeLow;
@@ -345,6 +389,7 @@ export class FideoControls {
     if (!force && this.seeking) return;
     this.currentTime.textContent = formatTime(state.currentTime);
     this.duration.textContent = formatTime(state.duration);
+    this.track.setAttribute('aria-valuetext', `${formatTime(state.currentTime)} of ${formatTime(state.duration)}`);
     this.setTrackProgress(state.duration ? (state.currentTime / state.duration) * 1000 : 0);
   }
 
@@ -355,7 +400,7 @@ export class FideoControls {
   }
 
   private startSmoothProgress(state = this.adapter.getState()): void {
-    if (state.paused || !state.duration || this.seeking) return;
+    if (state.paused || !state.duration || this.seeking || prefersReducedMotion()) return;
     this.stopSmoothProgress();
     this.smoothStartState = state;
     this.smoothStartMs = performance.now();
@@ -398,6 +443,15 @@ export class FideoControls {
 
 function clampVolume(value: number): number {
   return Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : 0;
+}
+
+// Skip rAF-based timeline interpolation when the user requests reduced motion.
+function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
 }
 
 export function formatTime(seconds: number): string {

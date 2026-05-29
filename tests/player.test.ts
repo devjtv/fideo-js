@@ -136,9 +136,18 @@ describe('Fideo player', () => {
     const iframe = document.querySelector('iframe')!;
     const player = mountFideo(iframe);
 
+    let frame: FrameRequestCallback | undefined;
+    const originalRaf = window.requestAnimationFrame;
+    window.requestAnimationFrame = ((cb: FrameRequestCallback) => {
+      frame = cb;
+      return 1;
+    }) as typeof window.requestAnimationFrame;
+
     Object.defineProperty(player.wrapper, 'clientWidth', { configurable: true, value: 300 });
     Object.defineProperty(player.wrapper, 'clientHeight', { configurable: true, value: 500 });
     window.dispatchEvent(new Event('resize'));
+    frame?.(0);
+    window.requestAnimationFrame = originalRaf;
 
     const src = new URL(iframe.src);
     expect(src.searchParams.get('h')).toBe('privatehash');
@@ -298,13 +307,24 @@ describe('Fideo player', () => {
     expect(poster.src.endsWith('/desktop-poster.jpg')).toBe(true);
     expect(player.wrapper.classList.contains('is-poster-visible')).toBe(true);
 
+    let frame: FrameRequestCallback | undefined;
+    const originalRaf = window.requestAnimationFrame;
+    window.requestAnimationFrame = ((cb: FrameRequestCallback) => {
+      frame = cb;
+      return 1;
+    }) as typeof window.requestAnimationFrame;
+
     Object.defineProperty(window, 'innerWidth', { configurable: true, writable: true, value: 900 });
     window.dispatchEvent(new Event('resize'));
+    frame?.(0);
     expect(poster.src.endsWith('/tablet-poster.jpg')).toBe(true);
 
     Object.defineProperty(window, 'innerWidth', { configurable: true, writable: true, value: 600 });
     window.dispatchEvent(new Event('resize'));
+    frame?.(0);
     expect(poster.src.endsWith('/mobile-poster.jpg')).toBe(true);
+
+    window.requestAnimationFrame = originalRaf;
 
     (player as any).adapter.state.paused = false;
     (player as any).adapter.dispatchEvent(new Event('play'));
@@ -763,5 +783,69 @@ describe('Fideo player', () => {
     expect(player.element).toBe(video);
     expect(player.wrapper.querySelector('.fideo__controls')).toBeNull();
     expect(player.options.sources.desktop).toBe('/helper-init.mp4');
+  });
+
+  // Regression coverage for the review fixes: disabled providers, poster overlay, lazy remount, shortcuts.
+  it('throws and leaves the DOM untouched when the resolved provider is disabled', () => {
+    document.body.innerHTML = '<iframe data-fideo src="https://vimeo.com/76979871"></iframe>';
+    const iframe = document.querySelector('iframe')!;
+
+    expect(() => mountFideo(iframe, { disabledProviders: ['vimeo'] })).toThrow(/disabled/);
+    expect(document.querySelector('.fideo')).toBeNull();
+    expect(iframe.parentElement).toBe(document.body);
+  });
+
+  it('uses the poster overlay for native video without setting a native poster attribute', () => {
+    document.body.innerHTML = '<video data-fideo data-fideo-src="/movie.mp4" data-fideo-poster="/p.jpg"></video>';
+    const video = document.querySelector('video')!;
+    const player = mountFideo(video);
+
+    expect(video.getAttribute('poster')).toBeNull();
+    expect(player.wrapper.querySelector('img.fideo__poster')).toBeTruthy();
+  });
+
+  it('restores the iframe src on destroy so lazy embeds can be remounted', () => {
+    const observers: Array<{ callback: IntersectionObserverCallback; observed?: Element }> = [];
+    class MockIntersectionObserver {
+      constructor(callback: IntersectionObserverCallback) {
+        observers.push({ callback });
+      }
+
+      observe(element: Element) {
+        observers[observers.length - 1].observed = element;
+      }
+
+      disconnect() {}
+    }
+    Object.defineProperty(window, 'IntersectionObserver', { configurable: true, value: MockIntersectionObserver });
+
+    document.body.innerHTML = '<iframe data-fideo src="https://vimeo.com/76979871"></iframe>';
+    const iframe = document.querySelector('iframe')!;
+    const first = mountFideo(iframe);
+
+    expect(iframe.getAttribute('src')).toBeNull();
+    expect(iframe.dataset.fideoLazySrc).toBe('https://vimeo.com/76979871');
+
+    first.destroy();
+    expect(iframe.getAttribute('src')).toBe('https://vimeo.com/76979871');
+    expect(iframe.dataset.fideoLazySrc).toBeUndefined();
+
+    const second = mountFideo(iframe);
+    expect((second as any).adapter.source).toBe('https://vimeo.com/76979871');
+  });
+
+  it('seeks forward with the ArrowRight shortcut on the click target', () => {
+    document.body.innerHTML = '<video data-fideo data-fideo-src="/movie.mp4"></video>';
+    const video = document.querySelector('video')!;
+    const player = mountFideo(video);
+    const adapter = (player as any).adapter;
+    adapter.state.duration = 100;
+    adapter.state.currentTime = 20;
+
+    const seekSpy = vi.spyOn(player, 'seek');
+    const clickTarget = player.wrapper.querySelector('.fideo__click-target') as HTMLButtonElement;
+    clickTarget.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+
+    expect(seekSpy).toHaveBeenCalledWith(25);
   });
 });

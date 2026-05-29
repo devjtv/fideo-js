@@ -108,6 +108,9 @@ export function mountFideo(
   if (existing) return existing;
 
   const resolved = resolveOptions(element, options);
+  if (resolved.disabledProviders.includes(resolved.provider)) {
+    throw new Error(`Fideo provider "${resolved.provider}" is disabled via disabledProviders.`);
+  }
   const player = new FideoPlayer(element, resolved, (destroyedElement, destroyedPlayer) => {
     if (instances.get(destroyedElement) === destroyedPlayer) {
       instances.delete(destroyedElement);
