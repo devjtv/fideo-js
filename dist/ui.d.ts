@@ -11,6 +11,7 @@ export declare class FideoControls {
     private duration;
     private fullscreenButton;
     private speedMenu;
+    private settingsButton;
     private volumeGroup;
     private volumePanel;
     private settingsGroup;
@@ -36,7 +37,9 @@ export declare class FideoControls {
     private button;
     private range;
     private createSpeedMenu;
+    private onSpeedMenuKeydown;
     private closeMenus;
+    private closeSettings;
     private togglePlay;
     private toggleMute;
     private changeVolume;

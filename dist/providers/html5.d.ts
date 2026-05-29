@@ -12,7 +12,6 @@ export declare class Html5Provider extends BaseProvider {
     setMuted(muted: boolean): Promise<void>;
     setPlaybackRate(rate: number): Promise<void>;
     setSource(source: string): Promise<void>;
-    setPoster(poster: string): void;
     destroy(): void;
     private bind;
     private handleMediaEvent;

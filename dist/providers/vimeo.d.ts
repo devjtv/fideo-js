@@ -45,7 +45,6 @@ export declare class VimeoProvider extends BaseProvider {
     private bind;
     private applyEvent;
     private sync;
-    private postMessage;
     private providerParams;
 }
 export {};

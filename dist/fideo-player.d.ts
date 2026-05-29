@@ -11,6 +11,7 @@ export declare class FideoPlayer implements FideoPlayerInstance {
     private resizeController;
     private lifecycleController;
     private activityTimer?;
+    private resizeFrame?;
     private resizeObserver?;
     private posterImage?;
     private clickTarget?;
@@ -33,7 +34,10 @@ export declare class FideoPlayer implements FideoPlayerInstance {
     private syncPlaybackClasses;
     private activateControls;
     private clearActivity;
+    private handleShortcut;
+    private toggleFullscreen;
     private bindResponsiveMedia;
+    private scheduleResponsiveUpdate;
     private applyResponsiveMedia;
     private bindViewportPlayback;
     private bindBackgroundCover;
