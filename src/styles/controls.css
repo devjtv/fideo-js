@@ -1,0 +1,315 @@
+/*
+ * Shadow-scope styles. Adopted once per document by FideoControls and shared
+ * across every player instance. These selectors only ever match inside the
+ * shadow root, so they are deliberately absent from host.css.
+ *
+ * The --fideo-* custom properties are declared on .fideo in host.css and
+ * inherit through the shadow boundary, which keeps user overrides working.
+ */
+.fideo__button {
+  display: inline-grid;
+  place-items: center;
+  position: relative;
+  z-index: 1;
+  width: var(--fideo-button-size, 26px);
+  height: var(--fideo-button-size, 26px);
+  padding: 0;
+  color: var(--fideo-control-color, #ffffff);
+  background: transparent;
+  border: 0;
+  border-radius: var(--fideo-button-radius, 4px);
+  cursor: pointer;
+  line-height: 0;
+  transition:
+    opacity 140ms ease,
+    color 140ms ease;
+}
+
+.fideo__button:hover,
+.fideo__button:focus-visible {
+  color: var(--fideo-accent, #46d9a7);
+  background: transparent;
+}
+
+.fideo__button svg {
+  display: block;
+  width: var(--fideo-icon-size, 17px);
+  height: var(--fideo-icon-size, 17px);
+  pointer-events: none;
+}
+
+.fideo__control-row {
+  display: flex;
+  gap: var(--fideo-gap, 10px);
+  align-items: center;
+  min-width: 0;
+}
+
+.fideo__play {
+  margin-right: -4px;
+}
+
+.fideo__spacer {
+  flex: 1 1 auto;
+}
+
+.fideo__timeline {
+  display: block;
+  min-width: 0;
+}
+
+.fideo__time-group {
+  display: inline-flex;
+  gap: 3px;
+  align-items: center;
+  margin-left: 2px;
+}
+
+.fideo__time {
+  min-width: auto;
+  color: var(--fideo-muted-color, rgba(255, 255, 255, 0.92));
+  font: 600 12px/1 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-variant-numeric: tabular-nums;
+  text-align: left;
+}
+
+.fideo__time-separator {
+  color: var(--fideo-muted-color, rgba(255, 255, 255, 0.92));
+  font: 600 12px/1 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.fideo__track,
+.fideo__volume {
+  --fideo-progress: 0%;
+  --fideo-buffered: 0%;
+  width: 100%;
+  height: 18px;
+  padding: 0;
+  background: transparent;
+  accent-color: var(--fideo-accent, #46d9a7);
+  cursor: pointer;
+  appearance: none;
+}
+
+.fideo__track::-webkit-slider-runnable-track,
+.fideo__volume::-webkit-slider-runnable-track {
+  height: var(--fideo-track-size, 5px);
+  background: linear-gradient(
+    to right,
+    var(--fideo-track-fill, rgba(255, 255, 255, 0.9)) 0%,
+    var(--fideo-track-fill, rgba(255, 255, 255, 0.9)) var(--fideo-progress),
+    var(--fideo-buffer-color, rgba(255, 255, 255, 0.68)) var(--fideo-progress),
+    var(--fideo-buffer-color, rgba(255, 255, 255, 0.68)) var(--fideo-buffered),
+    var(--fideo-track, rgba(255, 255, 255, 0.46)) var(--fideo-buffered),
+    var(--fideo-track, rgba(255, 255, 255, 0.46)) 100%
+  );
+  border-radius: 999px;
+}
+
+.fideo__volume::-webkit-slider-runnable-track {
+  width: var(--fideo-track-size, 5px);
+  height: 100%;
+  background: linear-gradient(
+    to top,
+    var(--fideo-track-fill, rgba(255, 255, 255, 0.9)) 0%,
+    var(--fideo-track-fill, rgba(255, 255, 255, 0.9)) var(--fideo-progress),
+    var(--fideo-track, rgba(255, 255, 255, 0.46)) var(--fideo-progress),
+    var(--fideo-track, rgba(255, 255, 255, 0.46)) 100%
+  );
+}
+
+.fideo__track::-moz-range-track,
+.fideo__volume::-moz-range-track {
+  height: var(--fideo-track-size, 5px);
+  background: linear-gradient(
+    to right,
+    var(--fideo-buffer-color, rgba(255, 255, 255, 0.68)) 0%,
+    var(--fideo-buffer-color, rgba(255, 255, 255, 0.68)) var(--fideo-buffered),
+    var(--fideo-track, rgba(255, 255, 255, 0.46)) var(--fideo-buffered),
+    var(--fideo-track, rgba(255, 255, 255, 0.46)) 100%
+  );
+  border-radius: 999px;
+}
+
+.fideo__volume::-moz-range-track {
+  width: var(--fideo-track-size, 5px);
+  height: 100%;
+  background: var(--fideo-track, rgba(255, 255, 255, 0.46));
+}
+
+.fideo__track::-moz-range-progress,
+.fideo__volume::-moz-range-progress {
+  height: var(--fideo-track-size, 5px);
+  background: var(--fideo-track-fill, rgba(255, 255, 255, 0.9));
+  border-radius: 999px;
+}
+
+.fideo__volume::-moz-range-progress {
+  width: var(--fideo-track-size, 5px);
+}
+
+.fideo__track::-webkit-slider-thumb,
+.fideo__volume::-webkit-slider-thumb {
+  width: var(--fideo-thumb-size, 13px);
+  height: var(--fideo-thumb-size, 13px);
+  margin-top: calc((var(--fideo-thumb-size, 13px) - var(--fideo-track-size, 5px)) / -2);
+  background: var(--fideo-control-color, #ffffff);
+  border: 0;
+  border-radius: 999px;
+  appearance: none;
+}
+
+.fideo__volume::-webkit-slider-thumb {
+  margin-top: 0;
+  margin-left: calc((var(--fideo-thumb-size, 13px) - var(--fideo-track-size, 5px)) / -2);
+}
+
+.fideo__track::-webkit-slider-thumb {
+  opacity: 0;
+}
+
+.fideo__track:hover::-webkit-slider-thumb,
+.fideo__track:focus-visible::-webkit-slider-thumb {
+  opacity: 1;
+}
+
+.fideo__track::-moz-range-thumb,
+.fideo__volume::-moz-range-thumb {
+  width: var(--fideo-thumb-size, 13px);
+  height: var(--fideo-thumb-size, 13px);
+  background: var(--fideo-control-color, #ffffff);
+  border: 0;
+  border-radius: 999px;
+}
+
+.fideo__track::-moz-range-thumb {
+  opacity: 0;
+}
+
+.fideo__track:hover::-moz-range-thumb,
+.fideo__track:focus-visible::-moz-range-thumb {
+  opacity: 1;
+}
+
+.fideo__volume-group {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: var(--fideo-button-size, 26px);
+  height: var(--fideo-button-size, 26px);
+}
+
+.fideo__volume-panel {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 76px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%);
+  transition:
+    opacity 140ms ease,
+    bottom 140ms ease;
+}
+
+.fideo__volume-panel::after {
+  position: absolute;
+  right: -10px;
+  bottom: -14px;
+  left: -10px;
+  height: 14px;
+  content: "";
+}
+
+/* vertical-lr + rtl is the pairing that fills bottom-to-top and matches the
+   `to top` track gradient. Do not "modernise" this to vertical-rl — it inverts
+   the fill direction and drops the thumb to the bottom of the panel. */
+.fideo__volume {
+  width: 18px;
+  height: 76px;
+  direction: rtl;
+  writing-mode: vertical-lr;
+}
+
+.fideo__volume-group:hover .fideo__volume-panel,
+.fideo__volume-group.is-open .fideo__volume-panel,
+.fideo__volume-group:focus-within .fideo__volume-panel {
+  bottom: calc(100% + 14px);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.fideo__settings {
+  position: relative;
+}
+
+.fideo__settings-menu {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  display: grid;
+  min-width: 90px;
+  padding: 6px;
+  pointer-events: none;
+  background: rgba(8, 10, 13, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  box-shadow: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 140ms ease,
+    transform 140ms ease;
+}
+
+.fideo__settings.is-open .fideo__settings-menu {
+  pointer-events: auto;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.fideo__speed {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 12px 0 8px;
+  color: var(--fideo-control-color, #ffffff);
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Tick column keeps every rate label aligned whether or not it is active. */
+.fideo__speed::before {
+  width: 10px;
+  content: "";
+  opacity: 0;
+}
+
+.fideo__speed[aria-checked="true"]::before {
+  content: "\2713";
+  opacity: 1;
+}
+
+.fideo__speed[aria-checked="true"] {
+  color: var(--fideo-accent, #46d9a7);
+}
+
+.fideo__speed:hover,
+.fideo__speed:focus-visible {
+  color: #07100d;
+  background: var(--fideo-accent, #46d9a7);
+}
+
+@media (max-width: 700px) {
+  .fideo__time,
+  .fideo__time-separator {
+    font-size: 11px;
+  }
+}

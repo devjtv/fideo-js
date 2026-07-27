@@ -1,5 +1,6 @@
-import './styles.css';
+import './styles/host.css';
 import { FideoPlayer } from './fideo-player';
+import { injectHostStyles } from './styles';
 import type {
   FideoAdapter,
   FideoInitResult,
@@ -90,7 +91,17 @@ export function initFideo(options: FideoOptions = {}): FideoInitResult {
   const elements = Array.from(document.querySelectorAll<HTMLVideoElement | HTMLIFrameElement>(selector)).filter(
     (element) => element instanceof HTMLVideoElement || element instanceof HTMLIFrameElement,
   );
-  const players = elements.map((element) => mountFideo(element, options));
+
+  // One unmountable element (disabled provider, wrong tag for its provider)
+  // must not take down every other player on the page.
+  const players: FideoPlayerInstance[] = [];
+  for (const element of elements) {
+    try {
+      players.push(mountFideo(element, options));
+    } catch (error) {
+      console.warn('[fideo] Skipped an element that could not be mounted.', element, error);
+    }
+  }
 
   return {
     players,
@@ -106,6 +117,8 @@ export function mountFideo(
 ): FideoPlayerInstance {
   const existing = instances.get(element);
   if (existing) return existing;
+
+  if (options.injectStyles !== false) injectHostStyles();
 
   const resolved = resolveOptions(element, options);
   if (resolved.disabledProviders.includes(resolved.provider)) {

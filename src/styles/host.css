@@ -1,0 +1,192 @@
+/*
+ * Page-scope styles. These target the wrapper and the controls host element,
+ * so they must live in the main document — the shadow root can never match them.
+ * Injected automatically by injectHostStyles(); also emitted as dist/fideo.css
+ * for anyone who prefers a plain <link> (avoids a flash before the JS runs).
+ */
+.fideo {
+  --fideo-accent: #46d9a7;
+  --fideo-bg: transparent;
+  --fideo-control-bg: transparent;
+  --fideo-control-color: #ffffff;
+  --fideo-muted-color: rgba(255, 255, 255, 0.92);
+  --fideo-track: rgba(255, 255, 255, 0.46);
+  --fideo-track-fill: rgba(255, 255, 255, 0.9);
+  --fideo-buffer-color: rgba(255, 255, 255, 0.68);
+  --fideo-track-size: 5px;
+  --fideo-thumb-size: 13px;
+  --fideo-radius: 8px;
+  --fideo-button-size: 26px;
+  --fideo-button-radius: 4px;
+  --fideo-icon-size: 17px;
+  --fideo-gap: 10px;
+  position: relative;
+  display: block;
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: var(--fideo-bg);
+  color: var(--fideo-control-color);
+  border-radius: var(--fideo-radius);
+}
+
+.fideo::after {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 1;
+  height: 104px;
+  pointer-events: none;
+  content: "";
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.42) 0%,
+    rgba(0, 0, 0, 0.26) 38%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+.fideo:hover::after,
+.fideo:focus-within::after,
+.fideo.is-paused::after,
+.fideo.is-user-active::after {
+  opacity: 1;
+}
+
+.fideo__media {
+  position: relative;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  object-fit: cover;
+}
+
+.fideo__poster {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.fideo.has-poster.is-poster-visible .fideo__poster {
+  opacity: 1;
+}
+
+.fideo--background {
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  aspect-ratio: auto;
+  border-radius: inherit;
+}
+
+.fideo--background::after,
+.fideo--no-controls::after {
+  display: none;
+}
+
+.fideo--background .fideo__media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  object-fit: cover;
+}
+
+.fideo--background iframe.fideo__media,
+.fideo--background wistia-player.fideo__media {
+  inset: auto;
+  object-fit: initial;
+  pointer-events: none;
+}
+
+.fideo__click-target {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.fideo__click-target:focus-visible {
+  outline: 2px solid var(--fideo-accent);
+  outline-offset: -4px;
+}
+
+.fideo.is-fullscreen {
+  border-radius: 0;
+}
+
+.fideo.is-fullscreen .fideo__media {
+  object-fit: contain;
+}
+
+.fideo--background.is-fullscreen .fideo__media {
+  position: static;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.fideo--background.is-fullscreen iframe.fideo__media,
+.fideo--background.is-fullscreen wistia-player.fideo__media {
+  inset: auto;
+  object-fit: initial;
+  pointer-events: auto;
+}
+
+/* Shadow host: positioning and reveal transition live in the page, the
+   internals live in controls.css inside the shadow root. */
+.fideo__controls {
+  position: absolute;
+  right: 16px;
+  bottom: 10px;
+  left: 16px;
+  z-index: 3;
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: 6px;
+  padding: 0;
+  background: var(--fideo-control-bg);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  filter: none;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(5px);
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.fideo:hover .fideo__controls,
+.fideo:focus-within .fideo__controls,
+.fideo.is-paused .fideo__controls,
+.fideo.is-user-active .fideo__controls {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+@media (max-width: 700px) {
+  .fideo__controls {
+    right: 12px;
+    bottom: 8px;
+    left: 12px;
+  }
+}

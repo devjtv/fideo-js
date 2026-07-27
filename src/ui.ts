@@ -1,5 +1,5 @@
-import stylesheet from './styles.css?inline';
 import { defaultIcons } from './icons';
+import { adoptControlsStyles } from './styles';
 import type { FideoAdapter, FideoResolvedOptions, FideoState } from './types';
 import { createElement } from './utils/dom';
 
@@ -18,6 +18,12 @@ export class FideoControls {
   private volumePanel: HTMLElement;
   private settingsGroup: HTMLElement;
   private seeking = false;
+  private speedButtons: Array<{ button: HTMLButtonElement; rate: number }> = [];
+  private lastRenderedTime = -1;
+  private lastRenderedDuration = -1;
+  private lastTrackProgress = -1;
+  private lastBufferedProgress = -1;
+  private lastRenderedRate = -1;
   private smoothFrame?: number;
   private smoothStartState?: FideoState;
   private smoothStartMs = 0;
@@ -66,9 +72,7 @@ export class FideoControls {
     this.icons = { ...defaultIcons, ...options.icons };
     this.element = createElement('div', 'fideo__controls');
     const root = this.element.attachShadow({ mode: 'open' });
-    const style = document.createElement('style');
-    style.textContent = stylesheet;
-    root.appendChild(style);
+    adoptControlsStyles(root);
     this.playButton = this.button('fideo__button fideo__play', 'Play', this.icons.play, 'play-button');
     this.muteButton = this.button('fideo__button fideo__mute', 'Mute', this.icons.volume, 'mute-button');
     this.track = this.range('fideo__track', 0, 1000, 1, 'timeline');
@@ -148,6 +152,12 @@ export class FideoControls {
         this.volumeGroup.classList.toggle('is-open');
       }
     });
+    this.volumeGroup.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      this.volumeGroup.classList.remove('is-open');
+      this.muteButton.focus();
+    });
     this.fullscreenButton.addEventListener('click', () => {
       this.wrapper.classList.add('is-user-active');
       this.toggleFullscreen();
@@ -215,7 +225,9 @@ export class FideoControls {
     for (const rate of rates) {
       const button = this.button('fideo__speed', `${rate}x`, '', 'speed-button');
       button.textContent = `${rate}x`;
-      button.setAttribute('role', 'menuitem');
+      button.setAttribute('role', 'menuitemradio');
+      button.setAttribute('aria-checked', 'false');
+      this.speedButtons.push({ button, rate });
       button.addEventListener('click', () => {
         this.wrapper.classList.add('is-user-active');
         this.adapter.setPlaybackRate(rate).catch(() => undefined);
@@ -308,6 +320,9 @@ export class FideoControls {
     const state = this.adapter.getState();
     this.setTrackProgress(Number(this.track.value));
     if (!state.duration) return;
+    // The scrub preview writes the time label directly, so invalidate the
+    // render cache and let the next real state update repaint it.
+    this.lastRenderedTime = -1;
     this.currentTime.textContent = formatTime((Number(this.track.value) / 1000) * state.duration);
   }
 
@@ -321,8 +336,10 @@ export class FideoControls {
   }
 
   private toggleFullscreen(): void {
-    if (document.fullscreenElement) {
-      document.exitFullscreen();
+    // Only leave fullscreen when this player owns it — another element on the
+    // page may be fullscreen for unrelated reasons.
+    if (document.fullscreenElement === this.wrapper) {
+      document.exitFullscreen?.();
       return;
     }
     this.wrapper.requestFullscreen?.();
@@ -387,16 +404,52 @@ export class FideoControls {
 
   private syncPlaybackState(state: FideoState, force = false): void {
     if (!force && this.seeking) return;
-    this.currentTime.textContent = formatTime(state.currentTime);
-    this.duration.textContent = formatTime(state.duration);
-    this.track.setAttribute('aria-valuetext', `${formatTime(state.currentTime)} of ${formatTime(state.duration)}`);
     this.setTrackProgress(state.duration ? (state.currentTime / state.duration) * 1000 : 0);
+    this.setBufferedProgress(state.buffered);
+    this.renderTimeText(state);
+    this.renderSpeedState(state.playbackRate);
+  }
+
+  // Called up to once per animation frame while playing, but the displayed
+  // time only changes once per second — skipping the no-op writes keeps the
+  // rAF loop to a single custom-property update and stops assistive tech from
+  // being flooded with duplicate aria-valuetext announcements.
+  private renderTimeText(state: FideoState): void {
+    const currentSecond = Math.floor(state.currentTime);
+    const durationSecond = Math.floor(state.duration);
+    if (currentSecond === this.lastRenderedTime && durationSecond === this.lastRenderedDuration) return;
+
+    this.lastRenderedTime = currentSecond;
+    this.lastRenderedDuration = durationSecond;
+    const currentLabel = formatTime(state.currentTime);
+    const durationLabel = formatTime(state.duration);
+    this.currentTime.textContent = currentLabel;
+    this.duration.textContent = durationLabel;
+    this.track.setAttribute('aria-valuetext', `${currentLabel} of ${durationLabel}`);
+  }
+
+  private renderSpeedState(rate: number): void {
+    const activeRate = Number.isFinite(rate) && rate > 0 ? rate : 1;
+    if (activeRate === this.lastRenderedRate) return;
+    this.lastRenderedRate = activeRate;
+    for (const { button, rate: buttonRate } of this.speedButtons) {
+      button.setAttribute('aria-checked', String(buttonRate === activeRate));
+    }
   }
 
   private setTrackProgress(value: number): void {
     const clamped = Number.isFinite(value) ? Math.min(1000, Math.max(0, value)) : 0;
+    if (clamped === this.lastTrackProgress) return;
+    this.lastTrackProgress = clamped;
     this.track.value = String(clamped);
     this.track.style.setProperty('--fideo-progress', `${clamped / 10}%`);
+  }
+
+  private setBufferedProgress(buffered: number): void {
+    const percent = Number.isFinite(buffered) ? Math.round(Math.min(1, Math.max(0, buffered)) * 100) : 0;
+    if (percent === this.lastBufferedProgress) return;
+    this.lastBufferedProgress = percent;
+    this.track.style.setProperty('--fideo-buffered', `${percent}%`);
   }
 
   private startSmoothProgress(state = this.adapter.getState()): void {
@@ -446,18 +499,26 @@ function clampVolume(value: number): number {
 }
 
 // Skip rAF-based timeline interpolation when the user requests reduced motion.
+// The query is resolved once — this runs on every timeupdate.
+let reducedMotionQuery: MediaQueryList | null | undefined;
+
 function prefersReducedMotion(): boolean {
-  return (
-    typeof window !== 'undefined' &&
-    typeof window.matchMedia === 'function' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  );
+  if (reducedMotionQuery === undefined) {
+    reducedMotionQuery =
+      typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+        ? window.matchMedia('(prefers-reduced-motion: reduce)')
+        : null;
+  }
+  return reducedMotionQuery?.matches ?? false;
 }
 
 export function formatTime(seconds: number): string {
   if (!Number.isFinite(seconds) || seconds <= 0) return '0:00';
   const rounded = Math.floor(seconds);
-  const minutes = Math.floor(rounded / 60);
-  const remaining = rounded % 60;
-  return `${minutes}:${String(remaining).padStart(2, '0')}`;
+  const hours = Math.floor(rounded / 3600);
+  const minutes = Math.floor((rounded % 3600) / 60);
+  const paddedSeconds = String(rounded % 60).padStart(2, '0');
+
+  if (hours > 0) return `${hours}:${String(minutes).padStart(2, '0')}:${paddedSeconds}`;
+  return `${minutes}:${paddedSeconds}`;
 }

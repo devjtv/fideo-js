@@ -848,4 +848,60 @@ describe('Fideo player', () => {
 
     expect(seekSpy).toHaveBeenCalledWith(25);
   });
+
+  it('injects the host stylesheet once per document', () => {
+    document.body.innerHTML = '<video data-fideo data-fideo-src="/a.mp4"></video><video data-fideo data-fideo-src="/b.mp4"></video>';
+    initFideo();
+
+    const styles = document.querySelectorAll('#fideo-host-styles');
+    expect(styles).toHaveLength(1);
+    expect(styles[0].textContent).toContain('.fideo__controls');
+  });
+
+  it('skips host style injection when injectStyles is false', () => {
+    document.body.innerHTML = '<video data-fideo data-fideo-src="/a.mp4"></video>';
+    initFideo({ injectStyles: false });
+
+    expect(document.querySelector('#fideo-host-styles')).toBeNull();
+  });
+
+  it('keeps mounting the remaining players when one element fails', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    document.body.innerHTML = `
+      <iframe data-fideo src="https://vimeo.com/76979871"></iframe>
+      <video data-fideo data-fideo-src="/movie.mp4"></video>
+    `;
+
+    const result = initFideo({ disabledProviders: ['vimeo'] });
+
+    expect(result.players).toHaveLength(1);
+    expect(result.players[0].options.provider).toBe('html5');
+    expect(warn).toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
+  it('renders the buffered range on the timeline', () => {
+    document.body.innerHTML = '<video data-fideo data-fideo-src="/movie.mp4"></video>';
+    const video = document.querySelector('video')!;
+    const player = mountFideo(video);
+    const adapter = (player as any).adapter;
+
+    adapter.update({ duration: 100, currentTime: 10, buffered: 0.4 }, 'timeupdate');
+
+    const track = player.wrapper.querySelector('.fideo__controls')!.shadowRoot!.querySelector('.fideo__track') as HTMLInputElement;
+    expect(track.style.getPropertyValue('--fideo-buffered')).toBe('40%');
+  });
+
+  it('marks the active playback rate in the settings menu', () => {
+    document.body.innerHTML = '<video data-fideo data-fideo-src="/movie.mp4"></video>';
+    const video = document.querySelector('video')!;
+    const player = mountFideo(video);
+    const adapter = (player as any).adapter;
+
+    adapter.update({ playbackRate: 1.5 }, 'change');
+
+    const menu = player.wrapper.querySelector('.fideo__controls')!.shadowRoot!.querySelector('.fideo__settings-menu')!;
+    const checked = Array.from(menu.querySelectorAll('[aria-checked="true"]')).map((item) => item.textContent);
+    expect(checked).toEqual(['1.5x']);
+  });
 });
