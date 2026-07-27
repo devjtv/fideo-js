@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>JavaScript API — Fideo JS docs</title>
+    <meta name="description" content="The Fideo JS player instance: properties, methods, state shape and the DOM events every player emits." />
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+    <link rel="preconnect" href="https://rsms.me/" />
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+    <link rel="stylesheet" href="./_assets/docs.css" />
+    <script>
+      window.__fideoAutoInit = { selector: '[data-fideo-auto]' };
+    </script>
+  </head>
+  <body>
+    <header class="top-nav">
+      <div class="top-nav-inner">
+        <a class="brand" href="../index.html">
+          <span class="brand-mark" aria-hidden="true"><img src="../favicon.svg" alt="" /></span>
+          <span>fideo-js</span>
+          <span class="tag" data-version>docs</span>
+        </a>
+        <button class="nav-toggle" data-nav-toggle aria-expanded="false">Menu</button>
+        <div class="top-nav-links">
+          <a href="../index.html">Overview</a>
+          <a href="../improvements.html">Benchmarks</a>
+          <a href="https://github.com/devjtv/fideo-js">GitHub</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar" data-docs-sidebar></aside>
+
+      <main class="content">
+        <p class="page-kicker">Scripting</p>
+        <h1>JavaScript API</h1>
+        <p class="lede">
+          Every entry point returns the same player instance, and every provider implements the same methods. Code
+          written against an MP4 works unchanged against a YouTube embed.
+        </p>
+
+        <div class="demo">
+          <div class="demo-stage">
+            <video id="api-demo" src="../media/fideo-demo.mp4" poster="../media/fideo-demo-poster.jpg" playsinline></video>
+          </div>
+          <div class="demo-foot"><span>Events are logged below as they fire</span><span class="mono" data-api-provider>—</span></div>
+        </div>
+        <div class="readout">
+          <div class="cell"><span class="k">currentTime</span><span class="v" data-s-current>0</span></div>
+          <div class="cell"><span class="k">duration</span><span class="v" data-s-duration>0</span></div>
+          <div class="cell"><span class="k">paused</span><span class="v" data-s-paused>true</span></div>
+          <div class="cell"><span class="k">volume</span><span class="v" data-s-volume>1</span></div>
+          <div class="cell"><span class="k">muted</span><span class="v" data-s-muted>false</span></div>
+          <div class="cell"><span class="k">buffered</span><span class="v" data-s-buffered>0</span></div>
+        </div>
+        <div class="btn-row">
+          <button class="action" data-api="play">play()</button>
+          <button class="action" data-api="pause">pause()</button>
+          <button class="action" data-api="seek">seek(10)</button>
+          <button class="action" data-api="rate">setPlaybackRate(1.5)</button>
+          <button class="action" data-api="mute">setMuted(toggle)</button>
+          <button class="action" data-api="volume">setVolume(0.3)</button>
+        </div>
+        <div class="log" data-api-log aria-live="polite"></div>
+
+        <h2 id="entry">Entry points</h2>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Function</th><th>Signature</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">initFideo</td><td class="mono">(options?) =&gt; { players, destroy() }</td></tr>
+                <tr><td class="mono">createFideo</td><td class="mono">(target, options?) =&gt; player</td></tr>
+                <tr><td class="mono">mountFideo</td><td class="mono">(element, options?) =&gt; player</td></tr>
+                <tr><td class="mono">new Fideo</td><td class="mono">(target, options?) =&gt; player</td></tr>
+                <tr><td class="mono">Fideo.init</td><td class="mono">(options?) =&gt; { players, destroy() }</td></tr>
+                <tr><td class="mono">Fideo.mount</td><td class="mono">(element, options?) =&gt; player</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p><code>target</code> is a CSS selector or an element; <code>mountFideo</code> takes an element only. Full walkthrough on <a href="./initializing.html">Initializing</a>.</p>
+
+        <h2 id="properties">Instance properties</h2>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Property</th><th>Type</th><th>What it is</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">element</td><td><span class="type">HTMLVideoElement | HTMLIFrameElement</span></td><td>The element you mounted. Events are dispatched here.</td></tr>
+                <tr><td class="mono">wrapper</td><td><span class="type">HTMLElement</span></td><td>The generated <code>.fideo</code> div. State classes live here.</td></tr>
+                <tr><td class="mono">options</td><td><span class="type">FideoResolvedOptions</span></td><td>Fully-resolved configuration, defaults applied.</td></tr>
+                <tr><td class="mono">adapter</td><td><span class="type">FideoAdapter</span></td><td>The provider driver. Low level — prefer the methods below.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <h2 id="methods">Methods</h2>
+        <p>All the playback methods return a promise. For iframe providers that promise also covers loading the SDK, so awaiting <code>play()</code> on a lazy embed waits for it to be ready.</p>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Method</th><th>Returns</th><th>Notes</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">play()</td><td class="mono">Promise&lt;void&gt;</td><td>May reject when browser autoplay policy blocks it — catch it.</td></tr>
+                <tr><td class="mono">pause()</td><td class="mono">Promise&lt;void&gt;</td><td></td></tr>
+                <tr><td class="mono">seek(seconds)</td><td class="mono">Promise&lt;void&gt;</td><td>Absolute position in seconds.</td></tr>
+                <tr><td class="mono">setVolume(value)</td><td class="mono">Promise&lt;void&gt;</td><td><code>0</code>–<code>1</code>, clamped.</td></tr>
+                <tr><td class="mono">setMuted(muted)</td><td class="mono">Promise&lt;void&gt;</td><td></td></tr>
+                <tr><td class="mono">setPlaybackRate(rate)</td><td class="mono">Promise&lt;void&gt;</td><td>Providers may refuse unusual rates.</td></tr>
+                <tr><td class="mono">setSource(url)</td><td class="mono">Promise&lt;void&gt;</td><td>Swaps the media in place. See below.</td></tr>
+                <tr><td class="mono">getState()</td><td class="mono">FideoState</td><td>Synchronous snapshot — a copy, not a live object.</td></tr>
+                <tr><td class="mono">destroy()</td><td class="mono">void</td><td>Full teardown. Safe to call twice.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="code">
+          <div class="code-head"><span>Typical use</span><span class="lang">js</span></div>
+<pre><span class="tk-kw">const</span> player = <span class="tk-kw">new</span> <span class="tk-fn">Fideo</span>(<span class="tk-str">'#hero'</span>, { muted: <span class="tk-kw">true</span> });
+
+<span class="tk-kw">await</span> player.<span class="tk-fn">play</span>().<span class="tk-fn">catch</span>(() =&gt; {
+  <span class="tk-com">// Autoplay was blocked — show your own play affordance.</span>
+});
+
+<span class="tk-kw">await</span> player.<span class="tk-fn">seek</span>(<span class="tk-num">30</span>);
+<span class="tk-kw">await</span> player.<span class="tk-fn">setVolume</span>(<span class="tk-num">0.4</span>);</pre>
+        </div>
+
+        <h3 id="set-source">setSource()</h3>
+        <ul class="plain">
+          <li><b>HTML5</b> replaces <code>src</code> and reloads, resuming playback if it was playing. Setting the URL it already has is a no-op.</li>
+          <li><b>YouTube and Vimeo</b> load the new video through their APIs, so the iframe is not recreated. The URL is normalized first.</li>
+          <li><b>Wistia</b> swaps the media ID on the custom element.</li>
+        </ul>
+        <div class="note warn">
+          <strong>Responsive sources can overwrite it.</strong> If the player has <code>sources</code> configured, a
+          resize that crosses a breakpoint reapplies the matching source and discards what you set.
+        </div>
+
+        <h2 id="state">State</h2>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Field</th><th>Type</th><th>Meaning</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">currentTime</td><td><span class="type">number</span></td><td>Seconds elapsed</td></tr>
+                <tr><td class="mono">duration</td><td><span class="type">number</span></td><td>Seconds total, <code>0</code> until known</td></tr>
+                <tr><td class="mono">paused</td><td><span class="type">boolean</span></td><td></td></tr>
+                <tr><td class="mono">volume</td><td><span class="type">number</span></td><td><code>0</code>–<code>1</code></td></tr>
+                <tr><td class="mono">muted</td><td><span class="type">boolean</span></td><td></td></tr>
+                <tr><td class="mono">playbackRate</td><td><span class="type">number</span></td><td></td></tr>
+                <tr><td class="mono">buffered</td><td><span class="type">number</span></td><td>Fraction buffered, <code>0</code>–<code>1</code>. HTML5 only; other providers report <code>0</code>.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <h2 id="events">Events</h2>
+        <p>
+          Every player dispatches namespaced <code>CustomEvent</code>s on its media element. They bubble, so one
+          listener on a container can serve a whole page of players.
+        </p>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Event</th><th>Fires when</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">fideo:play</td><td>Playback starts or resumes</td></tr>
+                <tr><td class="mono">fideo:pause</td><td>Playback pauses</td></tr>
+                <tr><td class="mono">fideo:ended</td><td>Playback reaches the end</td></tr>
+                <tr><td class="mono">fideo:timeupdate</td><td>Position advances</td></tr>
+                <tr><td class="mono">fideo:volumechange</td><td>Volume or muted state changes</td></tr>
+                <tr><td class="mono">fideo:change</td><td>Any other state change, such as duration becoming known</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>detail carries the player and a state snapshot</span><span class="lang">js</span></div>
+<pre>player.element.<span class="tk-fn">addEventListener</span>(<span class="tk-str">'fideo:timeupdate'</span>, (event) =&gt; {
+  <span class="tk-kw">const</span> { player, state } = event.detail;
+  <span class="tk-kw">if</span> (state.duration &amp;&amp; state.currentTime / state.duration &gt; <span class="tk-num">0.9</span>) {
+    <span class="tk-fn">markAsWatched</span>(player.element.id);
+  }
+});
+
+<span class="tk-com">// Or once, for every player on the page</span>
+document.<span class="tk-fn">addEventListener</span>(<span class="tk-str">'fideo:play'</span>, (event) =&gt; {
+  <span class="tk-fn">analytics</span>(<span class="tk-str">'video_play'</span>, { id: event.target.id });
+});</pre>
+        </div>
+        <div class="note">
+          <strong>Listen on the element, not the wrapper.</strong> Events are dispatched from
+          <code>player.element</code> and bubble upward from there.
+        </div>
+
+        <h3 id="adapter-events">Adapter events</h3>
+        <p>
+          The adapter is an <code>EventTarget</code> emitting un-namespaced versions of the same events, plus
+          <code>durationchange</code>. It is what the control bar listens to. Reach for it only when you need
+          something the player API does not expose — it is closer to the provider and less stable.
+        </p>
+        <div class="code">
+          <div class="code-head"><span>Lower level</span><span class="lang">js</span></div>
+<pre>player.adapter.<span class="tk-fn">addEventListener</span>(<span class="tk-str">'durationchange'</span>, () =&gt; {
+  console.<span class="tk-fn">log</span>(player.<span class="tk-fn">getState</span>().duration);
+});</pre>
+        </div>
+
+        <h2 id="typescript">TypeScript</h2>
+        <p>Types ship with the package and every public shape is exported.</p>
+        <div class="code">
+          <div class="code-head"><span>Exported types</span><span class="lang">ts</span></div>
+<pre><span class="tk-kw">import type</span> {
+  FideoOptions,
+  FideoResolvedOptions,
+  FideoPlayerInstance,
+  FideoInitResult,
+  FideoState,
+  FideoAdapter,
+  FideoProviderName,
+  FideoViewportMode,
+  FideoPreload,
+  FideoSources,
+  FideoPosters,
+  FideoBreakpoints,
+  FideoControlVisibility,
+  FideoIcons,
+  FideoTarget,
+} <span class="tk-kw">from</span> <span class="tk-str">'fideo-js'</span>;</pre>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>Typing the custom event</span><span class="lang">ts</span></div>
+<pre><span class="tk-kw">type</span> FideoEvent = CustomEvent&lt;{ player: FideoPlayerInstance; state: FideoState }&gt;;
+
+el.<span class="tk-fn">addEventListener</span>(<span class="tk-str">'fideo:play'</span>, (event) =&gt; {
+  <span class="tk-kw">const</span> { state } = (event <span class="tk-kw">as</span> FideoEvent).detail;
+});</pre>
+        </div>
+
+        <h2 id="teardown">Teardown</h2>
+        <p><code>destroy()</code> is thorough, which is what makes remounting safe:</p>
+        <ul class="plain">
+          <li>Listeners are removed through <code>AbortController</code>s, and observers disconnect.</li>
+          <li>The control bar, poster overlay and click target are removed.</li>
+          <li>The element leaves the wrapper and returns to its original position, and the wrapper is deleted.</li>
+          <li>State classes and <code>data-fideo-ready</code> are cleared.</li>
+          <li>The instance is released, so a later <code>mountFideo()</code> creates a fresh one.</li>
+        </ul>
+        <div class="note warn">
+          <strong>A wrapper you wrote yourself is removed too.</strong> If the element was already inside an element
+          with class <code>fideo</code>, Fideo adopts it rather than creating one — and <code>destroy()</code> then
+          removes your markup. Let Fideo create its own wrapper.
+        </div>
+
+        <nav class="page-nav" data-docs-pagenav></nav>
+      </main>
+    </div>
+
+    <script src="../../dist/fideo.global.js"></script>
+    <script type="module" src="./_assets/docs.js"></script>
+    <script type="module">
+      import { log } from './_assets/docs.js';
+
+      const player = mountFideo(document.querySelector('#api-demo'), { muted: true, loop: true, volume: 0.6 });
+      const logEl = document.querySelector('[data-api-log]');
+      document.querySelector('[data-api-provider]').textContent = `provider: ${player.options.provider}`;
+
+      const cells = {
+        current: document.querySelector('[data-s-current]'),
+        duration: document.querySelector('[data-s-duration]'),
+        paused: document.querySelector('[data-s-paused]'),
+        volume: document.querySelector('[data-s-volume]'),
+        muted: document.querySelector('[data-s-muted]'),
+        buffered: document.querySelector('[data-s-buffered]'),
+      };
+
+      function renderState() {
+        const state = player.getState();
+        cells.current.textContent = state.currentTime.toFixed(1);
+        cells.duration.textContent = state.duration.toFixed(1);
+        cells.paused.textContent = String(state.paused);
+        cells.volume.textContent = state.volume.toFixed(2);
+        cells.muted.textContent = String(state.muted);
+        cells.buffered.textContent = state.buffered.toFixed(2);
+      }
+
+      // timeupdate is deliberately not logged — it would drown everything else.
+      ['fideo:play', 'fideo:pause', 'fideo:ended', 'fideo:volumechange', 'fideo:change'].forEach((event) =>
+        player.element.addEventListener(event, () => {
+          log(logEl, `${event} · ${player.getState().currentTime.toFixed(1)}s`);
+          renderState();
+        }),
+      );
+      player.element.addEventListener('fideo:timeupdate', renderState);
+      renderState();
+
+      const actions = {
+        play: () => player.play().catch(() => log(logEl, 'play() rejected — autoplay policy', 'warn')),
+        pause: () => player.pause(),
+        seek: () => player.seek(10),
+        rate: () => player.setPlaybackRate(1.5),
+        mute: () => player.setMuted(!player.getState().muted),
+        volume: () => player.setVolume(0.3),
+      };
+
+      document.querySelectorAll('[data-api]').forEach((button) =>
+        button.addEventListener('click', () => {
+          log(logEl, `→ ${button.textContent}`, 'ok');
+          actions[button.dataset.api]();
+        }),
+      );
+    </script>
+  </body>
+</html>

@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Controls & keyboard — Fideo JS docs</title>
+    <meta name="description" content="The Fideo JS control bar: what each control does, how it auto-hides, the keyboard shortcuts, and how to hide controls you do not want." />
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+    <link rel="preconnect" href="https://rsms.me/" />
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+    <link rel="stylesheet" href="./_assets/docs.css" />
+    <script>
+      window.__fideoAutoInit = { selector: '[data-fideo-auto]' };
+    </script>
+  </head>
+  <body>
+    <header class="top-nav">
+      <div class="top-nav-inner">
+        <a class="brand" href="../index.html">
+          <span class="brand-mark" aria-hidden="true"><img src="../favicon.svg" alt="" /></span>
+          <span>fideo-js</span>
+          <span class="tag" data-version>docs</span>
+        </a>
+        <button class="nav-toggle" data-nav-toggle aria-expanded="false">Menu</button>
+        <div class="top-nav-links">
+          <a href="../index.html">Overview</a>
+          <a href="../improvements.html">Benchmarks</a>
+          <a href="https://github.com/devjtv/fideo-js">GitHub</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar" data-docs-sidebar></aside>
+
+      <main class="content">
+        <p class="page-kicker">Interface</p>
+        <h1>Controls &amp; keyboard</h1>
+        <p class="lede">
+          One control bar for every provider, rendered inside a shadow root so page CSS cannot break it and its own
+          styles cannot leak out.
+        </p>
+
+        <div class="demo">
+          <div class="demo-stage">
+            <video id="controls-demo" src="../media/fideo-demo.mp4" poster="../media/fideo-demo-poster.jpg" playsinline></video>
+          </div>
+          <div class="demo-foot"><span>Click the video, then try the shortcuts below</span><span class="mono" data-controls-state>—</span></div>
+        </div>
+
+        <h2 id="anatomy">Anatomy</h2>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Control</th><th>Behaviour</th></tr></thead>
+              <tbody>
+                <tr><td>Play / pause</td><td>Icon and label follow playback state.</td></tr>
+                <tr><td>Elapsed / duration</td><td>Tabular figures, so the bar does not jitter as digits change. Switches to <code>h:mm:ss</code> past an hour.</td></tr>
+                <tr><td>Timeline</td><td>A range input. Shows played, buffered and remaining as three bands; interpolates between updates so it moves smoothly.</td></tr>
+                <tr><td>Volume</td><td>Mute toggle that reveals a vertical slider on hover or focus. Dragging to zero mutes; unmuting restores the last audible level.</td></tr>
+                <tr><td>Settings</td><td>Playback-rate menu. The active rate is ticked and exposed as <code>aria-checked</code>.</td></tr>
+                <tr><td>Fullscreen</td><td>Requests fullscreen on the wrapper, so posters, overlays and controls all scale with it.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="note">
+          <strong>Only HTML5 reports a buffered range.</strong> The band is there for every provider, but iframe
+          providers report zero, so it stays empty. See <a href="./providers.html#differences">capability differences</a>.
+        </div>
+
+        <h2 id="keyboard">Keyboard</h2>
+        <p>
+          A transparent button covers the video surface. It is the click-to-play target and the shortcut host, so
+          shortcuts work once a player has focus and never hijack keys while the visitor is typing elsewhere on the page.
+        </p>
+        <div class="table-wrap">
+          <div class="table-head">With the player focused</div>
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Key</th><th>Action</th></tr></thead>
+              <tbody>
+                <tr><td><kbd>Space</kbd> / <kbd>Enter</kbd></td><td>Play or pause</td></tr>
+                <tr><td><kbd>←</kbd> / <kbd>→</kbd></td><td>Seek 5 seconds, clamped to the duration</td></tr>
+                <tr><td><kbd>↑</kbd> / <kbd>↓</kbd></td><td>Volume by 10%. <kbd>↑</kbd> also unmutes.</td></tr>
+                <tr><td><kbd>M</kbd></td><td>Toggle mute</td></tr>
+                <tr><td><kbd>F</kbd></td><td>Toggle fullscreen</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-head">With the settings menu open</div>
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Key</th><th>Action</th></tr></thead>
+              <tbody>
+                <tr><td><kbd>↑</kbd> / <kbd>↓</kbd></td><td>Move between rates, wrapping at the ends</td></tr>
+                <tr><td><kbd>Home</kbd> / <kbd>End</kbd></td><td>First or last rate</td></tr>
+                <tr><td><kbd>Esc</kbd></td><td>Close and return focus to the settings button</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p><kbd>Esc</kbd> closes the volume panel too, returning focus to the mute button.</p>
+
+        <h2 id="visibility">When the bar is visible</h2>
+        <p>The control bar fades in on any of these, and fades out again shortly after activity stops during playback.</p>
+        <ul class="plain">
+          <li>Pointer over the player</li>
+          <li>Focus anywhere inside it, so keyboard users never lose the controls</li>
+          <li>While paused — a paused player keeps its controls up</li>
+          <li>For about 1.8 seconds after a shortcut or a click</li>
+        </ul>
+        <div class="note">
+          <strong>Visibility is driven by classes on the wrapper</strong> — <code>is-playing</code>,
+          <code>is-paused</code>, <code>is-user-active</code>, <code>has-poster</code>,
+          <code>is-poster-visible</code>, <code>is-fullscreen</code>. Hook your own CSS onto them, or force the bar
+          open in a demo by adding <code>is-user-active</code>.
+        </div>
+
+        <h2 id="hiding">Hiding controls</h2>
+        <p>Drop individual controls, or the whole bar. Hidden controls are never created, not merely hidden with CSS.</p>
+        <div class="demo">
+          <div class="demo-stage">
+            <video
+              id="minimal-demo"
+              data-fideo-show-settings="false"
+              data-fideo-show-volume="false"
+              data-fideo-show-duration="false"
+              src="../media/fideo-demo.mp4"
+              poster="../media/fideo-demo-poster.jpg"
+              playsinline
+            ></video>
+          </div>
+          <div class="demo-foot"><span>Play, elapsed time, timeline and fullscreen only</span><span class="mono">3 controls removed</span></div>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>The markup above</span><span class="lang">html</span></div>
+<pre><span class="tk-tag">&lt;video</span>
+  <span class="tk-attr">data-fideo</span>
+  <span class="tk-attr">data-fideo-show-settings</span>=<span class="tk-str">"false"</span>
+  <span class="tk-attr">data-fideo-show-volume</span>=<span class="tk-str">"false"</span>
+  <span class="tk-attr">data-fideo-show-duration</span>=<span class="tk-str">"false"</span>
+<span class="tk-tag">&gt;&lt;/video&gt;</span></pre>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>No control bar at all</span><span class="lang">html</span></div>
+<pre><span class="tk-tag">&lt;video</span> <span class="tk-attr">data-fideo</span> <span class="tk-attr">data-fideo-controls</span>=<span class="tk-str">"false"</span><span class="tk-tag">&gt;&lt;/video&gt;</span></pre>
+        </div>
+        <div class="note warn">
+          <strong><code>controls: false</code> also removes the click target.</strong> With no control bar there is no
+          click-to-play and no keyboard shortcuts, so drive the player from your own UI through the
+          <a href="./api.html">JavaScript API</a>.
+        </div>
+
+        <h2 id="accessibility">Accessibility</h2>
+        <ul class="plain">
+          <li><b>Every control is a real button or range input</b> with an accessible name, reachable by keyboard in DOM order.</li>
+          <li><b>The timeline exposes <code>aria-valuetext</code></b> as "elapsed of duration", updated once per second rather than every frame so screen readers are not flooded.</li>
+          <li><b>The mute button carries <code>aria-pressed</code></b>; the settings menu uses <code>menuitemradio</code> with <code>aria-checked</code> on the active rate.</li>
+          <li><b>The click target has a visible focus ring</b> drawn in the player's accent colour.</li>
+          <li><b>Timeline interpolation is skipped</b> when <code>prefers-reduced-motion: reduce</code> is set.</li>
+        </ul>
+        <div class="note">
+          <strong>Captions are not part of the control bar yet.</strong> Native <code>&lt;track&gt;</code> elements
+          still work on an HTML5 player, and providers keep their own caption handling, but Fideo does not render a
+          caption toggle.
+        </div>
+
+        <nav class="page-nav" data-docs-pagenav></nav>
+      </main>
+    </div>
+
+    <script src="../../dist/fideo.global.js"></script>
+    <script type="module" src="./_assets/docs.js"></script>
+    <script type="module">
+      const player = mountFideo(document.querySelector('#controls-demo'), { muted: true, loop: true, volume: 0.6 });
+      const readout = document.querySelector('[data-controls-state]');
+
+      const render = () => {
+        const state = player.getState();
+        readout.textContent = `${state.paused ? 'paused' : 'playing'} · ${state.playbackRate}× · ${
+          state.muted ? 'muted' : Math.round(state.volume * 100) + '%'
+        }`;
+      };
+
+      render();
+      ['fideo:play', 'fideo:pause', 'fideo:volumechange', 'fideo:change', 'fideo:timeupdate'].forEach((event) =>
+        player.element.addEventListener(event, render),
+      );
+
+      mountFideo(document.querySelector('#minimal-demo'), { muted: true, loop: true });
+    </script>
+  </body>
+</html>

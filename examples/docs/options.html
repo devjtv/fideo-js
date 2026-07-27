@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Options reference — Fideo JS docs</title>
+    <meta name="description" content="Every Fideo JS option: type, default, data-attribute equivalent and what it does." />
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+    <link rel="preconnect" href="https://rsms.me/" />
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+    <link rel="stylesheet" href="./_assets/docs.css" />
+    <script>
+      window.__fideoAutoInit = { selector: '[data-fideo-auto]' };
+    </script>
+  </head>
+  <body>
+    <header class="top-nav">
+      <div class="top-nav-inner">
+        <a class="brand" href="../index.html">
+          <span class="brand-mark" aria-hidden="true"><img src="../favicon.svg" alt="" /></span>
+          <span>fideo-js</span>
+          <span class="tag" data-version>docs</span>
+        </a>
+        <button class="nav-toggle" data-nav-toggle aria-expanded="false">Menu</button>
+        <div class="top-nav-links">
+          <a href="../index.html">Overview</a>
+          <a href="../improvements.html">Benchmarks</a>
+          <a href="https://github.com/devjtv/fideo-js">GitHub</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar" data-docs-sidebar></aside>
+
+      <main class="content">
+        <p class="page-kicker">Configure</p>
+        <h1>Options reference</h1>
+        <p class="lede">
+          The same options object is accepted by every entry point. Nearly all of them have a
+          <code>data-fideo-*</code> equivalent listed on <a href="./attributes.html">Data attributes</a>.
+        </p>
+
+        <h2 id="playground">Try them</h2>
+        <p>Each toggle destroys the player and mounts it again with the option changed, since options are fixed at mount.</p>
+
+        <div class="demo">
+          <div class="demo-stage">
+            <video id="playground-player" src="../media/fideo-demo.mp4" poster="../media/fideo-demo-poster.jpg" playsinline></video>
+          </div>
+          <div class="demo-foot"><span>Mounted with</span><span class="mono" data-playground-summary>—</span></div>
+        </div>
+        <div class="btn-row" data-playground-controls>
+          <button class="action" data-opt="controls" aria-pressed="true">controls</button>
+          <button class="action" data-opt="loop" aria-pressed="true">loop</button>
+          <button class="action" data-opt="timeline" aria-pressed="true">timeline</button>
+          <button class="action" data-opt="volume" aria-pressed="true">volume</button>
+          <button class="action" data-opt="settings" aria-pressed="true">settings</button>
+          <button class="action" data-opt="fullscreen" aria-pressed="true">fullscreen</button>
+          <button class="action" data-opt="duration" aria-pressed="true">duration</button>
+        </div>
+
+        <h2 id="playback">Playback</h2>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Option</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td class="mono">autoplay</td><td><span class="type">boolean</span></td><td><span class="default">false</span></td>
+                  <td>Starts playback once the player is mounted. Subject to browser autoplay policy — pair it with <code>muted</code>.</td>
+                </tr>
+                <tr>
+                  <td class="mono">muted</td><td><span class="type">boolean</span></td><td><span class="default">false</span></td>
+                  <td>Starts muted. Forced on when <code>background</code> is set.</td>
+                </tr>
+                <tr>
+                  <td class="mono">loop</td><td><span class="type">boolean</span></td><td><span class="default">false</span></td>
+                  <td>Repeats on end. For YouTube this also adds the <code>playlist</code> parameter the API requires.</td>
+                </tr>
+                <tr>
+                  <td class="mono">playsInline</td><td><span class="type">boolean</span></td><td><span class="default">true</span></td>
+                  <td>Keeps playback inline on iOS rather than going fullscreen.</td>
+                </tr>
+                <tr>
+                  <td class="mono">volume</td><td><span class="type">number</span></td><td><span class="default">1</span></td>
+                  <td>Initial volume, <code>0</code>–<code>1</code>. Clamped.</td>
+                </tr>
+                <tr>
+                  <td class="mono">playbackRates</td><td><span class="type">number[]</span></td><td><span class="default">[0.5, 1, 1.25, 1.5, 2]</span></td>
+                  <td>Rates offered in the settings menu.</td>
+                </tr>
+                <tr>
+                  <td class="mono">preload</td><td><span class="type">'none' | 'metadata' | 'auto'</span></td><td><span class="default">'metadata'</span></td>
+                  <td>Maps to the <code>&lt;video&gt;</code> preload attribute. HTML5 only.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <h2 id="loading-opts">Loading</h2>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Option</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td class="mono">lazy</td><td><span class="type">boolean</span></td><td><span class="default">true for iframes</span></td>
+                  <td>Defers the provider SDK and the embed until the player nears the viewport. <code>false</code> for <code>&lt;video&gt;</code>.</td>
+                </tr>
+                <tr>
+                  <td class="mono">lazyRootMargin</td><td><span class="type">string</span></td><td><span class="default">'800px 0px'</span></td>
+                  <td>The <code>IntersectionObserver</code> margin that decides how early loading starts.</td>
+                </tr>
+                <tr>
+                  <td class="mono">provider</td><td><span class="type">'auto' | 'html5' | 'youtube' | 'vimeo' | 'wistia'</span></td><td><span class="default">'auto'</span></td>
+                  <td>Skips URL inference. See <a href="./providers.html#detection">detection</a>.</td>
+                </tr>
+                <tr>
+                  <td class="mono">disabledProviders</td><td><span class="type">FideoProviderName[]</span></td><td><span class="default">[]</span></td>
+                  <td>Guarantees those SDKs are never loaded. Mounting a disabled provider throws.</td>
+                </tr>
+                <tr>
+                  <td class="mono">selector</td><td><span class="type">string</span></td><td><span class="default">'[data-fideo]'</span></td>
+                  <td>What <code>initFideo()</code> queries. Ignored by the single-player entry points.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <h2 id="media">Sources and posters</h2>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Option</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td class="mono">sources</td><td><span class="type">string | { desktop?, tablet?, mobile? }</span></td><td><span class="default">{}</span></td>
+                  <td>A string is treated as <code>{ desktop }</code>. Swapped on resize. See <a href="./responsive.html">Responsive media</a>.</td>
+                </tr>
+                <tr>
+                  <td class="mono">posters</td><td><span class="type">string | { desktop?, tablet?, mobile? }</span></td><td><span class="default">{}</span></td>
+                  <td>Rendered as an overlay image that hides on play.</td>
+                </tr>
+                <tr>
+                  <td class="mono">breakpoints</td><td><span class="type">{ mobile?, tablet? }</span></td><td><span class="default">{ mobile: 767, tablet: 1024 }</span></td>
+                  <td>Widths in pixels that decide which source and poster apply.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <h2 id="behaviour">Layout and behaviour</h2>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Option</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td class="mono">background</td><td><span class="type">boolean</span></td><td><span class="default">false</span></td>
+                  <td>Cover-fills the container and forces <code>autoplay</code>, <code>muted</code>, <code>loop</code> and <code>playsInline</code>. Also turns controls off unless you ask for them.</td>
+                </tr>
+                <tr>
+                  <td class="mono">backgroundAspectRatio</td><td><span class="type">number | string</span></td><td><span class="default">16 / 9</span></td>
+                  <td>Source aspect ratio used for cover maths. Accepts <code>1.777</code>, <code>'16:9'</code> or <code>'16/9'</code>.</td>
+                </tr>
+                <tr>
+                  <td class="mono">viewport</td><td><span class="type">false | 'play' | 'pause' | 'play-pause'</span></td><td><span class="default">false</span></td>
+                  <td>Plays and/or pauses as the player scrolls in and out of view. Background players default to <code>'play-pause'</code>.</td>
+                </tr>
+                <tr>
+                  <td class="mono">viewportThreshold</td><td><span class="type">number</span></td><td><span class="default">0.35</span></td>
+                  <td>How much of the player must be visible to count as in view.</td>
+                </tr>
+                <tr>
+                  <td class="mono">controls</td><td><span class="type">boolean</span></td><td><span class="default">true, or false in background mode</span></td>
+                  <td>Renders the control bar. When off, no click-to-toggle target is created either.</td>
+                </tr>
+                <tr>
+                  <td class="mono">controlVisibility</td><td><span class="type">Partial&lt;FideoControlVisibility&gt;</span></td><td><span class="default">all true</span></td>
+                  <td>Per-control switches — see below.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <h3 id="control-visibility">controlVisibility</h3>
+        <p>Every key defaults to <code>true</code>. Hiding a control removes it from the DOM rather than hiding it with CSS.</p>
+        <div class="code">
+          <div class="code-head"><span>A minimal bar</span><span class="lang">js</span></div>
+<pre><span class="tk-fn">initFideo</span>({
+  controlVisibility: {
+    play: <span class="tk-kw">true</span>,
+    timeline: <span class="tk-kw">true</span>,
+    currentTime: <span class="tk-kw">false</span>,
+    duration: <span class="tk-kw">false</span>,
+    volume: <span class="tk-kw">true</span>,
+    settings: <span class="tk-kw">false</span>,
+    fullscreen: <span class="tk-kw">true</span>,
+  },
+});</pre>
+        </div>
+
+        <h2 id="appearance">Appearance</h2>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Option</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td class="mono">cssVars</td><td><span class="type">Record&lt;string, string&gt;</span></td><td><span class="default">{}</span></td>
+                  <td>Custom properties set inline on the wrapper. See <a href="./theming.html">Theming</a>.</td>
+                </tr>
+                <tr>
+                  <td class="mono">className</td><td><span class="type">string</span></td><td><span class="default">''</span></td>
+                  <td>Extra class added to the generated <code>.fideo</code> wrapper.</td>
+                </tr>
+                <tr>
+                  <td class="mono">icons</td><td><span class="type">FideoIcons</span></td><td><span class="default">{}</span></td>
+                  <td>Inline SVG strings replacing any of the built-in icons.</td>
+                </tr>
+                <tr>
+                  <td class="mono">injectStyles</td><td><span class="type">boolean</span></td><td><span class="default">true</span></td>
+                  <td>Adds the wrapper stylesheet to <code>&lt;head&gt;</code> on first mount. Set <code>false</code> if you link <code>dist/fideo.css</code> yourself.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <h2 id="resolved">Reading what was resolved</h2>
+        <p>
+          <code>player.options</code> holds the fully-resolved configuration — defaults applied, attributes merged,
+          every optional field filled in. It is the quickest way to check why a player is behaving the way it is.
+        </p>
+        <div class="code">
+          <div class="code-head"><span>Debugging a player</span><span class="lang">js</span></div>
+<pre><span class="tk-kw">const</span> player = <span class="tk-fn">mountFideo</span>(el);
+console.<span class="tk-fn">log</span>(player.options);
+<span class="tk-com">// { provider: 'html5', autoplay: false, muted: false, volume: 1,</span>
+<span class="tk-com">//   breakpoints: { mobile: 767, tablet: 1024 }, … }</span></pre>
+        </div>
+
+        <nav class="page-nav" data-docs-pagenav></nav>
+      </main>
+    </div>
+
+    <script src="../../dist/fideo.global.js"></script>
+    <script type="module" src="./_assets/docs.js"></script>
+    <script type="module">
+      const el = document.querySelector("#playground-player");
+      const summary = document.querySelector('[data-playground-summary]');
+      const state = { controls: true, loop: true, timeline: true, volume: true, settings: true, fullscreen: true, duration: true };
+      let player = null;
+
+      function apply() {
+        player?.destroy();
+        player = mountFideo(el, {
+          muted: true,
+          controls: state.controls,
+          loop: state.loop,
+          controlVisibility: {
+            timeline: state.timeline,
+            volume: state.volume,
+            settings: state.settings,
+            fullscreen: state.fullscreen,
+            duration: state.duration,
+          },
+        });
+
+        const off = Object.entries(state)
+          .filter(([, on]) => !on)
+          .map(([key]) => key);
+        summary.textContent = off.length ? `disabled: ${off.join(', ')}` : 'everything enabled';
+      }
+
+      document.querySelector('[data-playground-controls]').addEventListener('click', (event) => {
+        const button = event.target.closest('[data-opt]');
+        if (!button) return;
+        const key = button.dataset.opt;
+        state[key] = !state[key];
+        button.setAttribute('aria-pressed', String(state[key]));
+        apply();
+      });
+
+      apply();
+    </script>
+  </body>
+</html>

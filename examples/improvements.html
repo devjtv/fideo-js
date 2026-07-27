@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fideo JS — what changed and what it bought</title>
+    <meta name="robots" content="noindex" />
+    <meta
+      name="description"
+      content="The released Fideo JS build and the current build, rendering the same state side by side, with a benchmark that runs live in your browser."
+    />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <style>
+      :root {
+        --bg: #07090c;
+        --panel: #0f131a;
+        --panel-2: #151a23;
+        --line: #212836;
+        --line-soft: #1a202b;
+        --text: #eaeff6;
+        --muted: #8b95a7;
+        --dim: #626c7e;
+        --accent: #46d9a7;
+        --bad: #ef7a6d;
+        --warn: #f0b45f;
+        color-scheme: dark;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        padding: 0 24px 120px;
+        background:
+          radial-gradient(1200px 600px at 50% -200px, rgba(70, 217, 167, 0.07), transparent 70%),
+          var(--bg);
+        color: var(--text);
+        font: 15px/1.65 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .wrap { max-width: 1000px; margin: 0 auto; }
+
+      h1 { margin: 0 0 14px; font-size: clamp(30px, 4.6vw, 46px); line-height: 1.1; letter-spacing: -0.03em; }
+      h2 {
+        margin: 0 0 6px;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+      h3 { margin: 0 0 10px; font-size: 22px; letter-spacing: -0.015em; }
+      p { margin: 0 0 14px; color: var(--muted); max-width: 70ch; }
+      code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.88em; color: #c9d3e2; }
+      kbd {
+        padding: 1px 6px;
+        border: 1px solid var(--line);
+        border-bottom-width: 2px;
+        border-radius: 5px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.82em;
+        color: #c9d3e2;
+      }
+
+      header { padding: 76px 0 44px; }
+      .lede { font-size: 18px; line-height: 1.6; color: #adb8c8; max-width: 66ch; }
+
+      .pill {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 20px;
+        padding: 5px 12px 5px 8px;
+        background: rgba(70, 217, 167, 0.08);
+        border: 1px solid rgba(70, 217, 167, 0.22);
+        border-radius: 999px;
+        font-size: 12.5px;
+        color: #9fe6cd;
+      }
+      .pill::before {
+        width: 6px;
+        height: 6px;
+        background: var(--accent);
+        border-radius: 50%;
+        content: "";
+      }
+
+      section { padding: 64px 0 0; }
+      section + section { border-top: 1px solid var(--line-soft); margin-top: 64px; }
+
+      .hero-player { margin: 28px 0 8px; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+      .caption { margin-top: 10px; font-size: 13px; color: var(--dim); }
+
+      .stats { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); margin-top: 28px; }
+      .stat { padding: 18px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
+      .stat .k { display: block; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--dim); }
+      .stat .v { display: block; margin-top: 8px; font-size: 30px; font-weight: 650; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; color: var(--accent); }
+      .stat .n { display: block; margin-top: 6px; font-size: 12.5px; line-height: 1.5; color: var(--muted); }
+
+      .compare { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; margin: 24px 0 6px; }
+      .compare figure { margin: 0; }
+      .compare figcaption {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 10px;
+        margin-bottom: 8px;
+        font-size: 12.5px;
+        color: var(--dim);
+      }
+      .compare .tag { font-weight: 600; letter-spacing: 0.02em; }
+      .compare .before .tag { color: var(--bad); }
+      .compare .after .tag { color: var(--accent); }
+      .frame {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #0b0e13;
+        display: block;
+      }
+      .compare .after .frame { border-color: rgba(70, 217, 167, 0.35); }
+
+      .verdict { margin-top: 12px; font-size: 13.5px; color: var(--muted); }
+      .verdict b { color: var(--text); font-weight: 600; }
+
+      .panel { margin: 22px 0; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+      .panel-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 18px;
+        border-bottom: 1px solid var(--line);
+        font-size: 12px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--dim);
+      }
+      .scroller { overflow-x: auto; }
+
+      table { width: 100%; border-collapse: collapse; font-size: 14px; }
+      th, td { padding: 11px 18px; text-align: left; border-bottom: 1px solid var(--line-soft); }
+      th { color: var(--dim); font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.06em; }
+      tbody tr:last-child td { border-bottom: 0; }
+      td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+      tbody tr.total td { background: rgba(255, 255, 255, 0.02); font-weight: 600; }
+
+      .delta { font-weight: 600; }
+      .good { color: var(--accent); }
+      .neutral { color: var(--dim); }
+      .bad { color: var(--bad); }
+
+      ul { margin: 0 0 14px; padding-left: 20px; color: var(--muted); max-width: 70ch; }
+      li { margin-bottom: 8px; }
+      li b { color: var(--text); font-weight: 600; }
+
+      .note {
+        margin: 20px 0;
+        padding: 15px 18px;
+        border: 1px solid rgba(240, 180, 95, 0.25);
+        border-left-width: 2px;
+        border-left-color: var(--warn);
+        border-radius: 0 10px 10px 0;
+        background: rgba(240, 180, 95, 0.05);
+        color: #d9c6a4;
+        font-size: 14px;
+      }
+      .note strong { color: #f0d5aa; }
+
+      .metrics-host { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); pointer-events: none; }
+
+      .status { color: var(--dim); font-style: italic; }
+
+      @media (max-width: 760px) {
+        .compare { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <span class="pill">Benchmarked live in this browser</span>
+        <h1>What changed in Fideo,<br />and what it actually bought</h1>
+        <p class="lede">
+          Every comparison below runs two real builds at once: the released <code>v0.6.0</code> bundle, pinned and
+          committed to the repo, and the current working build. Same markup, same state, same harness code — only the
+          library differs.
+        </p>
+      </header>
+
+      <section>
+        <h2>The player</h2>
+        <h3>Current build, no stylesheet link</h3>
+        <p>
+          This player is mounted by <code>&lt;script src="fideo.global.js"&gt;</code> alone. The released build could
+          not do that: its page-scope CSS positioned the shadow host, so a missing <code>&lt;link&gt;</code> left the
+          controls stacked in the top-left corner. Hover for the controls.
+        </p>
+        <div class="hero-player">
+          <iframe
+            class="frame"
+            style="border: 0; border-radius: 0"
+            src="./bench/player.html?build=current&scenario=play"
+            title="Fideo current build, playing"
+          ></iframe>
+        </div>
+        <p class="caption">16-second procedurally generated clip, 101 KB, bundled with the repo — no external requests.</p>
+
+        <div class="stats" id="headline">
+          <div class="stat"><span class="k">Benchmark</span><span class="v">…</span><span class="n">Running both builds.</span></div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Fix 01</h2>
+        <h3>Durations past an hour were wrong</h3>
+        <p>
+          <code>formatTime</code> divided seconds by 60 once and stopped, so an hour-long video reported inflated
+          minutes. Both frames are driven with the same state: 3,904 seconds total, 2,704 elapsed.
+        </p>
+        <div class="compare">
+          <figure class="before">
+            <figcaption><span class="tag">v0.6.0</span><span>reads as 65 minutes</span></figcaption>
+            <iframe class="frame" src="./bench/player.html?build=legacy&scenario=hours" title="v0.6.0 hour formatting"></iframe>
+          </figure>
+          <figure class="after">
+            <figcaption><span class="tag">Current</span><span>reads as 1:05:04</span></figcaption>
+            <iframe class="frame" src="./bench/player.html?build=current&scenario=hours" title="Current build hour formatting"></iframe>
+          </figure>
+        </div>
+        <p class="verdict">Any video over 60 minutes displayed a duration that <b>did not exist</b>. Now covered by unit tests.</p>
+      </section>
+
+      <section>
+        <h2>Fix 02</h2>
+        <h3>The buffered range was computed but never drawn</h3>
+        <p>
+          The HTML5 provider had always populated <code>state.buffered</code>. Nothing consumed it. The timeline now
+          paints it as a third band behind the played portion. Both frames are driven with <code>buffered: 0.62</code>
+          at 23% elapsed.
+        </p>
+        <div class="compare">
+          <figure class="before">
+            <figcaption><span class="tag">v0.6.0</span><span>flat track, no load state</span></figcaption>
+            <iframe class="frame" src="./bench/player.html?build=legacy&scenario=buffered" title="v0.6.0 timeline"></iframe>
+          </figure>
+          <figure class="after">
+            <figcaption><span class="tag">Current</span><span>played · buffered · remaining</span></figcaption>
+            <iframe class="frame" src="./bench/player.html?build=current&scenario=buffered" title="Current build timeline"></iframe>
+          </figure>
+        </div>
+        <p class="verdict">Data the library already had, surfaced for <b>zero runtime cost</b> — one extra gradient stop.</p>
+      </section>
+
+      <section>
+        <h2>Fix 03</h2>
+        <h3>The speed menu never showed the active rate</h3>
+        <p>
+          Menu items were plain <code>menuitem</code> buttons with no selected state — nothing visual, nothing for
+          assistive tech. They are now <code>menuitemradio</code> with a live <code>aria-checked</code> state and a tick.
+          Both frames are driven at 1.5× with the menu open.
+        </p>
+        <div class="compare">
+          <figure class="before">
+            <figcaption><span class="tag">v0.6.0</span><span>which one is active?</span></figcaption>
+            <iframe class="frame" src="./bench/player.html?build=legacy&scenario=speed" title="v0.6.0 speed menu"></iframe>
+          </figure>
+          <figure class="after">
+            <figcaption><span class="tag">Current</span><span>1.5× ticked and announced</span></figcaption>
+            <iframe class="frame" src="./bench/player.html?build=current&scenario=speed" title="Current build speed menu"></iframe>
+          </figure>
+        </div>
+        <p class="verdict">A screen reader now announces the rate as <b>selected</b> instead of reading four identical buttons.</p>
+      </section>
+
+      <section>
+        <h2>Fix 04</h2>
+        <h3>Keyboard focus landed on an invisible button</h3>
+        <p>
+          A transparent button covers the whole video to catch play/pause clicks, and it is first in tab order. It had
+          no focus style, so tabbing into a player moved focus nowhere visible. Click inside either frame and press
+          <kbd>Tab</kbd>.
+        </p>
+        <div class="compare">
+          <figure class="before">
+            <figcaption><span class="tag">v0.6.0</span><span>no visible focus</span></figcaption>
+            <iframe class="frame" src="./bench/player.html?build=legacy&scenario=focus" title="v0.6.0 focus behaviour"></iframe>
+          </figure>
+          <figure class="after">
+            <figcaption><span class="tag">Current</span><span>inset focus ring</span></figcaption>
+            <iframe class="frame" src="./bench/player.html?build=current&scenario=focus" title="Current build focus behaviour"></iframe>
+          </figure>
+        </div>
+        <p class="verdict">Required for <b>WCAG 2.4.7</b>. The ring uses the player's own accent variable.</p>
+      </section>
+
+      <section>
+        <h2>Fix 05</h2>
+        <h3>The timeline rewrote the DOM 60 times a second</h3>
+        <p>
+          Progress is interpolated on <code>requestAnimationFrame</code> so the bar moves smoothly. The released build
+          rewrote both time labels, the <code>aria-valuetext</code> attribute, the input value and the progress
+          property on every frame — even though the visible clock only changes once a second, and screen readers were
+          re-announced 60 times a second.
+        </p>
+        <p>
+          The current build keeps the per-frame property update and drops every write whose value has not changed. The
+          harness below mounts six players in each build and pushes one state update per animation frame for three
+          seconds, with playback time advancing in real time.
+        </p>
+        <div class="panel">
+          <div class="panel-head"><span>DOM writes · 6 players · 3 seconds</span><span id="writes-frames"></span></div>
+          <div class="scroller">
+            <table id="writes-table">
+              <thead>
+                <tr><th>Operation</th><th class="num">v0.6.0</th><th class="num">Current</th><th class="num">Delta</th></tr>
+              </thead>
+              <tbody><tr><td class="status" colspan="4">Waiting for both builds…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+        <p class="verdict">
+          DOM writes are a proxy for style and layout work, not a direct measure of frame time. The reduction is real;
+          what it saves depends on the page.
+        </p>
+      </section>
+
+      <section>
+        <h2>Fix 06</h2>
+        <h3>Every player cloned the entire stylesheet</h3>
+        <p>
+          Controls live in a shadow root. The released build copied all 7.6 KB of CSS into a fresh
+          <code>&lt;style&gt;</code> node per player, and that CSS carried every page-scope rule
+          (<code>.fideo</code>, <code>.fideo__poster</code>, <code>.fideo__click-target</code>) which can never match
+          inside a shadow root. The sheet is now split in two, and the controls half is adopted once and shared by
+          every instance.
+        </p>
+        <div class="panel">
+          <div class="panel-head"><span>Stylesheet cost · 6 players</span></div>
+          <div class="scroller">
+            <table id="styles-table">
+              <thead>
+                <tr><th>Measurement</th><th class="num">v0.6.0</th><th class="num">Current</th><th class="num">Delta</th></tr>
+              </thead>
+              <tbody><tr><td class="status" colspan="4">Waiting for both builds…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Fix 07</h2>
+        <h3>One bad element took down every player on the page</h3>
+        <p>
+          <code>initFideo()</code> mapped over its matches, so the first element that threw — a disabled provider, an
+          iframe a provider rejects — aborted every remaining mount. It now warns and continues. The harness mounts a
+          Vimeo iframe with <code>disabledProviders: ['vimeo']</code> next to one healthy video.
+        </p>
+        <div class="panel">
+          <div class="panel-head"><span>Two elements, one of them unmountable</span></div>
+          <div class="scroller">
+            <table id="resilience-table">
+              <thead>
+                <tr><th>Build</th><th>Outcome</th><th class="num">Players mounted</th></tr>
+              </thead>
+              <tbody><tr><td class="status" colspan="3">Waiting for both builds…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Fix 08</h2>
+        <h3>Setup lost a required step</h3>
+        <p>
+          Because the page-scope CSS is what positions the shadow host, forgetting the stylesheet produced a broken
+          player rather than an unstyled one. That half is now injected once per document, prepended to
+          <code>&lt;head&gt;</code> so author CSS still wins the cascade. Opt out with <code>injectStyles: false</code>.
+        </p>
+        <div class="panel">
+          <div class="panel-head"><span>What the page has to provide</span></div>
+          <div class="scroller">
+            <table id="setup-table">
+              <thead>
+                <tr><th>Measurement</th><th class="num">v0.6.0</th><th class="num">Current</th><th class="num">Delta</th></tr>
+              </thead>
+              <tbody><tr><td class="status" colspan="4">Waiting for both builds…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><span>Transfer size · gzip · measured from the builds on disk</span></div>
+          <div class="scroller">
+            <table>
+              <thead>
+                <tr><th>File</th><th class="num">v0.6.0</th><th class="num">Current</th><th class="num">Delta</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>fideo.global.js</code></td><td class="num">14,011 B</td><td class="num">14,839 B</td><td class="num delta bad">+828 B</td></tr>
+                <tr><td><code>fideo.css</code></td><td class="num">1,818 B</td><td class="num">919 B</td><td class="num delta good">−899 B</td></tr>
+                <tr class="total"><td>Script + stylesheet</td><td class="num">15,829 B</td><td class="num">15,758 B</td><td class="num delta good">−71 B</td></tr>
+                <tr class="total"><td>Script only — not possible before</td><td class="num">15,829 B</td><td class="num">14,839 B</td><td class="num delta good">−990 B · −6.3%</td></tr>
+                <tr><td>Requests for a styled player</td><td class="num">2</td><td class="num">1</td><td class="num delta good">−1</td></tr>
+                <tr><td><code>fideo.css</code>, uncompressed</td><td class="num">7,661 B</td><td class="num">2,904 B</td><td class="num delta good">−62.1%</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="note">
+          <strong>The script got bigger.</strong> Moving the page CSS into JavaScript costs 828 gzipped bytes. If you
+          already link the stylesheet and never wanted injection, this trade nets you 71 bytes — it buys a removed
+          setup step, not raw bytes. The 6.3% saving applies to the script-only path the released build could not offer.
+        </div>
+      </section>
+
+      <section>
+        <h2>Also shipped</h2>
+        <h3>Smaller corrections in the same pass</h3>
+        <ul>
+          <li><b>Fullscreen ownership.</b> The control-bar button exited fullscreen even when a different element owned it. It now checks, matching what the <kbd>F</kbd> shortcut already did.</li>
+          <li><b>Escape closes the volume panel</b> and returns focus to the mute button. Only the settings menu handled it before.</li>
+          <li><b>Reduced-motion query resolved once</b> instead of allocating a <code>MediaQueryList</code> on every <code>timeupdate</code>.</li>
+          <li><b>Tests</b> now run with real CSS processing, so the injected and adopted stylesheets are covered rather than stubbed. Suite is 48 passing.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Not in these numbers</h2>
+        <h3>Identified, not yet built</h3>
+        <ul>
+          <li><b>Provider code splitting.</b> An MP4-only page still downloads the YouTube, Vimeo and Wistia adapters.</li>
+          <li><b>YouTube polling.</b> A 250 ms interval runs forever, including in background tabs.</li>
+          <li><b>Vimeo round trips.</b> Every volume or seek call triggers five async postMessage queries.</li>
+          <li><b>Background-cover reflow.</b> Size reads and style writes are interleaved inside a ResizeObserver callback.</li>
+          <li><b>Aspect ratio.</b> The wrapper is hard-coded to 16:9 with <code>object-fit: cover</code>, so a 4:3 or vertical source is cropped rather than fitted.</li>
+        </ul>
+        <p>
+          Memory held by duplicated stylesheets is reported as attached CSS text, not heap usage — the real cost is
+          larger than the text and engine-dependent.
+        </p>
+      </section>
+    </div>
+
+    <div class="metrics-host">
+      <iframe src="./bench/metrics-legacy.html" title="v0.6.0 metrics harness"></iframe>
+      <iframe src="./bench/metrics-next.html" title="Current build metrics harness"></iframe>
+    </div>
+
+    <script type="module">
+      const results = {};
+      const fmt = new Intl.NumberFormat('en-US');
+      const bytes = (n) => `${fmt.format(n)} B`;
+
+      function deltaCell(before, after, { lowerIsBetter = true, unit = '', render } = {}) {
+        if (before === after) return '<td class="num delta neutral">no change</td>';
+        const diff = after - before;
+        const improved = lowerIsBetter ? diff < 0 : diff > 0;
+        const pct = before === 0 ? null : Math.round((Math.abs(diff) / before) * 100);
+        const sign = diff > 0 ? '+' : '−';
+        const magnitude = render ? `${sign}${render(Math.abs(diff))}` : `${sign}${fmt.format(Math.abs(diff))}${unit}`;
+        const suffix = pct === null ? '' : ` · ${sign}${pct}%`;
+        return `<td class="num delta ${improved ? 'good' : 'bad'}">${magnitude}${suffix}</td>`;
+      }
+
+      function row(label, before, after, opts = {}) {
+        const render = opts.render || ((v) => fmt.format(v));
+        return `<tr><td>${label}</td><td class="num">${render(before)}</td><td class="num">${render(after)}</td>${deltaCell(before, after, opts)}</tr>`;
+      }
+
+      function fill(id, html) {
+        document.querySelector(`#${id} tbody`).innerHTML = html;
+      }
+
+      function renderWrites(a, b) {
+        document.querySelector('#writes-frames').textContent =
+          `${fmt.format(a.frames)} vs ${fmt.format(b.frames)} frames sampled`;
+        fill('writes-table', [
+          row('Total DOM writes', a.domWrites.total, b.domWrites.total),
+          row('Writes per second', a.domWrites.perSecond, b.domWrites.perSecond),
+          row('Writes per frame, per player', a.domWrites.perFramePerPlayer, b.domWrites.perFramePerPlayer, {
+            render: (v) => v.toFixed(2),
+          }),
+          row('Time label rewrites', a.domWrites.textContent, b.domWrites.textContent),
+          row('aria-valuetext announcements', a.domWrites.setAttribute, b.domWrites.setAttribute),
+          row('Range value assignments', a.domWrites.inputValue, b.domWrites.inputValue),
+          row('Custom property updates', a.domWrites.setProperty, b.domWrites.setProperty),
+        ].join(''));
+      }
+
+      function renderStyles(a, b) {
+        fill('styles-table', [
+          row('Stylesheet nodes cloned into shadow roots', a.styles.inlineStyleNodes, b.styles.inlineStyleNodes),
+          row('CSS text attached to shadow roots', a.styles.inlineStyleBytes, b.styles.inlineStyleBytes, {
+            render: bytes,
+          }),
+          row('Shared stylesheets adopted', a.styles.uniqueSheets, b.styles.uniqueSheets, { lowerIsBetter: false }),
+          row('CSS rules parsed across all players', a.styles.cssRules, b.styles.cssRules),
+        ].join(''));
+      }
+
+      function renderSetup(a, b) {
+        fill('setup-table', [
+          row('Stylesheet links the page must include', a.styles.linkedStylesheets, b.styles.linkedStylesheets),
+          row('CSS the library injects itself', a.styles.headStyleBytes, b.styles.headStyleBytes, {
+            render: bytes,
+            lowerIsBetter: false,
+          }),
+        ].join(''));
+      }
+
+      function renderResilience(a, b) {
+        const describe = (r) =>
+          r.threw
+            ? '<span class="bad">initFideo() threw — nothing mounted</span>'
+            : '<span class="good">warned and carried on</span>';
+        fill('resilience-table', [
+          `<tr><td>v0.6.0</td><td>${describe(a.resilience)}</td><td class="num">${a.resilience.mounted} of 2</td></tr>`,
+          `<tr><td>Current</td><td>${describe(b.resilience)}</td><td class="num">${b.resilience.mounted} of 2</td></tr>`,
+        ].join(''));
+      }
+
+      function renderHeadline(a, b) {
+        const writeDrop = Math.round((1 - b.domWrites.total / a.domWrites.total) * 100);
+        const cssDrop = Math.round((1 - b.styles.inlineStyleBytes / Math.max(a.styles.inlineStyleBytes, 1)) * 100);
+        const ariaDrop = Math.round((1 - b.domWrites.setAttribute / Math.max(a.domWrites.setAttribute, 1)) * 100);
+
+        const cards = [
+          {
+            k: 'Timeline DOM writes',
+            v: `−${writeDrop}%`,
+            n: `${fmt.format(a.domWrites.perSecond)}/s → ${fmt.format(b.domWrites.perSecond)}/s across six players`,
+          },
+          {
+            k: 'CSS cloned per page',
+            v: `−${cssDrop}%`,
+            n: `${bytes(a.styles.inlineStyleBytes)} → ${bytes(b.styles.inlineStyleBytes)} attached to shadow roots`,
+          },
+          {
+            k: 'Screen-reader churn',
+            v: `−${ariaDrop}%`,
+            n: `${fmt.format(a.domWrites.setAttribute)} → ${fmt.format(b.domWrites.setAttribute)} aria-valuetext rewrites in 3 s`,
+          },
+          {
+            k: 'Script-only download',
+            v: '−6.3%',
+            n: '15,829 B → 14,839 B gzipped, one request instead of two',
+          },
+        ];
+
+        document.querySelector('#headline').innerHTML = cards
+          .map((c) => `<div class="stat"><span class="k">${c.k}</span><span class="v">${c.v}</span><span class="n">${c.n}</span></div>`)
+          .join('');
+      }
+
+      function maybeRender() {
+        const a = results['v0.6.0 (released)'];
+        const b = results['current build'];
+        if (!a || !b) return;
+        renderHeadline(a, b);
+        renderWrites(a, b);
+        renderStyles(a, b);
+        renderSetup(a, b);
+        renderResilience(a, b);
+      }
+
+      window.addEventListener('message', (event) => {
+        if (!event.data || event.data.type !== 'fideo-bench') return;
+        results[event.data.payload.label] = event.data.payload;
+        maybeRender();
+      });
+
+      setTimeout(() => {
+        if (Object.keys(results).length >= 2) return;
+        document.querySelector('#headline').innerHTML =
+          '<div class="stat"><span class="k">Benchmark incomplete</span><span class="v">—</span><span class="n">A harness frame did not report. Check the console.</span></div>';
+      }, 20000);
+    </script>
+  </body>
+</html>

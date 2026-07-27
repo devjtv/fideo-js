@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Data attributes — Fideo JS docs</title>
+    <meta name="description" content="Every data-fideo-* attribute Fideo JS reads, how values are parsed, and how to configure a player without writing JavaScript." />
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+    <link rel="preconnect" href="https://rsms.me/" />
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+    <link rel="stylesheet" href="./_assets/docs.css" />
+    <script>
+      window.__fideoAutoInit = { selector: '[data-fideo-auto]' };
+    </script>
+  </head>
+  <body>
+    <header class="top-nav">
+      <div class="top-nav-inner">
+        <a class="brand" href="../index.html">
+          <span class="brand-mark" aria-hidden="true"><img src="../favicon.svg" alt="" /></span>
+          <span>fideo-js</span>
+          <span class="tag" data-version>docs</span>
+        </a>
+        <button class="nav-toggle" data-nav-toggle aria-expanded="false">Menu</button>
+        <div class="top-nav-links">
+          <a href="../index.html">Overview</a>
+          <a href="../improvements.html">Benchmarks</a>
+          <a href="https://github.com/devjtv/fideo-js">GitHub</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar" data-docs-sidebar></aside>
+
+      <main class="content">
+        <p class="page-kicker">Configure</p>
+        <h1>Data attributes</h1>
+        <p class="lede">
+          Everything on this page configures a player without a line of JavaScript, which makes it the natural fit for
+          CMS output and templates. Attributes are read once, when the player mounts.
+        </p>
+
+        <div class="demo">
+          <div class="demo-stage">
+            <video
+              id="attr-demo"
+              data-fideo-src="../media/fideo-demo.mp4"
+              data-fideo-poster="../media/fideo-demo-poster.jpg"
+              data-fideo-muted="true"
+              data-fideo-loop="true"
+              data-fideo-volume="0.4"
+              data-fideo-playback-rates="1, 1.5, 2"
+              data-fideo-show-settings="false"
+              data-fideo-accent="#7ab8ff"
+              playsinline
+            ></video>
+          </div>
+          <div class="demo-foot"><span>Configured by</span><span class="mono">markup only</span></div>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>The markup above</span><span class="lang">html</span></div>
+<pre><span class="tk-tag">&lt;video</span>
+  <span class="tk-attr">data-fideo</span>
+  <span class="tk-attr">data-fideo-src</span>=<span class="tk-str">"/media/clip.mp4"</span>
+  <span class="tk-attr">data-fideo-poster</span>=<span class="tk-str">"/media/poster.jpg"</span>
+  <span class="tk-attr">data-fideo-muted</span>=<span class="tk-str">"true"</span>
+  <span class="tk-attr">data-fideo-loop</span>=<span class="tk-str">"true"</span>
+  <span class="tk-attr">data-fideo-volume</span>=<span class="tk-str">"0.4"</span>
+  <span class="tk-attr">data-fideo-playback-rates</span>=<span class="tk-str">"1, 1.5, 2"</span>
+  <span class="tk-attr">data-fideo-show-settings</span>=<span class="tk-str">"false"</span>
+  <span class="tk-attr">data-fideo-accent</span>=<span class="tk-str">"#7ab8ff"</span>
+<span class="tk-tag">&gt;&lt;/video&gt;</span></pre>
+        </div>
+
+        <h2 id="parsing">How values are parsed</h2>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Kind</th><th>Accepted</th><th>Notes</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>Boolean</td>
+                  <td class="mono">"" · true · 1 · yes · on<br />false · 0 · no · off</td>
+                  <td>Case-insensitive. A bare attribute counts as <code>true</code>, which is why <code>data-fideo-muted</code> alone works. Anything unrecognised falls back to the default.</td>
+                </tr>
+                <tr>
+                  <td>Number</td>
+                  <td class="mono">0.4 · 30 · 1e3</td>
+                  <td>Anything <code>Number()</code> accepts. Non-finite values fall back to the default.</td>
+                </tr>
+                <tr>
+                  <td>Number list</td>
+                  <td class="mono">"1, 1.5, 2"</td>
+                  <td>Comma separated. Values that are not finite and positive are dropped; an empty result falls back.</td>
+                </tr>
+                <tr>
+                  <td>Ratio</td>
+                  <td class="mono">"16:9" · "16/9" · "1.777"</td>
+                  <td>Both parts must be positive numbers, otherwise the default applies.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="note">
+          <strong>An invalid value never throws.</strong> Fideo falls back to the JavaScript option, then to the
+          built-in default, so a bad CMS field degrades instead of breaking the page.
+        </div>
+
+        <h2 id="core">Core</h2>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Attribute</th><th>Option</th><th>Default</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">data-fideo</td><td>Marks the element for <code>initFideo()</code> and auto-init</td><td>—</td></tr>
+                <tr><td class="mono">data-fideo-provider</td><td class="mono">provider</td><td class="default">auto</td></tr>
+                <tr><td class="mono">data-fideo-class</td><td class="mono">className</td><td class="default">''</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <h2 id="playback-attrs">Playback</h2>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Attribute</th><th>Option</th><th>Default</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">data-fideo-autoplay</td><td class="mono">autoplay</td><td class="default">false</td></tr>
+                <tr><td class="mono">data-fideo-muted</td><td class="mono">muted</td><td class="default">false</td></tr>
+                <tr><td class="mono">data-fideo-loop</td><td class="mono">loop</td><td class="default">false</td></tr>
+                <tr><td class="mono">data-fideo-playsinline</td><td class="mono">playsInline<small>data-fideo-plays-inline also works</small></td><td class="default">true</td></tr>
+                <tr><td class="mono">data-fideo-volume</td><td class="mono">volume</td><td class="default">1</td></tr>
+                <tr><td class="mono">data-fideo-playback-rates</td><td class="mono">playbackRates</td><td class="default">0.5, 1, 1.25, 1.5, 2</td></tr>
+                <tr><td class="mono">data-fideo-preload</td><td class="mono">preload</td><td class="default">metadata</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <h2 id="loading-attrs">Loading</h2>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Attribute</th><th>Option</th><th>Default</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">data-fideo-lazy</td><td class="mono">lazy</td><td class="default">true for iframes</td></tr>
+                <tr><td class="mono">data-fideo-lazy-root-margin</td><td class="mono">lazyRootMargin</td><td class="default">800px 0px</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="note">
+          <code>data-fideo-lazy-src</code> is written <em>by</em> Fideo while an embed waits to load. It holds the URL
+          taken off <code>src</code> and is removed once the player upgrades — do not set it yourself.
+        </div>
+
+        <h2 id="media-attrs">Sources and posters</h2>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Attribute</th><th>Applies to</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">data-fideo-src</td><td>Desktop source, and the fallback for every width</td></tr>
+                <tr><td class="mono">data-fideo-src-desktop</td><td>Desktop source — wins over <code>data-fideo-src</code></td></tr>
+                <tr><td class="mono">data-fideo-src-tablet</td><td>Tablet source</td></tr>
+                <tr><td class="mono">data-fideo-src-mobile</td><td>Mobile source</td></tr>
+                <tr><td class="mono">data-fideo-poster</td><td>Desktop poster, and the fallback for every width</td></tr>
+                <tr><td class="mono">data-fideo-poster-desktop</td><td>Desktop poster — wins over <code>data-fideo-poster</code></td></tr>
+                <tr><td class="mono">data-fideo-poster-tablet</td><td>Tablet poster</td></tr>
+                <tr><td class="mono">data-fideo-poster-mobile</td><td>Mobile poster</td></tr>
+                <tr><td class="mono">data-fideo-breakpoint-mobile</td><td>Mobile breakpoint in pixels — default <code>767</code></td></tr>
+                <tr><td class="mono">data-fideo-breakpoint-tablet</td><td>Tablet breakpoint in pixels — default <code>1024</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <h2 id="behaviour-attrs">Layout and behaviour</h2>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Attribute</th><th>Option</th><th>Default</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">data-fideo-background</td><td class="mono">background</td><td class="default">false</td></tr>
+                <tr><td class="mono">data-fideo-background-aspect-ratio</td><td class="mono">backgroundAspectRatio</td><td class="default">16:9</td></tr>
+                <tr><td class="mono">data-fideo-viewport</td><td class="mono">viewport<small>play · pause · play-pause · none</small></td><td class="default">false</td></tr>
+                <tr><td class="mono">data-fideo-viewport-threshold</td><td class="mono">viewportThreshold</td><td class="default">0.35</td></tr>
+                <tr><td class="mono">data-fideo-controls</td><td class="mono">controls</td><td class="default">true</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="note">
+          <code>data-fideo-viewport</code> also accepts a plain boolean. <code>true</code> means
+          <code>play-pause</code>; <code>false</code> or <code>none</code> switches it off.
+        </div>
+
+        <h2 id="controls-attrs">Showing and hiding controls</h2>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Attribute</th><th>Hides</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">data-fideo-show-play</td><td>Play/pause button</td></tr>
+                <tr><td class="mono">data-fideo-show-timeline</td><td>Seek bar</td></tr>
+                <tr><td class="mono">data-fideo-show-current-time</td><td>Elapsed time</td></tr>
+                <tr><td class="mono">data-fideo-show-duration</td><td>Total duration</td></tr>
+                <tr><td class="mono">data-fideo-show-time</td><td>Both time labels at once — a shorthand the two above override</td></tr>
+                <tr><td class="mono">data-fideo-show-volume</td><td>Mute button and volume slider</td></tr>
+                <tr><td class="mono">data-fideo-show-settings</td><td>Playback-rate menu</td></tr>
+                <tr><td class="mono">data-fideo-show-fullscreen</td><td>Fullscreen button</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p>All default to <code>true</code>; set one to <code>"false"</code> to remove that control.</p>
+
+        <h2 id="theme-attrs">Theming</h2>
+        <p>These six write a custom property straight onto the wrapper. Anything beyond them belongs in CSS or <code>cssVars</code>.</p>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Attribute</th><th>Custom property</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">data-fideo-accent</td><td class="mono">--fideo-accent</td></tr>
+                <tr><td class="mono">data-fideo-control-bg</td><td class="mono">--fideo-control-bg</td></tr>
+                <tr><td class="mono">data-fideo-control-color</td><td class="mono">--fideo-control-color</td></tr>
+                <tr><td class="mono">data-fideo-track</td><td class="mono">--fideo-track</td></tr>
+                <tr><td class="mono">data-fideo-track-fill</td><td class="mono">--fideo-track-fill</td></tr>
+                <tr><td class="mono">data-fideo-radius</td><td class="mono">--fideo-radius</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <h2 id="generated">Attributes Fideo writes</h2>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Attribute</th><th>Meaning</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">data-fideo-ready</td><td>Set to <code>"true"</code> on the media element once mounted. Removed on <code>destroy()</code>.</td></tr>
+                <tr><td class="mono">data-fideo-lazy-src</td><td>Holds a deferred embed URL until the player loads.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <nav class="page-nav" data-docs-pagenav></nav>
+      </main>
+    </div>
+
+    <script src="../../dist/fideo.global.js"></script>
+    <script type="module" src="./_assets/docs.js"></script>
+    <script type="module">
+      mountFideo(document.querySelector('#attr-demo'));
+    </script>
+  </body>
+</html>

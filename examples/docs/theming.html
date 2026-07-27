@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Theming — Fideo JS docs</title>
+    <meta name="description" content="Restyle the Fideo JS player with custom properties, ::part() selectors and your own SVG icons." />
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+    <link rel="preconnect" href="https://rsms.me/" />
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+    <link rel="stylesheet" href="./_assets/docs.css" />
+    <style>
+      /* Used by the ::part() example further down the page. */
+      .themed-parts .fideo__controls::part(play-button),
+      .themed-parts .fideo__controls::part(fullscreen-button) {
+        background: rgba(0, 0, 0, 0.55);
+        border-radius: 999px;
+      }
+      .themed-parts .fideo__controls::part(timeline) { height: 22px; }
+      .themed-parts .fideo__controls::part(current-time),
+      .themed-parts .fideo__controls::part(duration) { letter-spacing: 0.04em; }
+      .themed-parts .fideo__controls::part(settings-menu) {
+        border-radius: 14px;
+        border-color: rgba(255, 255, 255, 0.3);
+      }
+    </style>
+    <script>
+      window.__fideoAutoInit = { selector: '[data-fideo-auto]' };
+    </script>
+  </head>
+  <body>
+    <header class="top-nav">
+      <div class="top-nav-inner">
+        <a class="brand" href="../index.html">
+          <span class="brand-mark" aria-hidden="true"><img src="../favicon.svg" alt="" /></span>
+          <span>fideo-js</span>
+          <span class="tag" data-version>docs</span>
+        </a>
+        <button class="nav-toggle" data-nav-toggle aria-expanded="false">Menu</button>
+        <div class="top-nav-links">
+          <a href="../index.html">Overview</a>
+          <a href="../improvements.html">Benchmarks</a>
+          <a href="https://github.com/devjtv/fideo-js">GitHub</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar" data-docs-sidebar></aside>
+
+      <main class="content">
+        <p class="page-kicker">Interface</p>
+        <h1>Theming</h1>
+        <p class="lede">
+          The control bar lives in a shadow root, so ordinary selectors cannot reach inside it. That is deliberate —
+          nothing on your page can accidentally break the player. There are three supported ways in: custom
+          properties, <code>::part()</code>, and your own icons.
+        </p>
+
+        <h2 id="live">Live</h2>
+        <div class="demo">
+          <div class="demo-stage">
+            <video id="theme-demo" src="../media/fideo-demo.mp4" poster="../media/fideo-demo-poster.jpg" playsinline></video>
+          </div>
+          <div class="demo-foot"><span>Applied</span><span class="mono" data-theme-name>default</span></div>
+        </div>
+        <div class="btn-row" data-theme-controls>
+          <button class="action" data-theme="default" aria-pressed="true">Default</button>
+          <button class="action" data-theme="sunset">Sunset</button>
+          <button class="action" data-theme="mono">Mono</button>
+          <button class="action" data-theme="chunky">Chunky</button>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>What the buttons set</span><span class="lang">js</span></div>
+<pre><span class="tk-kw">const</span> sunset = {
+  <span class="tk-str">'--fideo-accent'</span>: <span class="tk-str">'#ff9d5c'</span>,
+  <span class="tk-str">'--fideo-track-fill'</span>: <span class="tk-str">'#ffd0a8'</span>,
+  <span class="tk-str">'--fideo-buffer-color'</span>: <span class="tk-str">'rgba(255, 208, 168, 0.45)'</span>,
+  <span class="tk-str">'--fideo-radius'</span>: <span class="tk-str">'14px'</span>,
+};
+
+<span class="tk-fn">mountFideo</span>(el, { cssVars: sunset });</pre>
+        </div>
+
+        <h2 id="variables">Custom properties</h2>
+        <p>
+          Every variable is declared on the <code>.fideo</code> wrapper and inherits through the shadow boundary, which
+          is why setting one in ordinary CSS reaches the controls.
+        </p>
+        <div class="table-wrap">
+          <div class="table-head">Colour</div>
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Property</th><th>Default</th><th>Affects</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">--fideo-accent</td><td class="default">#46d9a7</td><td>Hover and focus colour, active playback rate, focus ring</td></tr>
+                <tr><td class="mono">--fideo-bg</td><td class="default">transparent</td><td>Wrapper background behind the media</td></tr>
+                <tr><td class="mono">--fideo-control-bg</td><td class="default">transparent</td><td>Control bar background</td></tr>
+                <tr><td class="mono">--fideo-control-color</td><td class="default">#ffffff</td><td>Icons and slider thumbs</td></tr>
+                <tr><td class="mono">--fideo-muted-color</td><td class="default">rgba(255,255,255,.92)</td><td>Time labels</td></tr>
+                <tr><td class="mono">--fideo-track</td><td class="default">rgba(255,255,255,.46)</td><td>Unplayed part of the timeline</td></tr>
+                <tr><td class="mono">--fideo-track-fill</td><td class="default">rgba(255,255,255,.9)</td><td>Played part of the timeline</td></tr>
+                <tr><td class="mono">--fideo-buffer-color</td><td class="default">rgba(255,255,255,.68)</td><td>Buffered band between played and unplayed</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-head">Size and shape</div>
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Property</th><th>Default</th><th>Affects</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">--fideo-radius</td><td class="default">8px</td><td>Wrapper corners</td></tr>
+                <tr><td class="mono">--fideo-track-size</td><td class="default">5px</td><td>Timeline and volume slider thickness</td></tr>
+                <tr><td class="mono">--fideo-thumb-size</td><td class="default">13px</td><td>Slider handle diameter</td></tr>
+                <tr><td class="mono">--fideo-button-size</td><td class="default">26px</td><td>Button hit area</td></tr>
+                <tr><td class="mono">--fideo-button-radius</td><td class="default">4px</td><td>Button corners</td></tr>
+                <tr><td class="mono">--fideo-icon-size</td><td class="default">17px</td><td>Icon dimensions</td></tr>
+                <tr><td class="mono">--fideo-gap</td><td class="default">10px</td><td>Spacing between controls</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <h3 id="where">Four places to set them</h3>
+        <div class="code">
+          <div class="code-head"><span>Globally, in your stylesheet</span><span class="lang">css</span></div>
+<pre>.fideo {
+  --fideo-accent: #ff9d5c;
+  --fideo-radius: 14px;
+}</pre>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>Per player, with a class</span><span class="lang">css</span></div>
+<pre>.fideo.brand-dark { --fideo-control-color: #0b0e13; }</pre>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>Per player, in markup — six shorthands exist</span><span class="lang">html</span></div>
+<pre><span class="tk-tag">&lt;video</span> <span class="tk-attr">data-fideo</span> <span class="tk-attr">data-fideo-accent</span>=<span class="tk-str">"#ff6f61"</span> <span class="tk-attr">data-fideo-radius</span>=<span class="tk-str">"0"</span><span class="tk-tag">&gt;&lt;/video&gt;</span></pre>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>Per player, in JavaScript — any property</span><span class="lang">js</span></div>
+<pre><span class="tk-fn">mountFideo</span>(el, {
+  cssVars: { <span class="tk-str">'--fideo-accent'</span>: <span class="tk-str">'#ff6f61'</span>, <span class="tk-str">'--fideo-gap'</span>: <span class="tk-str">'16px'</span> },
+});</pre>
+        </div>
+        <div class="note">
+          <strong>The markup shorthands only cover six properties</strong> — <code>accent</code>,
+          <code>control-bg</code>, <code>control-color</code>, <code>track</code>, <code>track-fill</code> and
+          <code>radius</code>. Everything else goes through CSS or <code>cssVars</code>.
+        </div>
+
+        <h2 id="parts">::part()</h2>
+        <p>
+          When a variable is not enough, each control is exposed as a shadow part on the
+          <code>.fideo__controls</code> host, which you can target from ordinary CSS.
+        </p>
+        <div class="demo themed-parts">
+          <div class="demo-stage">
+            <video id="parts-demo" src="../media/fideo-demo.mp4" poster="../media/fideo-demo-poster.jpg" playsinline></video>
+          </div>
+          <div class="demo-foot"><span>Pill buttons, taller timeline</span><span class="mono">::part()</span></div>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>The CSS applied above</span><span class="lang">css</span></div>
+<pre>.fideo__controls::part(play-button),
+.fideo__controls::part(fullscreen-button) {
+  background: rgba(0, 0, 0, 0.55);
+  border-radius: 999px;
+}
+
+.fideo__controls::part(timeline) { height: 22px; }
+
+.fideo__controls::part(settings-menu) {
+  border-radius: 14px;
+  border-color: rgba(255, 255, 255, 0.3);
+}</pre>
+        </div>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Part</th><th>Element</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">play-button</td><td>Play / pause toggle</td></tr>
+                <tr><td class="mono">mute-button</td><td>Mute / unmute toggle</td></tr>
+                <tr><td class="mono">volume-slider</td><td>Volume range input</td></tr>
+                <tr><td class="mono">timeline</td><td>Seek bar range input</td></tr>
+                <tr><td class="mono">current-time</td><td>Elapsed time text</td></tr>
+                <tr><td class="mono">duration</td><td>Duration text</td></tr>
+                <tr><td class="mono">time-separator</td><td>The slash between them</td></tr>
+                <tr><td class="mono">settings-button</td><td>Playback-rate toggle</td></tr>
+                <tr><td class="mono">settings-menu</td><td>Rate menu container</td></tr>
+                <tr><td class="mono">speed-button</td><td>An individual rate option</td></tr>
+                <tr><td class="mono">fullscreen-button</td><td>Fullscreen toggle</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="note warn">
+          <strong><code>::part()</code> cannot select descendants.</strong> You can style the part itself, but not
+          elements inside it — <code>::part(play-button) svg</code> will not match. Size icons with
+          <code>--fideo-icon-size</code> instead.
+        </div>
+
+        <h2 id="wrapper">Styling the wrapper</h2>
+        <p>
+          Everything outside the shadow root is plain CSS. The wrapper carries state classes you can hook into.
+        </p>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Class</th><th>Present when</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">.fideo</td><td>Always — the generated wrapper</td></tr>
+                <tr><td class="mono">.fideo--html5 · --youtube · --vimeo · --wistia</td><td>Per provider</td></tr>
+                <tr><td class="mono">.fideo--background</td><td>Background mode</td></tr>
+                <tr><td class="mono">.fideo--no-controls</td><td>Controls disabled</td></tr>
+                <tr><td class="mono">.is-ready</td><td>Mounted</td></tr>
+                <tr><td class="mono">.is-playing · .is-paused</td><td>Playback state</td></tr>
+                <tr><td class="mono">.is-user-active</td><td>Recent pointer or keyboard activity</td></tr>
+                <tr><td class="mono">.has-poster · .is-poster-visible</td><td>A poster exists / is currently shown</td></tr>
+                <tr><td class="mono">.is-fullscreen</td><td>This player owns fullscreen</td></tr>
+                <tr><td class="mono">.fideo__media</td><td>On the video, iframe or wistia-player element</td></tr>
+                <tr><td class="mono">.fideo__poster</td><td>On the poster overlay image</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>Add your own class</span><span class="lang">html</span></div>
+<pre><span class="tk-tag">&lt;video</span> <span class="tk-attr">data-fideo</span> <span class="tk-attr">data-fideo-class</span>=<span class="tk-str">"rounded-hero"</span><span class="tk-tag">&gt;&lt;/video&gt;</span></pre>
+        </div>
+
+        <h2 id="icons">Replacing the icons</h2>
+        <p>Pass inline SVG strings. Anything you leave out keeps its default.</p>
+        <div class="demo">
+          <div class="demo-stage">
+            <video id="icons-demo" src="../media/fideo-demo.mp4" poster="../media/fideo-demo-poster.jpg" playsinline></video>
+          </div>
+          <div class="demo-foot"><span>Custom play, pause and fullscreen icons</span><span class="mono">icons option</span></div>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>Triangle and bars instead of the defaults</span><span class="lang">js</span></div>
+<pre><span class="tk-fn">mountFideo</span>(el, {
+  icons: {
+    play: <span class="tk-str">'&lt;svg viewBox="0 0 24 24"&gt;&lt;path d="M8 5v14l11-7z"/&gt;&lt;/svg&gt;'</span>,
+    pause: <span class="tk-str">'&lt;svg viewBox="0 0 24 24"&gt;&lt;path d="M7 5h4v14H7zM13 5h4v14h-4z"/&gt;&lt;/svg&gt;'</span>,
+  },
+});</pre>
+        </div>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Key</th><th>Used for</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">play</td><td>Play button, paused state</td></tr>
+                <tr><td class="mono">pause</td><td>Play button, playing state</td></tr>
+                <tr><td class="mono">volume</td><td>Volume above 50%</td></tr>
+                <tr><td class="mono">volumeLow</td><td>Volume at or below 50%</td></tr>
+                <tr><td class="mono">muted</td><td>Muted, or volume at zero</td></tr>
+                <tr><td class="mono">settings</td><td>Playback-rate menu</td></tr>
+                <tr><td class="mono">fullscreen</td><td>Enter fullscreen</td></tr>
+                <tr><td class="mono">fullscreenExit</td><td>Leave fullscreen</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <ul class="plain">
+          <li><b>Use <code>fill="currentColor"</code> or <code>stroke="currentColor"</code></b> so icons inherit <code>--fideo-control-color</code> and the accent on hover.</li>
+          <li><b>Add <code>aria-hidden="true"</code></b> — the button already carries the accessible name.</li>
+          <li><b>Sizing comes from <code>--fideo-icon-size</code></b>, so omit width and height on the SVG.</li>
+        </ul>
+        <div class="note danger">
+          <strong>Icon strings are inserted as HTML.</strong> Treat them as code you control and never build them from
+          user input.
+        </div>
+
+        <nav class="page-nav" data-docs-pagenav></nav>
+      </main>
+    </div>
+
+    <script src="../../dist/fideo.global.js"></script>
+    <script type="module" src="./_assets/docs.js"></script>
+    <script type="module">
+      const THEMES = {
+        default: {},
+        sunset: {
+          '--fideo-accent': '#ff9d5c',
+          '--fideo-track-fill': '#ffd0a8',
+          '--fideo-buffer-color': 'rgba(255, 208, 168, 0.45)',
+          '--fideo-radius': '14px',
+        },
+        mono: {
+          '--fideo-accent': '#ffffff',
+          '--fideo-track-fill': '#ffffff',
+          '--fideo-track': 'rgba(255,255,255,.25)',
+          '--fideo-buffer-color': 'rgba(255,255,255,.45)',
+          '--fideo-radius': '0px',
+        },
+        chunky: {
+          '--fideo-track-size': '10px',
+          '--fideo-thumb-size': '20px',
+          '--fideo-button-size': '38px',
+          '--fideo-icon-size': '22px',
+          '--fideo-gap': '16px',
+          '--fideo-accent': '#7ab8ff',
+        },
+      };
+
+      const themeEl = document.querySelector('#theme-demo');
+      const themeName = document.querySelector('[data-theme-name]');
+      let themePlayer = mountFideo(themeEl, { muted: true, loop: true });
+
+      document.querySelector('[data-theme-controls]').addEventListener('click', (event) => {
+        const button = event.target.closest('[data-theme]');
+        if (!button) return;
+
+        document
+          .querySelectorAll('[data-theme-controls] .action')
+          .forEach((el) => el.setAttribute('aria-pressed', String(el === button)));
+
+        themePlayer.destroy();
+        themePlayer = mountFideo(themeEl, { muted: true, loop: true, cssVars: THEMES[button.dataset.theme] });
+        themeName.textContent = button.dataset.theme;
+      });
+
+      mountFideo(document.querySelector('#parts-demo'), { muted: true, loop: true });
+
+      mountFideo(document.querySelector('#icons-demo'), {
+        muted: true,
+        loop: true,
+        icons: {
+          play: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>',
+          pause: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>',
+          fullscreen:
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>',
+        },
+      });
+    </script>
+  </body>
+</html>

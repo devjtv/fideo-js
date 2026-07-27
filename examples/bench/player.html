@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fideo comparison frame</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #080a0d; overflow: hidden; }
+      #stage { position: relative; width: 100%; height: 100%; }
+      #stage video { width: 100%; height: 100%; }
+
+      /* Comparison frames keep the control bar pinned open so the difference
+         is readable without hovering each frame. */
+      body[data-pinned="true"] .fideo__controls {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        transform: none !important;
+      }
+      body[data-pinned="true"] .fideo::after { opacity: 1 !important; }
+    </style>
+  </head>
+  <body>
+    <div id="stage">
+      <video
+        data-fideo
+        muted
+        playsinline
+        preload="metadata"
+        src="../media/fideo-demo.mp4"
+        poster="../media/fideo-demo-poster.jpg"
+      ></video>
+    </div>
+
+    <script type="module">
+      /*
+       * One player, one build, one scenario. Used by improvements.html to show
+       * the released build and the current build rendering identical state.
+       *
+       *   ?build=legacy|current
+       *   &scenario=hours|buffered|speed|focus|play
+       */
+      const params = new URLSearchParams(location.search);
+      const isLegacy = params.get('build') === 'legacy';
+      const scenario = params.get('scenario') || 'play';
+
+      if (isLegacy) {
+        // The released build cannot style itself — without this link the
+        // controls render unpositioned.
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = './fideo-0.6.0.css';
+        document.head.append(link);
+      }
+
+      function loadBuild() {
+        return new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = isLegacy ? './fideo-0.6.0.global.js' : '../../dist/fideo.global.js';
+          script.addEventListener('load', () => resolve());
+          script.addEventListener('error', () => reject(new Error('build failed to load')));
+          document.head.append(script);
+        });
+      }
+
+      const video = document.querySelector('video');
+
+      /**
+       * Pushes fixed state through the adapter so both builds render it, and
+       * keeps re-applying it: the HTML5 provider re-reads the element on every
+       * media event, so metadata arriving late would otherwise clobber the
+       * scenario with the real 16-second duration.
+       */
+      function drive(player, state) {
+        const apply = () => player.adapter.update(state, 'timeupdate');
+        apply();
+        for (const event of ['loadedmetadata', 'loadeddata', 'durationchange', 'canplay', 'progress']) {
+          video.addEventListener(event, apply);
+        }
+      }
+
+      /** Lets the element settle before a scenario overrides its state. */
+      function waitForMetadata() {
+        if (video.readyState >= 1) return Promise.resolve();
+        return new Promise((resolve) => {
+          video.addEventListener('loadedmetadata', resolve, { once: true });
+          setTimeout(resolve, 2500);
+        });
+      }
+
+      await loadBuild();
+
+      if (scenario !== 'play') document.body.dataset.pinned = 'true';
+
+      const player = window.mountFideo(video, {
+        // Only the autoplaying hero has to be muted; the driven frames stay
+        // unmuted so the volume control shows a real level.
+        muted: scenario === 'play',
+        loop: true,
+        volume: 0.7,
+        playbackRates: [0.5, 1, 1.5, 2],
+      });
+
+      if (scenario !== 'play') await waitForMetadata();
+
+      if (scenario === 'hours') {
+        // 3,904s total with 2,704s elapsed. The released build prints the
+        // duration as 65:04 because it never divides past minutes.
+        drive(player, { duration: 3904, currentTime: 2704, buffered: 0.82, paused: true, playbackRate: 1 });
+      }
+
+      if (scenario === 'buffered' || scenario === 'focus') {
+        drive(player, { duration: 600, currentTime: 138, buffered: 0.62, paused: true, playbackRate: 1 });
+      }
+
+      if (scenario === 'speed') {
+        drive(player, { duration: 600, currentTime: 138, buffered: 0.62, paused: true, playbackRate: 1.5 });
+        player.wrapper.querySelector('.fideo__controls').shadowRoot.querySelector('.fideo__settings').classList.add('is-open');
+      }
+
+      if (scenario === 'play') {
+        player.play().catch(() => undefined);
+      }
+
+      parent.postMessage({ type: 'fideo-frame-ready', build: isLegacy ? 'legacy' : 'current', scenario }, '*');
+    </script>
+  </body>
+</html>

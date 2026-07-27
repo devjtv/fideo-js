@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Providers — Fideo JS docs</title>
+    <meta name="description" content="How Fideo JS detects and drives HTML5 video, YouTube, Vimeo and Wistia — URL normalization, lazy loading and skipping the SDKs you do not need." />
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+    <link rel="preconnect" href="https://rsms.me/" />
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+    <link rel="stylesheet" href="./_assets/docs.css" />
+    <script>
+      window.__fideoAutoInit = { selector: '[data-fideo-auto]' };
+    </script>
+  </head>
+  <body>
+    <header class="top-nav">
+      <div class="top-nav-inner">
+        <a class="brand" href="../index.html">
+          <span class="brand-mark" aria-hidden="true"><img src="../favicon.svg" alt="" /></span>
+          <span>fideo-js</span>
+          <span class="tag" data-version>docs</span>
+        </a>
+        <button class="nav-toggle" data-nav-toggle aria-expanded="false">Menu</button>
+        <div class="top-nav-links">
+          <a href="../index.html">Overview</a>
+          <a href="../improvements.html">Benchmarks</a>
+          <a href="https://github.com/devjtv/fideo-js">GitHub</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar" data-docs-sidebar></aside>
+
+      <main class="content">
+        <p class="page-kicker">Start here</p>
+        <h1>Providers</h1>
+        <p class="lede">
+          One markup pattern and one API across four backends. Fideo works out which provider a URL belongs to, loads
+          only the SDK that provider needs, and normalizes the embed URL so the same options behave the same way
+          everywhere.
+        </p>
+
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Provider</th><th>Element</th><th>URLs it claims</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td class="mono">html5</td>
+                  <td><code>&lt;video&gt;</code></td>
+                  <td>Any source the browser can play. The default for every <code>&lt;video&gt;</code> element.</td>
+                </tr>
+                <tr>
+                  <td class="mono">youtube</td>
+                  <td><code>&lt;iframe&gt;</code></td>
+                  <td><code>youtube.com</code>, <code>youtube-nocookie.com</code>, <code>youtu.be</code></td>
+                </tr>
+                <tr>
+                  <td class="mono">vimeo</td>
+                  <td><code>&lt;iframe&gt;</code></td>
+                  <td><code>vimeo.com</code>, including <code>player.vimeo.com</code></td>
+                </tr>
+                <tr>
+                  <td class="mono">wistia</td>
+                  <td><code>&lt;iframe&gt;</code></td>
+                  <td><code>wistia.com</code>, <code>wistia.net</code>, <code>fast.wistia.*</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <h2 id="detection">How detection works</h2>
+        <p>
+          A <code>&lt;video&gt;</code> is always <code>html5</code>. For an <code>&lt;iframe&gt;</code>, Fideo tests
+          candidate URLs in order — the element's <code>src</code>, then <code>sources.desktop</code>,
+          <code>sources.tablet</code>, <code>sources.mobile</code> — and takes the first provider that matches. If
+          nothing matches it falls back to <code>html5</code>, which will throw for an iframe, so an unrecognised
+          embed URL needs an explicit provider.
+        </p>
+
+        <div class="code">
+          <div class="code-head"><span>Only needed when a URL cannot be inferred</span><span class="lang">html</span></div>
+<pre><span class="tk-tag">&lt;iframe</span>
+  <span class="tk-attr">data-fideo</span>
+  <span class="tk-attr">data-fideo-provider</span>=<span class="tk-str">"vimeo"</span>
+  <span class="tk-attr">src</span>=<span class="tk-str">"https://my-proxy.example.com/embed/123"</span>
+<span class="tk-tag">&gt;&lt;/iframe&gt;</span></pre>
+        </div>
+        <div class="note">
+          <strong><code>provider</code> is one of the few options where JavaScript beats the data attribute.</strong>
+          Everything scalar works the other way around — see
+          <a href="./initializing.html#precedence">precedence</a>.
+        </div>
+
+        <h2 id="html5">HTML5 video</h2>
+        <p>
+          The richest provider: it is the only one that reports a real buffered range, and the only one that can use a
+          native <code>poster</code> attribute alongside Fideo's own poster overlay.
+        </p>
+        <div class="demo">
+          <div class="demo-stage">
+            <video data-fideo-demo="html5" src="../media/fideo-demo.mp4" poster="../media/fideo-demo-poster.jpg" playsinline></video>
+          </div>
+          <div class="demo-foot"><span>provider</span><span class="mono">html5</span></div>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>Nothing provider-specific required</span><span class="lang">html</span></div>
+<pre><span class="tk-tag">&lt;video</span> <span class="tk-attr">data-fideo</span> <span class="tk-attr">src</span>=<span class="tk-str">"/media/clip.mp4"</span> <span class="tk-attr">poster</span>=<span class="tk-str">"/media/poster.jpg"</span><span class="tk-tag">&gt;&lt;/video&gt;</span></pre>
+        </div>
+
+        <h2 id="youtube">YouTube</h2>
+        <p>
+          Fideo accepts watch URLs, short links, Shorts and existing embeds, and rewrites all of them to a
+          <code>youtube-nocookie.com/embed/…</code> URL with the JS API enabled and YouTube's own chrome switched off.
+        </p>
+        <div class="demo">
+          <div class="demo-stage">
+            <iframe data-fideo-demo="youtube" src="https://www.youtube.com/watch?v=pb-j3svRQLI" title="YouTube example" allowfullscreen></iframe>
+          </div>
+          <div class="demo-foot"><span>Normalized src</span><span class="mono" data-yt-src>loading…</span></div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-head">Accepted forms</div>
+          <div class="scroller">
+            <table>
+              <thead><tr><th>You write</th><th>Fideo loads</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">youtube.com/watch?v=ID</td><td class="mono" rowspan="4">youtube-nocookie.com/embed/ID</td></tr>
+                <tr><td class="mono">youtu.be/ID</td></tr>
+                <tr><td class="mono">youtube.com/shorts/ID</td></tr>
+                <tr><td class="mono">youtube.com/embed/ID</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <ul class="plain">
+          <li><b>Query parameters survive</b> normalization, so <code>?start=30</code> still applies.</li>
+          <li><b>Looping adds <code>playlist=ID</code></b> automatically, which YouTube requires for a single video to repeat.</li>
+          <li><b>No-cookie is not no-tracking.</b> It reduces cookies on load; playback can still send data to YouTube, so consent rules may still apply.</li>
+        </ul>
+
+        <h2 id="vimeo">Vimeo</h2>
+        <p>
+          Public, private and unlisted videos all work. A private URL carries its hash as a path segment, which Fideo
+          moves into the <code>h=</code> parameter the embed player expects.
+        </p>
+        <div class="demo">
+          <div class="demo-stage">
+            <iframe data-fideo-demo="vimeo" src="https://vimeo.com/347119375" title="Vimeo example" allowfullscreen></iframe>
+          </div>
+          <div class="demo-foot"><span>Normalized src</span><span class="mono" data-vimeo-src>loading…</span></div>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>Private and unlisted URLs</span><span class="lang">text</span></div>
+<pre>https://vimeo.com/123456789/5e2d1c1e6d
+  → https://player.vimeo.com/video/123456789?h=5e2d1c1e6d
+
+<span class="tk-com">// An existing embed URL with ?h= is left alone</span></pre>
+        </div>
+
+        <h2 id="wistia">Wistia</h2>
+        <p>
+          Wistia is the one provider that does not stay an iframe. Fideo reads the media ID out of the URL, replaces
+          the <code>&lt;iframe&gt;</code> with a <code>&lt;wistia-player&gt;</code> custom element, and drives that
+          instead.
+        </p>
+        <div class="demo">
+          <div class="demo-stage">
+            <iframe data-fideo-demo="wistia" src="https://fast.wistia.com/embed/medias/358edhd4og" title="Wistia example" allowfullscreen></iframe>
+          </div>
+          <div class="demo-foot"><span>Element in the DOM after mount</span><span class="mono" data-wistia-tag>loading…</span></div>
+        </div>
+        <div class="note warn">
+          <strong>The iframe you wrote will not be in the DOM.</strong> <code>player.element</code> still points at the
+          original iframe reference, but the visible node is a <code>&lt;wistia-player&gt;</code>. Style it through the
+          <code>.fideo__media</code> class, which Fideo copies across.
+        </div>
+
+        <h2 id="lazy">Lazy loading</h2>
+        <p>
+          Every iframe provider is lazy by default. Fideo strips the <code>src</code> into
+          <code>data-fideo-lazy-src</code>, watches the element with an <code>IntersectionObserver</code>, and only
+          then loads the provider SDK and the embed. Nothing is requested for a player the visitor never scrolls to.
+        </p>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Option</th><th>Default</th><th>Notes</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">lazy</td><td class="default">true for iframes, false for &lt;video&gt;</td><td>Set <code>data-fideo-lazy="false"</code> to load an embed immediately.</td></tr>
+                <tr><td class="mono">lazyRootMargin</td><td class="default">'800px 0px'</td><td>How far ahead of the viewport loading begins.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <ul class="plain">
+          <li><b>Calling <code>play()</code> forces the upgrade</b> — a lazy player that is asked to do something loads immediately rather than waiting to be scrolled into view.</li>
+          <li><b>Volume and muted state set before loading are buffered</b> and applied to the real adapter once it exists.</li>
+          <li><b>Without <code>IntersectionObserver</code></b> the player loads eagerly instead of never.</li>
+        </ul>
+
+        <h2 id="disabling">Skipping providers you do not use</h2>
+        <p>
+          <code>disabledProviders</code> guarantees a provider's SDK is never fetched. Asking for a disabled provider
+          throws, and <code>initFideo()</code> logs a warning and moves on to the next element rather than failing the
+          whole page.
+        </p>
+        <div class="code">
+          <div class="code-head"><span>MP4-only page</span><span class="lang">js</span></div>
+<pre><span class="tk-fn">initFideo</span>({
+  disabledProviders: [<span class="tk-str">'youtube'</span>, <span class="tk-str">'vimeo'</span>, <span class="tk-str">'wistia'</span>],
+});</pre>
+        </div>
+
+        <h2 id="sdks">What each provider loads</h2>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Provider</th><th>Fetched at mount</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">html5</td><td>Nothing — the browser's own media element</td></tr>
+                <tr><td class="mono">youtube</td><td class="mono">youtube.com/iframe_api</td></tr>
+                <tr><td class="mono">vimeo</td><td class="mono">player.vimeo.com/api/player.js</td></tr>
+                <tr><td class="mono">wistia</td><td class="mono">fast.wistia.com/player.js + /embed/&lt;id&gt;.js</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p>Each script is requested once per page no matter how many players use it, and only when a player of that provider actually loads.</p>
+
+        <h2 id="differences">Capability differences</h2>
+        <p>The API is identical across providers, but the data underneath is not.</p>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Behaviour</th><th>html5</th><th>youtube</th><th>vimeo</th><th>wistia</th></tr></thead>
+              <tbody>
+                <tr><td>Play, pause, seek, volume, rate</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+                <tr><td><code>state.buffered</code></td><td>Real value</td><td>Always 0</td><td>Always 0</td><td>Always 0</td></tr>
+                <tr><td>Time updates</td><td>Native events</td><td>Polled every 250 ms</td><td>Native events</td><td>Native events</td></tr>
+                <tr><td>Lazy by default</td><td>No</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+                <tr><td>Background cover sizing</td><td><code>object-fit</code></td><td>Calculated</td><td>Calculated</td><td><code>fit-strategy</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="note">
+          <strong>Autoplay is a browser policy, not a Fideo feature.</strong> Muted autoplay is the only reliably
+          permitted form, especially for iframes. <a href="./background.html">Background mode</a> forces muted for
+          exactly this reason.
+        </div>
+
+        <nav class="page-nav" data-docs-pagenav></nav>
+      </main>
+    </div>
+
+    <script src="../../dist/fideo.global.js"></script>
+    <script type="module" src="./_assets/docs.js"></script>
+    <script type="module">
+      const players = initFideo({
+        selector: '[data-fideo-demo]',
+        muted: true,
+        // Load the embeds straight away — a docs page should not make you
+        // scroll to find out whether the example works.
+        lazy: false,
+      });
+
+      const byProvider = (name) => players.players.find((player) => player.options.provider === name);
+
+      const shorten = (url) => (url || '').replace(/^https?:\/\//, '').split('?')[0];
+
+      requestAnimationFrame(() => {
+        const youtube = byProvider('youtube');
+        if (youtube) document.querySelector('[data-yt-src]').textContent = shorten(youtube.element.src);
+
+        const vimeo = byProvider('vimeo');
+        if (vimeo) document.querySelector('[data-vimeo-src]').textContent = shorten(vimeo.element.src);
+
+        const wistia = byProvider('wistia');
+        const wistiaNode = wistia?.wrapper.querySelector('.fideo__media');
+        if (wistiaNode) document.querySelector('[data-wistia-tag]').textContent = `<${wistiaNode.tagName.toLowerCase()}>`;
+      });
+    </script>
+  </body>
+</html>

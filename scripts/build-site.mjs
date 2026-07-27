@@ -14,24 +14,45 @@ await mkdir(SITE, { recursive: true });
 
 await cp(DIST, join(SITE, 'dist'), { recursive: true });
 await cp('assets', join(SITE, 'assets'), { recursive: true });
-await cp(join(EXAMPLES, 'posters'), join(SITE, 'posters'), { recursive: true });
 
-const entries = await readdir(EXAMPLES, { withFileTypes: true });
-for (const entry of entries) {
-  if (!entry.isFile()) continue; // directories (e.g. posters/) are copied separately
-  const src = join(EXAMPLES, entry.name);
-  const dest = join(SITE, entry.name);
-  if (entry.name.endsWith('.html')) {
+// examples/posters/ sits at the site root; every other directory keeps its name.
+const DIRECTORY_TARGETS = { posters: 'posters' };
+
+async function copyTree(sourceDir, destDir, depth) {
+  await mkdir(destDir, { recursive: true });
+  const entries = await readdir(sourceDir, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const src = join(sourceDir, entry.name);
+
+    if (entry.isDirectory()) {
+      const target = depth === 0 ? (DIRECTORY_TARGETS[entry.name] ?? entry.name) : entry.name;
+      await copyTree(src, join(destDir, target), depth + 1);
+      continue;
+    }
+
+    const dest = join(destDir, entry.name);
+    if (!entry.name.endsWith('.html')) {
+      // Favicons, manifest, verification files, pinned benchmark builds, etc.
+      await cp(src, dest);
+      continue;
+    }
+
+    // In examples/ the built assets live one level above the repo-root page;
+    // in site/ they are siblings, so each nesting level drops one `../`.
     const html = await readFile(src, 'utf8');
-    await writeFile(dest, html
-      .replaceAll('../dist/', './dist/')
-      .replaceAll('../assets/', './assets/')
-      .replaceAll('v__FIDEO_VERSION__', versionTag)
-      .replace('</head>', `  ${versionScript}\n  </head>`));
-  } else {
-    // Favicons, manifest, verification files, etc. — copy as-is.
-    await cp(src, dest);
+    const prefix = depth === 0 ? './' : '../'.repeat(depth);
+    await writeFile(
+      dest,
+      html
+        .replaceAll('../'.repeat(depth + 1) + 'dist/', `${prefix}dist/`)
+        .replaceAll('../'.repeat(depth + 1) + 'assets/', `${prefix}assets/`)
+        .replaceAll('v__FIDEO_VERSION__', versionTag)
+        .replace('</head>', `  ${versionScript}\n  </head>`),
+    );
   }
 }
+
+await copyTree(EXAMPLES, SITE, 0);
 
 console.log(`Built ${SITE}/ for static deploy (v${pkg.version}).`);

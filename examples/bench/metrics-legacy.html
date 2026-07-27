@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Fideo bench — v0.6.0</title>
+    <!-- The released build requires this link. Removing it leaves the player unstyled. -->
+    <link rel="stylesheet" href="./fideo-0.6.0.css" />
+    <style>
+      body { margin: 0; background: #0b0e13; font: 12px/1.4 ui-sans-serif, system-ui, sans-serif; color: #7c8798; }
+      #stage { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 4px; }
+      #stage video { background: #161b24; }
+      #probe { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+    </style>
+  </head>
+  <body>
+    <div id="stage"></div>
+    <div id="probe"></div>
+    <script src="./fideo-0.6.0.global.js"></script>
+    <script type="module">
+      import { runBenchmark, reportToParent } from './bench.js';
+      runBenchmark('v0.6.0 (released)').then(reportToParent);
+    </script>
+  </body>
+</html>

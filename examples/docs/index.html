@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Getting started — Fideo JS docs</title>
+    <meta name="description" content="Install Fideo JS and mount your first player. A lightweight, data-attribute driven video UI for HTML video, YouTube, Vimeo and Wistia." />
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+    <link rel="preconnect" href="https://rsms.me/" />
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+    <link rel="stylesheet" href="./_assets/docs.css" />
+    <script>
+      window.__fideoAutoInit = { selector: '[data-fideo-auto]' };
+    </script>
+  </head>
+  <body>
+    <header class="top-nav">
+      <div class="top-nav-inner">
+        <a class="brand" href="../index.html">
+          <span class="brand-mark" aria-hidden="true"><img src="../favicon.svg" alt="" /></span>
+          <span>fideo-js</span>
+          <span class="tag" data-version>docs</span>
+        </a>
+        <button class="nav-toggle" data-nav-toggle aria-expanded="false">Menu</button>
+        <div class="top-nav-links">
+          <a href="../index.html">Overview</a>
+          <a href="../improvements.html">Benchmarks</a>
+          <a href="https://github.com/devjtv/fideo-js">GitHub</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar" data-docs-sidebar></aside>
+
+      <main class="content">
+        <p class="page-kicker">Start here</p>
+        <h1>Getting started</h1>
+        <p class="lede">
+          Fideo gives one consistent player UI and one JavaScript API to HTML5 video, YouTube, Vimeo and Wistia. It has
+          no dependencies, ships around 15 KB gzipped, and can be driven entirely from markup.
+        </p>
+
+        <div class="demo">
+          <div class="demo-stage">
+            <video
+              data-fideo
+              data-fideo-auto
+              data-fideo-poster="../media/fideo-demo-poster.jpg"
+              data-fideo-muted
+              data-fideo-loop
+              src="../media/fideo-demo.mp4"
+              playsinline
+            ></video>
+          </div>
+          <div class="demo-foot"><span>Mounted from markup alone</span><span class="mono">auto-init</span></div>
+        </div>
+
+        <h2 id="install">Install</h2>
+        <p>
+          Fideo is not on the npm registry yet. Use the CDN build, install straight from GitHub, or drop the compiled
+          files into your project — the <code>dist/</code> folder is committed to the repository for exactly that.
+        </p>
+
+        <h3 id="install-cdn">CDN</h3>
+        <p>The quickest path, and the one that needs no build step at all.</p>
+        <div class="code">
+          <div class="code-head"><span>Pinned to a release</span><span class="lang">html</span></div>
+<pre><span class="tk-tag">&lt;script</span> <span class="tk-attr">src</span>=<span class="tk-str">"https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v__FIDEO_VERSION__/dist/fideo.global.js"</span><span class="tk-tag">&gt;&lt;/script&gt;</span></pre>
+        </div>
+        <div class="note">
+          <strong>Pin the version.</strong> jsDelivr will serve a moving target if you leave the tag off. The snippet
+          above is pinned to <span data-version class="mono"></span>, the release these docs were built from.
+        </div>
+
+        <h3 id="install-github">npm, from GitHub</h3>
+        <div class="code">
+          <div class="code-head"><span>Compiled files are committed, so this just works</span><span class="lang">bash</span></div>
+<pre>npm install github:devjtv/fideo-js</pre>
+        </div>
+
+        <h3 id="install-download">Download</h3>
+        <p>Copy what you need out of <code>dist/</code> and serve it yourself.</p>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>File</th><th>Use</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">fideo.global.js</td><td>Browser global. Defines <code>Fideo</code>, <code>initFideo</code>, <code>createFideo</code> and <code>mountFideo</code> on <code>window</code>.</td></tr>
+                <tr><td class="mono">fideo.js</td><td>ES module build.</td></tr>
+                <tr><td class="mono">fideo.umd.cjs</td><td>UMD / CommonJS build.</td></tr>
+                <tr><td class="mono">fideo.css</td><td>Wrapper styles. Optional — see below.</td></tr>
+                <tr><td class="mono">index.d.ts</td><td>TypeScript declarations.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <h2 id="first-player">Your first player</h2>
+        <p>
+          Add <code>data-fideo</code> to a normal <code>&lt;video&gt;</code>. Loaded as a classic script, Fideo finds it
+          on <code>DOMContentLoaded</code> and mounts it. That is the whole integration.
+        </p>
+        <div class="code">
+          <div class="code-head"><span>No JavaScript of your own</span><span class="lang">html</span></div>
+<pre><span class="tk-tag">&lt;script</span> <span class="tk-attr">src</span>=<span class="tk-str">"https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v__FIDEO_VERSION__/dist/fideo.global.js"</span><span class="tk-tag">&gt;&lt;/script&gt;</span>
+
+<span class="tk-tag">&lt;video</span>
+  <span class="tk-attr">data-fideo</span>
+  <span class="tk-attr">src</span>=<span class="tk-str">"/media/clip.mp4"</span>
+  <span class="tk-attr">data-fideo-poster</span>=<span class="tk-str">"/media/poster.jpg"</span>
+  <span class="tk-attr">data-fideo-muted</span>
+  <span class="tk-attr">data-fideo-loop</span>
+  <span class="tk-attr">playsinline</span>
+<span class="tk-tag">&gt;&lt;/video&gt;</span></pre>
+        </div>
+
+        <p>An embed works the same way — swap the tag and give it a provider URL. Fideo works out which provider it is.</p>
+        <div class="code">
+          <div class="code-head"><span>Provider inferred from the URL</span><span class="lang">html</span></div>
+<pre><span class="tk-tag">&lt;iframe</span> <span class="tk-attr">data-fideo</span> <span class="tk-attr">src</span>=<span class="tk-str">"https://www.youtube.com/watch?v=pb-j3svRQLI"</span><span class="tk-tag">&gt;&lt;/iframe&gt;</span></pre>
+        </div>
+
+        <h2 id="with-javascript">With JavaScript</h2>
+        <p>
+          When you need a handle on the player, mount it yourself. Every entry point takes the same options object.
+        </p>
+        <div class="code">
+          <div class="code-head"><span>ES module</span><span class="lang">js</span></div>
+<pre><span class="tk-kw">import</span> { Fideo, initFideo } <span class="tk-kw">from</span> <span class="tk-str">'fideo-js'</span>;
+
+<span class="tk-com">// Mount everything matching [data-fideo]</span>
+<span class="tk-fn">initFideo</span>();
+
+<span class="tk-com">// Or one player, with a reference you keep</span>
+<span class="tk-kw">const</span> player = <span class="tk-kw">new</span> <span class="tk-fn">Fideo</span>(<span class="tk-str">'#hero-video'</span>, {
+  muted: <span class="tk-kw">true</span>,
+  loop: <span class="tk-kw">true</span>,
+  autoplay: <span class="tk-kw">true</span>,
+});
+
+<span class="tk-kw">await</span> player.<span class="tk-fn">play</span>();</pre>
+        </div>
+        <p>
+          There are five ways to initialize a player and they each suit a different situation.
+          <a href="./initializing.html">Initializing</a> walks through all of them, each one running live.
+        </p>
+
+        <h2 id="styles">About the stylesheet</h2>
+        <p>
+          Fideo splits its CSS in two. The control bar renders inside a shadow root and always carries its own styles.
+          The wrapper styles live in the page, and the script injects them on first mount — so a bare
+          <code>&lt;script&gt;</code> tag produces a correct player with no <code>&lt;link&gt;</code> to forget.
+        </p>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Situation</th><th>What to do</th></tr></thead>
+              <tbody>
+                <tr><td>Default</td><td>Nothing. Wrapper styles are injected on first mount.</td></tr>
+                <tr><td>You want styles applied before the script runs</td><td>Also link <code>dist/fideo.css</code>. Injection is idempotent, so there is no conflict.</td></tr>
+                <tr><td>You ship your own wrapper CSS</td><td>Pass <code>injectStyles: false</code>.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="note">
+          <strong>Injected styles are prepended to <code>&lt;head&gt;</code>.</strong> Your own stylesheets come later
+          in the cascade and therefore win, so overriding anything on <code>.fideo</code> works as you would expect.
+        </div>
+
+        <h2 id="whats-next">What to read next</h2>
+        <ul class="plain">
+          <li><b><a href="./initializing.html">Initializing</a></b> — the five entry points and how configuration precedence works.</li>
+          <li><b><a href="./providers.html">Providers</a></b> — which URLs are recognised, lazy loading, and skipping SDKs you do not need.</li>
+          <li><b><a href="./options.html">Options reference</a></b> — every option, its type, default and data-attribute equivalent.</li>
+          <li><b><a href="./theming.html">Theming</a></b> — custom properties, <code>::part()</code> and replacing the icons.</li>
+        </ul>
+
+        <nav class="page-nav" data-docs-pagenav></nav>
+      </main>
+    </div>
+
+    <script src="../../dist/fideo.global.js"></script>
+    <script type="module" src="./_assets/docs.js"></script>
+  </body>
+</html>

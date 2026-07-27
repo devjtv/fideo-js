@@ -49,10 +49,14 @@ Fideo JS turns normal `<video>` and `<iframe>` elements into polished, configura
 - [Development](#development)
 - [Browser Notes](#browser-notes)
 
+## Documentation
+
+Full docs with live examples: [`examples/docs/`](./examples/docs/) — getting started, initializing, providers, options and data-attribute references, responsive media, background video, controls, theming, the JavaScript API, and framework recipes.
+
 ## Install
 
 ```bash
-npm install fideo-js
+npm install github:devjtv/fideo-js
 ```
 
 Import the JavaScript and stylesheet:
@@ -521,7 +525,9 @@ new Fideo('#player', {
 
 ## Styling
 
-Every visible UI element is styled with CSS variables. Override globally, per wrapper, with data attributes, or through the `cssVars` option.
+Fideo ships two halves of one stylesheet. The wrapper half is injected into `<head>` automatically on first mount, so a bare `<script>` renders a correct player with no `<link>`. The controls half is adopted into each player's shadow root as a single shared stylesheet. Link `dist/fideo.css` as well if you want the wrapper styled before the script runs, and pass `injectStyles: false` if you would rather manage it yourself.
+
+Every visible UI element is styled with CSS variables. Override globally, per wrapper, with data attributes, or through the `cssVars` option. The variables are declared on `.fideo` and inherit into the shadow root, so your overrides reach the controls.
 
 ```css
 .fideo {
@@ -532,6 +538,7 @@ Every visible UI element is styled with CSS variables. Override globally, per wr
   --fideo-muted-color: rgba(255, 255, 255, 0.92);
   --fideo-track: rgba(255, 255, 255, 0.46);
   --fideo-track-fill: rgba(255, 255, 255, 0.9);
+  --fideo-buffer-color: rgba(255, 255, 255, 0.68);
   --fideo-track-size: 5px;
   --fideo-thumb-size: 13px;
   --fideo-radius: 8px;
@@ -718,6 +725,7 @@ When a disabled provider is requested, Fideo throws an error. Supported provider
 | `className` | `string` | `''` | Additional wrapper class. |
 | `cssVars` | `Record<string, string>` | `{}` | CSS variable overrides. |
 | `disabledProviders` | `FideoProviderName[]` | `[]` | Prevent loading provider SDKs for providers you do not use. |
+| `injectStyles` | `boolean` | `true` | Add the wrapper stylesheet to `<head>` on first mount. Set to `false` when you link `dist/fideo.css` yourself. |
 
 ## Data Attributes
 
@@ -763,18 +771,23 @@ The compiled browser files are committed in `dist/` for users who want to downlo
 | `dist/fideo.global.js` | Browser global build. Adds `Fideo`, `initFideo`, `createFideo`, and `mountFideo` to `window`. Best for CDN or direct `<script>` usage. |
 | `dist/fideo.js` | ES module build. |
 | `dist/fideo.umd.cjs` | UMD/CommonJS-compatible build used by package tooling. |
-| `dist/fideo.css` | Fideo control styles. |
+| `dist/fideo.css` | Wrapper styles. Optional — the script injects them itself. |
 | `dist/styles.css` | Legacy stylesheet alias kept for older direct-link snippets. |
 | `dist/index.d.ts` | TypeScript declarations. |
 
 For direct browser usage:
 
 ```html
-<link rel="stylesheet" href="./dist/fideo.css" />
 <script src="./dist/fideo.global.js"></script>
 <script>
   Fideo.init();
 </script>
+```
+
+Add the stylesheet when you want the wrapper styled before the script executes:
+
+```html
+<link rel="stylesheet" href="./dist/fideo.css" />
 ```
 
 ## Development

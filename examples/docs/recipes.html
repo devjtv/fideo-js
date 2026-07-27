@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Framework recipes — Fideo JS docs</title>
+    <meta name="description" content="Using Fideo JS with React, Vue, Svelte, single-page apps, CMS templates and your own custom player UI." />
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+    <link rel="preconnect" href="https://rsms.me/" />
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+    <link rel="stylesheet" href="./_assets/docs.css" />
+    <script>
+      window.__fideoAutoInit = { selector: '[data-fideo-auto]' };
+    </script>
+  </head>
+  <body>
+    <header class="top-nav">
+      <div class="top-nav-inner">
+        <a class="brand" href="../index.html">
+          <span class="brand-mark" aria-hidden="true"><img src="../favicon.svg" alt="" /></span>
+          <span>fideo-js</span>
+          <span class="tag" data-version>docs</span>
+        </a>
+        <button class="nav-toggle" data-nav-toggle aria-expanded="false">Menu</button>
+        <div class="top-nav-links">
+          <a href="../index.html">Overview</a>
+          <a href="../improvements.html">Benchmarks</a>
+          <a href="https://github.com/devjtv/fideo-js">GitHub</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar" data-docs-sidebar></aside>
+
+      <main class="content">
+        <p class="page-kicker">Scripting</p>
+        <h1>Framework recipes</h1>
+        <p class="lede">
+          Fideo is framework-agnostic: it takes an element and gives back an instance. The only rule that matters is
+          mount on attach, <code>destroy()</code> on detach.
+        </p>
+
+        <h2 id="react">React</h2>
+        <div class="code">
+          <div class="code-head"><span>A reusable component</span><span class="lang">jsx</span></div>
+<pre><span class="tk-kw">import</span> { useEffect, useRef } <span class="tk-kw">from</span> <span class="tk-str">'react'</span>;
+<span class="tk-kw">import</span> { mountFideo } <span class="tk-kw">from</span> <span class="tk-str">'fideo-js'</span>;
+
+<span class="tk-kw">export function</span> <span class="tk-fn">Video</span>({ src, poster, ...options }) {
+  <span class="tk-kw">const</span> ref = <span class="tk-fn">useRef</span>(<span class="tk-kw">null</span>);
+
+  <span class="tk-fn">useEffect</span>(() =&gt; {
+    <span class="tk-kw">const</span> player = <span class="tk-fn">mountFideo</span>(ref.current, options);
+    <span class="tk-kw">return</span> () =&gt; player.<span class="tk-fn">destroy</span>();
+    <span class="tk-com">// Options are read at mount, so remount when they change.</span>
+  }, [<span class="tk-fn">JSON</span>.stringify(options)]);
+
+  <span class="tk-kw">return</span> &lt;<span class="tk-tag">video</span> <span class="tk-attr">ref</span>={ref} <span class="tk-attr">src</span>={src} <span class="tk-attr">poster</span>={poster} <span class="tk-attr">playsInline</span> /&gt;;
+}</pre>
+        </div>
+        <div class="note warn">
+          <strong>Strict Mode mounts effects twice in development.</strong> That is fine here — the cleanup destroys
+          the first instance, and <code>mountFideo</code> is idempotent besides. Do not skip the cleanup to work around
+          it.
+        </div>
+
+        <h3 id="react-imperative">Driving it from the parent</h3>
+        <div class="code">
+          <div class="code-head"><span>Expose the instance with a ref</span><span class="lang">jsx</span></div>
+<pre><span class="tk-kw">export const</span> Video = <span class="tk-fn">forwardRef</span>(({ src, ...options }, ref) =&gt; {
+  <span class="tk-kw">const</span> elRef = <span class="tk-fn">useRef</span>(<span class="tk-kw">null</span>);
+  <span class="tk-kw">const</span> playerRef = <span class="tk-fn">useRef</span>(<span class="tk-kw">null</span>);
+
+  <span class="tk-fn">useEffect</span>(() =&gt; {
+    playerRef.current = <span class="tk-fn">mountFideo</span>(elRef.current, options);
+    <span class="tk-kw">return</span> () =&gt; playerRef.current?.<span class="tk-fn">destroy</span>();
+  }, []);
+
+  <span class="tk-fn">useImperativeHandle</span>(ref, () =&gt; ({
+    play: () =&gt; playerRef.current?.<span class="tk-fn">play</span>(),
+    pause: () =&gt; playerRef.current?.<span class="tk-fn">pause</span>(),
+    <span class="tk-fn">seek</span>: (t) =&gt; playerRef.current?.<span class="tk-fn">seek</span>(t),
+  }));
+
+  <span class="tk-kw">return</span> &lt;<span class="tk-tag">video</span> <span class="tk-attr">ref</span>={elRef} <span class="tk-attr">src</span>={src} <span class="tk-attr">playsInline</span> /&gt;;
+});</pre>
+        </div>
+
+        <h3 id="next">Next.js and other SSR frameworks</h3>
+        <p>
+          Fideo touches the DOM at import time only behind a <code>typeof window</code> guard, so importing it on the
+          server is safe. Mounting is not — keep it inside an effect, in a client component.
+        </p>
+        <div class="code">
+          <div class="code-head"><span>app/components/Video.jsx</span><span class="lang">jsx</span></div>
+<pre><span class="tk-str">'use client'</span>;
+
+<span class="tk-kw">import</span> { useEffect, useRef } <span class="tk-kw">from</span> <span class="tk-str">'react'</span>;
+<span class="tk-kw">import</span> { mountFideo } <span class="tk-kw">from</span> <span class="tk-str">'fideo-js'</span>;
+<span class="tk-com">// Optional: only if you want wrapper styles before hydration.</span>
+<span class="tk-kw">import</span> <span class="tk-str">'fideo-js/fideo.css'</span>;</pre>
+        </div>
+
+        <h2 id="vue">Vue 3</h2>
+        <div class="code">
+          <div class="code-head"><span>Composition API</span><span class="lang">vue</span></div>
+<pre><span class="tk-tag">&lt;script setup&gt;</span>
+<span class="tk-kw">import</span> { onMounted, onBeforeUnmount, ref } <span class="tk-kw">from</span> <span class="tk-str">'vue'</span>;
+<span class="tk-kw">import</span> { mountFideo } <span class="tk-kw">from</span> <span class="tk-str">'fideo-js'</span>;
+
+<span class="tk-kw">const</span> el = <span class="tk-fn">ref</span>(<span class="tk-kw">null</span>);
+<span class="tk-kw">let</span> player = <span class="tk-kw">null</span>;
+
+<span class="tk-fn">onMounted</span>(() =&gt; {
+  player = <span class="tk-fn">mountFideo</span>(el.value, { muted: <span class="tk-kw">true</span>, loop: <span class="tk-kw">true</span> });
+});
+
+<span class="tk-fn">onBeforeUnmount</span>(() =&gt; player?.<span class="tk-fn">destroy</span>());
+<span class="tk-tag">&lt;/script&gt;</span>
+
+<span class="tk-tag">&lt;template&gt;</span>
+  <span class="tk-tag">&lt;video</span> <span class="tk-attr">ref</span>=<span class="tk-str">"el"</span> <span class="tk-attr">src</span>=<span class="tk-str">"/media/clip.mp4"</span> <span class="tk-attr">playsinline</span><span class="tk-tag">&gt;&lt;/video&gt;</span>
+<span class="tk-tag">&lt;/template&gt;</span></pre>
+        </div>
+
+        <h2 id="svelte">Svelte</h2>
+        <div class="code">
+          <div class="code-head"><span>An action is the natural fit</span><span class="lang">svelte</span></div>
+<pre><span class="tk-tag">&lt;script&gt;</span>
+  <span class="tk-kw">import</span> { mountFideo } <span class="tk-kw">from</span> <span class="tk-str">'fideo-js'</span>;
+
+  <span class="tk-kw">function</span> <span class="tk-fn">fideo</span>(node, options = {}) {
+    <span class="tk-kw">const</span> player = <span class="tk-fn">mountFideo</span>(node, options);
+    <span class="tk-kw">return</span> { destroy: () =&gt; player.<span class="tk-fn">destroy</span>() };
+  }
+<span class="tk-tag">&lt;/script&gt;</span>
+
+<span class="tk-tag">&lt;video</span> <span class="tk-attr">use:fideo</span>={{ muted: <span class="tk-kw">true</span> }} <span class="tk-attr">src</span>=<span class="tk-str">"/media/clip.mp4"</span> <span class="tk-attr">playsinline</span><span class="tk-tag">&gt;&lt;/video&gt;</span></pre>
+        </div>
+
+        <h2 id="spa">Single-page apps and injected content</h2>
+        <p>
+          <code>initFideo()</code> is safe to call repeatedly — mounted elements are tracked in a
+          <code>WeakMap</code>, so a second pass skips them. Re-run it after new markup lands.
+        </p>
+        <div class="code">
+          <div class="code-head"><span>After a route change or an AJAX insert</span><span class="lang">js</span></div>
+<pre><span class="tk-kw">let</span> current = <span class="tk-fn">initFideo</span>();
+
+router.<span class="tk-fn">afterEach</span>(() =&gt; {
+  current.<span class="tk-fn">destroy</span>();   <span class="tk-com">// tear down the previous view's players</span>
+  current = <span class="tk-fn">initFideo</span>();
+});</pre>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>Or mount as content appears</span><span class="lang">js</span></div>
+<pre><span class="tk-kw">const</span> observer = <span class="tk-kw">new</span> <span class="tk-fn">MutationObserver</span>(() =&gt; <span class="tk-fn">initFideo</span>());
+observer.<span class="tk-fn">observe</span>(document.body, { childList: <span class="tk-kw">true</span>, subtree: <span class="tk-kw">true</span> });</pre>
+        </div>
+        <div class="note">
+          <strong>Fideo does not watch the DOM for you.</strong> There is no built-in <code>MutationObserver</code> —
+          re-running <code>initFideo()</code> is the intended pattern, and it is cheap because already-mounted elements
+          are skipped.
+        </div>
+
+        <h2 id="cms">CMS templates</h2>
+        <p>
+          Where the page author is not writing JavaScript, expose fields that map to data attributes and let auto-init
+          do the rest. This is the case data attributes exist for.
+        </p>
+        <div class="code">
+          <div class="code-head"><span>A template partial</span><span class="lang">html</span></div>
+<pre><span class="tk-tag">&lt;video</span>
+  <span class="tk-attr">data-fideo</span>
+  <span class="tk-attr">data-fideo-src</span>=<span class="tk-str">"{{ video_url }}"</span>
+  <span class="tk-attr">data-fideo-poster</span>=<span class="tk-str">"{{ poster_url }}"</span>
+  <span class="tk-attr">data-fideo-autoplay</span>=<span class="tk-str">"{{ autoplay ? 'true' : 'false' }}"</span>
+  <span class="tk-attr">data-fideo-accent</span>=<span class="tk-str">"{{ brand_colour }}"</span>
+  <span class="tk-attr">playsinline</span>
+<span class="tk-tag">&gt;&lt;/video&gt;</span></pre>
+        </div>
+        <p>An empty or malformed value falls back to the default instead of throwing, so a half-filled field cannot break the page.</p>
+
+        <h2 id="custom-ui">Your own player UI</h2>
+        <p>Turn the control bar off and drive the instance yourself. Everything below is live.</p>
+
+        <div class="demo">
+          <div class="demo-stage">
+            <video id="custom-ui-player" src="../media/fideo-demo.mp4" poster="../media/fideo-demo-poster.jpg" playsinline></video>
+          </div>
+          <div class="demo-foot"><span>controls: false</span><span class="mono" data-custom-time>0:00</span></div>
+        </div>
+        <div class="btn-row">
+          <button class="action" data-custom="toggle">Play / pause</button>
+          <button class="action" data-custom="back">− 5s</button>
+          <button class="action" data-custom="forward">+ 5s</button>
+          <button class="action" data-custom="mute">Mute</button>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>The wiring</span><span class="lang">js</span></div>
+<pre><span class="tk-kw">const</span> player = <span class="tk-fn">mountFideo</span>(el, { controls: <span class="tk-kw">false</span>, muted: <span class="tk-kw">true</span> });
+
+toggle.<span class="tk-fn">addEventListener</span>(<span class="tk-str">'click'</span>, () =&gt; {
+  <span class="tk-kw">const</span> { paused } = player.<span class="tk-fn">getState</span>();
+  paused ? player.<span class="tk-fn">play</span>() : player.<span class="tk-fn">pause</span>();
+});
+
+player.element.<span class="tk-fn">addEventListener</span>(<span class="tk-str">'fideo:timeupdate'</span>, (event) =&gt; {
+  readout.textContent = <span class="tk-fn">format</span>(event.detail.state.currentTime);
+});</pre>
+        </div>
+
+        <h2 id="playlist">A playlist with one player</h2>
+        <p><code>setSource()</code> swaps media in place, so a playlist does not need a player per item.</p>
+        <div class="demo">
+          <div class="demo-stage">
+            <video id="playlist-player" src="../media/fideo-demo.mp4" poster="../media/fideo-demo-poster.jpg" playsinline></video>
+          </div>
+          <div class="demo-foot"><span>Current poster</span><span class="mono" data-playlist-name>clip one</span></div>
+        </div>
+        <div class="btn-row">
+          <button class="action" data-playlist="0" aria-pressed="true">Clip one</button>
+          <button class="action" data-playlist="1">Clip two</button>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>Swapping in place</span><span class="lang">js</span></div>
+<pre><span class="tk-kw">async function</span> <span class="tk-fn">select</span>(item) {
+  <span class="tk-kw">await</span> player.<span class="tk-fn">setSource</span>(item.src);
+  <span class="tk-kw">await</span> player.<span class="tk-fn">play</span>();
+}</pre>
+        </div>
+        <div class="note warn">
+          <strong>Do not combine <code>setSource()</code> with responsive <code>sources</code>.</strong> A resize past a
+          breakpoint reapplies the configured source and undoes your swap. Pick one approach per player.
+        </div>
+
+        <h2 id="analytics">Analytics</h2>
+        <p>Because the events bubble, one delegated listener covers every player on the page.</p>
+        <div class="code">
+          <div class="code-head"><span>Quartile tracking</span><span class="lang">js</span></div>
+<pre><span class="tk-kw">const</span> seen = <span class="tk-kw">new</span> <span class="tk-fn">WeakMap</span>();
+
+document.<span class="tk-fn">addEventListener</span>(<span class="tk-str">'fideo:timeupdate'</span>, (event) =&gt; {
+  <span class="tk-kw">const</span> { state } = event.detail;
+  <span class="tk-kw">if</span> (!state.duration) <span class="tk-kw">return</span>;
+
+  <span class="tk-kw">const</span> quartile = <span class="tk-fn">Math</span>.floor((state.currentTime / state.duration) * <span class="tk-num">4</span>);
+  <span class="tk-kw">if</span> (seen.<span class="tk-fn">get</span>(event.target) === quartile) <span class="tk-kw">return</span>;
+
+  seen.<span class="tk-fn">set</span>(event.target, quartile);
+  <span class="tk-fn">track</span>(<span class="tk-str">'video_progress'</span>, { id: event.target.id, quartile });
+});</pre>
+        </div>
+
+        <h2 id="checklist">Integration checklist</h2>
+        <ul class="plain">
+          <li><b>Always <code>destroy()</code> on unmount.</b> It is the one thing a component must not skip.</li>
+          <li><b>Options are read at mount.</b> Changing them means destroying and mounting again.</li>
+          <li><b>Never render the element inside a <code>.fideo</code> wrapper of your own</b> — Fideo adopts it and removes it on teardown.</li>
+          <li><b>Catch <code>play()</code>.</b> Autoplay policy rejects it far more often than you would expect.</li>
+          <li><b>Guard mounting against SSR</b> by keeping it in an effect or lifecycle hook.</li>
+        </ul>
+
+        <nav class="page-nav" data-docs-pagenav></nav>
+      </main>
+    </div>
+
+    <script src="../../dist/fideo.global.js"></script>
+    <script type="module" src="./_assets/docs.js"></script>
+    <script type="module">
+      /* Custom UI */
+      const customPlayer = mountFideo(document.querySelector("#custom-ui-player"), { controls: false, muted: true, loop: true });
+      const timeOut = document.querySelector('[data-custom-time]');
+
+      const format = (seconds) => {
+        const total = Math.max(0, Math.floor(seconds));
+        return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
+      };
+
+      const customActions = {
+        toggle: () => (customPlayer.getState().paused ? customPlayer.play() : customPlayer.pause()),
+        back: () => customPlayer.seek(Math.max(0, customPlayer.getState().currentTime - 5)),
+        forward: () => customPlayer.seek(customPlayer.getState().currentTime + 5),
+        mute: () => customPlayer.setMuted(!customPlayer.getState().muted),
+      };
+
+      document.querySelectorAll('[data-custom]').forEach((button) =>
+        button.addEventListener('click', () => customActions[button.dataset.custom]()),
+      );
+      customPlayer.element.addEventListener('fideo:timeupdate', (event) => {
+        timeOut.textContent = format(event.detail.state.currentTime);
+      });
+
+      /* Playlist */
+      const ITEMS = [
+        { name: 'clip one', src: '../media/fideo-demo.mp4', poster: '../media/fideo-demo-poster.jpg' },
+        { name: 'clip two', src: '../media/fideo-demo.mp4', poster: '../media/fideo-demo-poster-alt.jpg' },
+      ];
+
+      const playlistPlayer = mountFideo(document.querySelector("#playlist-player"), { muted: true, loop: true });
+      const playlistName = document.querySelector('[data-playlist-name]');
+
+      document.querySelectorAll('[data-playlist]').forEach((button) =>
+        button.addEventListener('click', async () => {
+          const item = ITEMS[Number(button.dataset.playlist)];
+          document
+            .querySelectorAll('[data-playlist]')
+            .forEach((el) => el.setAttribute('aria-pressed', String(el === button)));
+
+          playlistPlayer.element.poster = item.poster;
+          await playlistPlayer.setSource(item.src);
+          playlistName.textContent = item.name;
+        }),
+      );
+    </script>
+  </body>
+</html>

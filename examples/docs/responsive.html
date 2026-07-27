@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Responsive media — Fideo JS docs</title>
+    <meta name="description" content="Serve a different video source and poster per breakpoint with Fideo JS, and understand exactly which one is chosen at any width." />
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+    <link rel="preconnect" href="https://rsms.me/" />
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+    <link rel="stylesheet" href="./_assets/docs.css" />
+    <script>
+      window.__fideoAutoInit = { selector: '[data-fideo-auto]' };
+    </script>
+  </head>
+  <body>
+    <header class="top-nav">
+      <div class="top-nav-inner">
+        <a class="brand" href="../index.html">
+          <span class="brand-mark" aria-hidden="true"><img src="../favicon.svg" alt="" /></span>
+          <span>fideo-js</span>
+          <span class="tag" data-version>docs</span>
+        </a>
+        <button class="nav-toggle" data-nav-toggle aria-expanded="false">Menu</button>
+        <div class="top-nav-links">
+          <a href="../index.html">Overview</a>
+          <a href="../improvements.html">Benchmarks</a>
+          <a href="https://github.com/devjtv/fideo-js">GitHub</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar" data-docs-sidebar></aside>
+
+      <main class="content">
+        <p class="page-kicker">Configure</p>
+        <h1>Responsive media</h1>
+        <p class="lede">
+          Give Fideo up to three sources and three posters and it picks the right pair for the current viewport,
+          re-evaluating whenever the window resizes or the device rotates.
+        </p>
+
+        <h2 id="live">Resize this page</h2>
+        <p>
+          The player below has a poster for each breakpoint. Narrow your window past 1024px and then past 767px — the
+          poster swaps and the readout follows.
+        </p>
+
+        <div class="demo">
+          <div class="demo-stage">
+            <video
+              id="responsive-demo"
+              data-fideo-poster-desktop="../posters/youtube-desktop.svg"
+              data-fideo-poster-tablet="../posters/youtube-tablet.svg"
+              data-fideo-poster-mobile="../posters/youtube-mobile.svg"
+              src="../media/fideo-demo.mp4"
+              playsinline
+            ></video>
+          </div>
+          <div class="demo-foot"><span>Recomputed on resize</span><span class="mono" data-breakpoint-note>—</span></div>
+        </div>
+
+        <div class="readout">
+          <div class="cell"><span class="k">Viewport</span><span class="v" data-rw>—</span></div>
+          <div class="cell"><span class="k">Band</span><span class="v" data-rband>—</span></div>
+          <div class="cell"><span class="k">Poster in use</span><span class="v" data-rposter>—</span></div>
+        </div>
+
+        <h2 id="markup">Declaring sources</h2>
+        <p>
+          <code>data-fideo-src</code> is the general source; the suffixed variants override it for their band. A player
+          only needs the widths it actually has assets for.
+        </p>
+        <div class="code">
+          <div class="code-head"><span>Three encodes, one element</span><span class="lang">html</span></div>
+<pre><span class="tk-tag">&lt;video</span>
+  <span class="tk-attr">data-fideo</span>
+  <span class="tk-attr">data-fideo-src-desktop</span>=<span class="tk-str">"/media/clip-1080.mp4"</span>
+  <span class="tk-attr">data-fideo-src-tablet</span>=<span class="tk-str">"/media/clip-720.mp4"</span>
+  <span class="tk-attr">data-fideo-src-mobile</span>=<span class="tk-str">"/media/clip-480.mp4"</span>
+  <span class="tk-attr">data-fideo-poster-desktop</span>=<span class="tk-str">"/media/poster-wide.jpg"</span>
+  <span class="tk-attr">data-fideo-poster-mobile</span>=<span class="tk-str">"/media/poster-tall.jpg"</span>
+<span class="tk-tag">&gt;&lt;/video&gt;</span></pre>
+        </div>
+
+        <div class="code">
+          <div class="code-head"><span>The JavaScript equivalent</span><span class="lang">js</span></div>
+<pre><span class="tk-fn">mountFideo</span>(el, {
+  sources: {
+    desktop: <span class="tk-str">'/media/clip-1080.mp4'</span>,
+    tablet: <span class="tk-str">'/media/clip-720.mp4'</span>,
+    mobile: <span class="tk-str">'/media/clip-480.mp4'</span>,
+  },
+  posters: {
+    desktop: <span class="tk-str">'/media/poster-wide.jpg'</span>,
+    mobile: <span class="tk-str">'/media/poster-tall.jpg'</span>,
+  },
+});
+
+<span class="tk-com">// A bare string is shorthand for { desktop: … }</span>
+<span class="tk-fn">mountFideo</span>(el, { sources: <span class="tk-str">'/media/clip.mp4'</span> });</pre>
+        </div>
+
+        <div class="note warn">
+          <strong>Sources and posters merge, and JavaScript wins per key.</strong> This is the opposite of scalar
+          options, where the data attribute wins. Set <code>posters.desktop</code> in JavaScript and it overrides
+          <code>data-fideo-poster-desktop</code>, while <code>posters.mobile</code> from the markup survives.
+        </div>
+
+        <h2 id="bands">Which one gets picked</h2>
+        <p>
+          Fideo compares <code>window.innerWidth</code> against the breakpoints and walks a fallback chain, so a
+          missing asset never leaves the player empty.
+        </p>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Viewport width</th><th>Band</th><th>Preference order</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">≤ 767</td><td>mobile</td><td class="mono">mobile → tablet → desktop</td></tr>
+                <tr><td class="mono">768 – 1024</td><td>tablet</td><td class="mono">tablet → desktop → mobile</td></tr>
+                <tr><td class="mono">&gt; 1024</td><td>desktop</td><td class="mono">desktop → tablet → mobile</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <h3 id="breakpoints">Moving the breakpoints</h3>
+        <div class="code">
+          <div class="code-head"><span>Per player, either way</span><span class="lang">html</span></div>
+<pre><span class="tk-tag">&lt;video</span> <span class="tk-attr">data-fideo</span> <span class="tk-attr">data-fideo-breakpoint-mobile</span>=<span class="tk-str">"600"</span> <span class="tk-attr">data-fideo-breakpoint-tablet</span>=<span class="tk-str">"900"</span><span class="tk-tag">&gt;&lt;/video&gt;</span></pre>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>Or for every player at once</span><span class="lang">js</span></div>
+<pre><span class="tk-fn">initFideo</span>({ breakpoints: { mobile: <span class="tk-num">600</span>, tablet: <span class="tk-num">900</span> } });</pre>
+        </div>
+
+        <h2 id="swapping">What happens on resize</h2>
+        <ul class="plain">
+          <li><b>Resize and orientation changes are batched</b> into a single <code>requestAnimationFrame</code>, so dragging a window edge does not thrash the player.</li>
+          <li><b>The source only changes when the resolved URL actually differs.</b> Crossing a breakpoint with no asset for that band is a no-op.</li>
+          <li><b>Swapping a source reloads the media element</b>, which restarts playback from zero. Prefer encodes of the same cut.</li>
+          <li><b>The poster overlay updates in place</b> and is only visible while the player is paused.</li>
+        </ul>
+
+        <div class="note">
+          <strong>Posters are an overlay, not the native attribute.</strong> Fideo renders its own
+          <code>&lt;img class="fideo__poster"&gt;</code> so posters work identically for iframe providers, which have no
+          poster attribute at all. It is decorative and hidden from assistive tech.
+        </div>
+
+        <h2 id="iframe">Responsive embeds</h2>
+        <p>
+          Iframe providers accept the same attributes. Fideo loads the matching embed URL through the provider's own
+          API rather than reloading the frame.
+        </p>
+        <div class="code">
+          <div class="code-head"><span>A different cut per breakpoint</span><span class="lang">html</span></div>
+<pre><span class="tk-tag">&lt;iframe</span>
+  <span class="tk-attr">data-fideo</span>
+  <span class="tk-attr">data-fideo-src-desktop</span>=<span class="tk-str">"https://vimeo.com/347119375"</span>
+  <span class="tk-attr">data-fideo-src-mobile</span>=<span class="tk-str">"https://vimeo.com/76979871"</span>
+  <span class="tk-attr">data-fideo-poster-mobile</span>=<span class="tk-str">"/media/poster-tall.jpg"</span>
+<span class="tk-tag">&gt;&lt;/iframe&gt;</span></pre>
+        </div>
+        <div class="note">
+          Provider detection reads the responsive sources too, so an element with no <code>src</code> of its own is
+          still identified correctly from <code>data-fideo-src-desktop</code>.
+        </div>
+
+        <nav class="page-nav" data-docs-pagenav></nav>
+      </main>
+    </div>
+
+    <script src="../../dist/fideo.global.js"></script>
+    <script type="module" src="./_assets/docs.js"></script>
+    <script type="module">
+      const player = mountFideo(document.querySelector('#responsive-demo'), { muted: true, loop: true });
+      const { mobile, tablet } = player.options.breakpoints;
+
+      document.querySelector('[data-breakpoint-note]').textContent = `breakpoints: ${mobile} / ${tablet}`;
+
+      const rw = document.querySelector('[data-rw]');
+      const rband = document.querySelector('[data-rband]');
+      const rposter = document.querySelector('[data-rposter]');
+
+      function render() {
+        const width = window.innerWidth;
+        rw.textContent = `${width}px`;
+        rband.textContent = width <= mobile ? 'mobile' : width <= tablet ? 'tablet' : 'desktop';
+        const poster = player.wrapper.querySelector('.fideo__poster');
+        rposter.textContent = poster ? (poster.getAttribute('src') || '').split('/').pop() : 'none';
+      }
+
+      render();
+      // The player updates on its own rAF tick, so read one frame later.
+      window.addEventListener('resize', () => requestAnimationFrame(render), { passive: true });
+      window.addEventListener('orientationchange', () => requestAnimationFrame(render), { passive: true });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Initializing — Fideo JS docs</title>
+    <meta name="description" content="Every way to initialize a Fideo player: auto-init, initFideo, new Fideo, createFideo and mountFideo — plus how data attributes and JavaScript options resolve against each other." />
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+    <link rel="preconnect" href="https://rsms.me/" />
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+    <link rel="stylesheet" href="./_assets/docs.css" />
+    <script>
+      /*
+       * Auto-init is narrowed so each example on this page mounts on its own
+       * terms — which doubles as the demo for __fideoAutoInit below.
+       */
+      window.__fideoAutoInit = { selector: '[data-fideo-auto]' };
+    </script>
+  </head>
+  <body>
+    <header class="top-nav">
+      <div class="top-nav-inner">
+        <a class="brand" href="../index.html">
+          <span class="brand-mark" aria-hidden="true"><img src="../favicon.svg" alt="" /></span>
+          <span>fideo-js</span>
+          <span class="tag" data-version>docs</span>
+        </a>
+        <button class="nav-toggle" data-nav-toggle aria-expanded="false">Menu</button>
+        <div class="top-nav-links">
+          <a href="../index.html">Overview</a>
+          <a href="../improvements.html">Benchmarks</a>
+          <a href="https://github.com/devjtv/fideo-js">GitHub</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar" data-docs-sidebar></aside>
+
+      <main class="content">
+        <p class="page-kicker">Start here</p>
+        <h1>Initializing</h1>
+        <p class="lede">
+          Five entry points, two ways to configure them, and one set of precedence rules that decides who wins when you
+          use both. Every player on this page is running the code shown beneath it.
+        </p>
+
+        <h2 id="auto">Auto-init — no JavaScript at all</h2>
+        <p>
+          Loaded as a classic <code>&lt;script&gt;</code>, Fideo scans for <code>[data-fideo]</code> on
+          <code>DOMContentLoaded</code> and mounts what it finds.
+        </p>
+
+        <div class="demo">
+          <div class="demo-stage">
+            <video
+              data-fideo
+              data-fideo-auto
+              data-fideo-poster="../media/fideo-demo-poster.jpg"
+              data-fideo-muted
+              data-fideo-loop
+              src="../media/fideo-demo.mp4"
+              playsinline
+            ></video>
+          </div>
+          <div class="demo-foot"><span>Mounted by</span><span class="mono">auto-init on DOMContentLoaded</span></div>
+        </div>
+
+        <div class="code">
+          <div class="code-head"><span>The whole integration</span><span class="lang">html</span></div>
+<pre><span class="tk-tag">&lt;script</span> <span class="tk-attr">src</span>=<span class="tk-str">"https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v__FIDEO_VERSION__/dist/fideo.global.js"</span><span class="tk-tag">&gt;&lt;/script&gt;</span>
+
+<span class="tk-tag">&lt;video</span>
+  <span class="tk-attr">data-fideo</span>
+  <span class="tk-attr">src</span>=<span class="tk-str">"/media/clip.mp4"</span>
+  <span class="tk-attr">data-fideo-poster</span>=<span class="tk-str">"/media/poster.jpg"</span>
+  <span class="tk-attr">data-fideo-muted</span>
+  <span class="tk-attr">data-fideo-loop</span>
+<span class="tk-tag">&gt;&lt;/video&gt;</span></pre>
+        </div>
+
+        <div class="code">
+          <div class="code-head"><span>Optional — configure the auto pass</span><span class="lang">html</span></div>
+<pre><span class="tk-com">&lt;!-- Must run before the library script --&gt;</span>
+<span class="tk-tag">&lt;script&gt;</span>
+  <span class="tk-kw">window</span>.__fideoAutoInit = {
+    selector: <span class="tk-str">'.hero-video'</span>,
+    muted: <span class="tk-kw">true</span>,
+  };
+<span class="tk-tag">&lt;/script&gt;</span></pre>
+        </div>
+
+        <div class="note">
+          <strong>Auto-init only fires for classic scripts.</strong> When Fideo is imported as a module it detects that
+          (<code>document.currentScript</code> is <code>null</code>) and stays out of the way, so a bundled app never
+          gets a surprise mount pass.
+        </div>
+
+        <h2 id="init-fideo"><code>initFideo()</code> — mount everything that matches</h2>
+        <p>
+          The same scan, run on demand. Returns the mounted players plus a <code>destroy()</code> that tears down the
+          whole batch. Pass a <code>selector</code> to scope it; every other option becomes the default for each player
+          it mounts.
+        </p>
+
+        <div class="demo">
+          <div class="demo-stage">
+            <div class="demo-grid">
+              <video data-fideo data-fideo-demo="batch" src="../media/fideo-demo.mp4" poster="../media/fideo-demo-poster.jpg" playsinline></video>
+              <video data-fideo data-fideo-demo="batch" src="../media/fideo-demo.mp4" poster="../media/fideo-demo-poster.jpg" playsinline></video>
+            </div>
+          </div>
+          <div class="demo-foot"><span>One call mounted both</span><span class="mono" data-batch-count>—</span></div>
+        </div>
+
+        <div class="code">
+          <div class="code-head"><span>Scoped batch mount</span><span class="lang">js</span></div>
+<pre><span class="tk-kw">const</span> result = <span class="tk-fn">initFideo</span>({
+  selector: <span class="tk-str">'[data-fideo-demo="batch"]'</span>,
+  muted: <span class="tk-kw">true</span>,
+  loop: <span class="tk-kw">true</span>,
+  volume: <span class="tk-num">0.6</span>,
+});
+
+result.players.length; <span class="tk-com">// 2</span>
+result.<span class="tk-fn">destroy</span>();      <span class="tk-com">// unmounts both</span>
+
+<span class="tk-com">// Same thing as a static method</span>
+Fideo.<span class="tk-fn">init</span>({ selector: <span class="tk-str">'[data-fideo-demo="batch"]'</span> });
+
+<span class="tk-com">// Default selector when you pass nothing</span>
+<span class="tk-fn">initFideo</span>(); <span class="tk-com">// → [data-fideo]</span></pre>
+        </div>
+
+        <div class="note">
+          <strong>Safe to call more than once.</strong> Mounted elements are tracked in a <code>WeakMap</code>, so a
+          second pass skips them and returns the existing instances. Re-run it after injecting content and nothing is
+          double-mounted. An element that cannot mount is warned about and skipped — it does not abort the batch.
+        </div>
+
+        <h2 id="new-fideo"><code>new Fideo()</code> — one player, by selector</h2>
+        <p>
+          The class form. Takes a CSS selector or an element and returns an instance carrying the full player API.
+          The element does not need <code>data-fideo</code> — that attribute only matters to the selector-driven entry
+          points.
+        </p>
+
+        <div class="demo">
+          <div class="demo-stage">
+            <video id="player-new" src="../media/fideo-demo.mp4" poster="../media/fideo-demo-poster.jpg" playsinline></video>
+          </div>
+          <div class="demo-foot"><span>Live state</span><span class="mono" data-new-state>—</span></div>
+        </div>
+        <div class="btn-row">
+          <button class="action" data-new-play>play()</button>
+          <button class="action" data-new-pause>pause()</button>
+          <button class="action" data-new-seek>seek(8)</button>
+        </div>
+
+        <div class="code">
+          <div class="code-head"><span>No data attributes needed</span><span class="lang">js</span></div>
+<pre><span class="tk-kw">const</span> player = <span class="tk-kw">new</span> <span class="tk-fn">Fideo</span>(<span class="tk-str">'#player-new'</span>, {
+  muted: <span class="tk-kw">true</span>,
+  loop: <span class="tk-kw">true</span>,
+  volume: <span class="tk-num">0.5</span>,
+  playbackRates: [<span class="tk-num">0.5</span>, <span class="tk-num">1</span>, <span class="tk-num">1.5</span>, <span class="tk-num">2</span>],
+});
+
+<span class="tk-kw">await</span> player.<span class="tk-fn">play</span>();
+<span class="tk-kw">await</span> player.<span class="tk-fn">seek</span>(<span class="tk-num">8</span>);
+player.<span class="tk-fn">getState</span>(); <span class="tk-com">// { currentTime, duration, paused, … }</span></pre>
+        </div>
+
+        <h2 id="create-fideo"><code>createFideo()</code> — the same thing, without <code>new</code></h2>
+        <p>
+          A factory wrapper around the class, for codebases that avoid <code>new</code> or where a function reads
+          better. Identical arguments, identical instance. This one is handed a live element rather than a selector,
+          which is what you usually have inside a framework ref.
+        </p>
+
+        <div class="demo">
+          <div class="demo-stage">
+            <video id="player-create" src="../media/fideo-demo.mp4" poster="../media/fideo-demo-poster.jpg" playsinline></video>
+          </div>
+          <div class="demo-foot"><span>Target passed as</span><span class="mono">HTMLVideoElement</span></div>
+        </div>
+
+        <div class="code">
+          <div class="code-head"><span>Element reference, not a selector</span><span class="lang">js</span></div>
+<pre><span class="tk-kw">const</span> el = document.<span class="tk-fn">querySelector</span>(<span class="tk-str">'#player-create'</span>);
+
+<span class="tk-kw">const</span> player = <span class="tk-fn">createFideo</span>(el, {
+  muted: <span class="tk-kw">true</span>,
+  loop: <span class="tk-kw">true</span>,
+  controlVisibility: { settings: <span class="tk-kw">false</span> },
+});</pre>
+        </div>
+        <p>See <a href="./recipes.html">Framework recipes</a> for the React, Vue and SPA versions of this.</p>
+
+        <h2 id="mount-fideo"><code>mountFideo()</code> — element only, never duplicates</h2>
+        <p>
+          The primitive the other entry points are built on. It takes an element — never a selector — and is
+          idempotent: call it twice on the same element and you get the same instance back rather than a second player
+          stacked on the first.
+        </p>
+
+        <div class="demo">
+          <div class="demo-stage">
+            <video id="player-mount" src="../media/fideo-demo.mp4" poster="../media/fideo-demo-poster.jpg" playsinline></video>
+          </div>
+          <div class="demo-foot"><span>Identity check</span><span class="mono" data-mount-identity>—</span></div>
+        </div>
+        <div class="btn-row"><button class="action" data-mount-again>Call mountFideo() again</button></div>
+        <div class="log" data-mount-log aria-live="polite"></div>
+
+        <div class="code">
+          <div class="code-head"><span>Idempotent by design</span><span class="lang">js</span></div>
+<pre><span class="tk-kw">const</span> el = document.<span class="tk-fn">querySelector</span>(<span class="tk-str">'#player-mount'</span>);
+
+<span class="tk-kw">const</span> a = <span class="tk-fn">mountFideo</span>(el, { muted: <span class="tk-kw">true</span> });
+<span class="tk-kw">const</span> b = <span class="tk-fn">mountFideo</span>(el, { muted: <span class="tk-kw">false</span> });
+
+a === b; <span class="tk-com">// true — the second call's options are ignored</span></pre>
+        </div>
+
+        <div class="note warn">
+          <strong>The second call's options are discarded.</strong> The existing instance comes back untouched. To
+          change configuration, <code>destroy()</code> the player and mount it again.
+        </div>
+
+        <h2 id="precedence">Who wins when both are set</h2>
+        <p>
+          Anything you can set in JavaScript has a <code>data-fideo-*</code> equivalent, and the two mix freely on the
+          same element. Most options let the <b>data attribute</b> override JavaScript, so a page author can adjust one
+          player without touching the code that mounts it. Collection options merge instead, and there
+          <b>JavaScript</b> wins per key.
+        </p>
+
+        <div class="demo">
+          <div class="demo-stage">
+            <video
+              id="player-precedence"
+              data-fideo-autoplay="false"
+              data-fideo-volume="0.25"
+              data-fideo-poster="../media/fideo-demo-poster.jpg"
+              src="../media/fideo-demo.mp4"
+              playsinline
+            ></video>
+          </div>
+          <div class="demo-foot"><span>Poster shown is the one JavaScript supplied</span><span class="mono">posters merged</span></div>
+        </div>
+
+        <div class="code">
+          <div class="code-head"><span>Deliberately conflicting</span><span class="lang">js</span></div>
+<pre><span class="tk-fn">mountFideo</span>(el, {
+  autoplay: <span class="tk-kw">true</span>,   <span class="tk-com">// attribute says "false" → attribute wins</span>
+  volume: <span class="tk-num">1</span>,        <span class="tk-com">// attribute says "0.25"  → attribute wins</span>
+  muted: <span class="tk-kw">true</span>,      <span class="tk-com">// no attribute           → JS applies</span>
+  posters: {         <span class="tk-com">// merged map             → JS wins per key</span>
+    desktop: <span class="tk-str">'./media/poster-alt.jpg'</span>,
+  },
+});</pre>
+        </div>
+
+        <div class="table-wrap">
+          <div class="table-head">Resolved options, read from the live instance above</div>
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Option</th><th>Attribute</th><th>JavaScript</th><th>Resolved</th></tr></thead>
+              <tbody data-precedence-body><tr><td colspan="4">Reading instance…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <div class="table-head">The rules</div>
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Options</th><th>Winner</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>Scalars — <code>autoplay</code>, <code>muted</code>, <code>loop</code>, <code>controls</code>, <code>volume</code>, <code>lazy</code>, <code>preload</code>, <code>viewport</code>, <code>background</code>, <code>className</code>, and every <code>controlVisibility</code> flag</td>
+                  <td><b>Data attribute</b></td>
+                </tr>
+                <tr><td>Maps — <code>sources</code>, <code>posters</code>, <code>cssVars</code></td><td><b>JavaScript</b>, per key</td></tr>
+                <tr><td><code>provider</code></td><td><b>JavaScript</b></td></tr>
+                <tr><td><code>selector</code>, <code>icons</code>, <code>disabledProviders</code>, <code>injectStyles</code></td><td>JavaScript only — no attribute exists</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="note warn">
+          <strong>One override beats everything.</strong> <code>background: true</code> forces <code>autoplay</code>,
+          <code>muted</code>, <code>loop</code> and <code>playsInline</code> on from either source, because a
+          background video cannot work without them. See <a href="./background.html">Background video</a>.
+        </div>
+
+        <h2 id="lifecycle">Mount, destroy, mount again</h2>
+        <p>
+          <code>destroy()</code> unwraps the element, removes everything Fideo generated and releases the instance,
+          leaving markup you can mount again with different options. That is the supported way to reconfigure a player,
+          and what a single-page app should call when a route unmounts.
+        </p>
+
+        <div class="demo">
+          <div class="demo-stage">
+            <video id="player-lifecycle" src="../media/fideo-demo.mp4" poster="../media/fideo-demo-poster.jpg" playsinline></video>
+          </div>
+          <div class="demo-foot"><span>Status</span><span class="mono" data-lifecycle-status>—</span></div>
+        </div>
+        <div class="btn-row">
+          <button class="action" data-lifecycle-mount>Mount muted</button>
+          <button class="action" data-lifecycle-remount>Mount with a blue accent</button>
+          <button class="action" data-lifecycle-destroy>destroy()</button>
+        </div>
+        <div class="log" data-lifecycle-log aria-live="polite"></div>
+
+        <div class="code">
+          <div class="code-head"><span>Reconfiguring means remounting</span><span class="lang">js</span></div>
+<pre><span class="tk-kw">let</span> player = <span class="tk-fn">mountFideo</span>(el, { muted: <span class="tk-kw">true</span> });
+
+<span class="tk-com">// Options are locked in at mount, so swap the instance:</span>
+player.<span class="tk-fn">destroy</span>();
+player = <span class="tk-fn">mountFideo</span>(el, {
+  muted: <span class="tk-kw">true</span>,
+  cssVars: { <span class="tk-str">'--fideo-accent'</span>: <span class="tk-str">'#7ab8ff'</span> },
+});
+
+<span class="tk-com">// Or tear down a whole batch at once</span>
+<span class="tk-kw">const</span> result = <span class="tk-fn">initFideo</span>();
+result.<span class="tk-fn">destroy</span>();</pre>
+        </div>
+
+        <div class="note">
+          Teardown is complete: listeners are dropped through <code>AbortController</code>s, observers disconnect, the
+          wrapper and generated nodes are removed, and the element returns to where it started.
+        </div>
+
+        <h2 id="loading">Getting the library into your page</h2>
+        <div class="code">
+          <div class="code-head"><span>Browser global</span><span class="lang">html</span></div>
+<pre><span class="tk-tag">&lt;script</span> <span class="tk-attr">src</span>=<span class="tk-str">"/dist/fideo.global.js"</span><span class="tk-tag">&gt;&lt;/script&gt;</span>
+<span class="tk-tag">&lt;script&gt;</span>
+  <span class="tk-com">// window.Fideo, initFideo, createFideo, mountFideo</span>
+  Fideo.<span class="tk-fn">init</span>();
+<span class="tk-tag">&lt;/script&gt;</span></pre>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>ES module / bundler</span><span class="lang">js</span></div>
+<pre><span class="tk-kw">import</span> { Fideo, initFideo, createFideo, mountFideo } <span class="tk-kw">from</span> <span class="tk-str">'fideo-js'</span>;
+
+<span class="tk-fn">initFideo</span>(); <span class="tk-com">// nothing auto-mounts for module imports</span></pre>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>CommonJS</span><span class="lang">js</span></div>
+<pre><span class="tk-kw">const</span> { initFideo } = <span class="tk-fn">require</span>(<span class="tk-str">'fideo-js'</span>);</pre>
+        </div>
+
+        <h2 id="cheatsheet">Picking an entry point</h2>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Call</th><th>Target</th><th>Returns</th><th>Reach for it when</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">auto-init</td><td>every <code>[data-fideo]</code></td><td>nothing</td><td>A static page or CMS, no build step</td></tr>
+                <tr><td class="mono">initFideo(options)</td><td>a selector</td><td class="mono">{ players, destroy() }</td><td>Many players share one configuration</td></tr>
+                <tr><td class="mono">new Fideo(target, options)</td><td>selector or element</td><td>player instance</td><td>One player you hold a reference to</td></tr>
+                <tr><td class="mono">createFideo(target, options)</td><td>selector or element</td><td>player instance</td><td>Same, without <code>new</code></td></tr>
+                <tr><td class="mono">mountFideo(element, options)</td><td>element only</td><td>player instance</td><td>You already have the node and want no duplicates</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <nav class="page-nav" data-docs-pagenav></nav>
+      </main>
+    </div>
+
+    <script src="../../dist/fideo.global.js"></script>
+    <script type="module">
+      import { log } from './_assets/docs.js';
+
+      /* initFideo() — batch */
+      const batch = initFideo({
+        selector: '[data-fideo-demo="batch"]',
+        muted: true,
+        loop: true,
+        volume: 0.6,
+      });
+      document.querySelector('[data-batch-count]').textContent = `initFideo() → ${batch.players.length} players`;
+
+      /* new Fideo() */
+      const newPlayer = new Fideo('#player-new', {
+        muted: true,
+        loop: true,
+        volume: 0.5,
+        playbackRates: [0.5, 1, 1.5, 2],
+      });
+
+      const newEl = document.querySelector('#player-new');
+      const newState = document.querySelector('[data-new-state]');
+      const renderNewState = () => {
+        const state = newPlayer.getState();
+        newState.textContent = `${state.paused ? 'paused' : 'playing'} · ${state.currentTime.toFixed(1)}s`;
+      };
+      renderNewState();
+      ['fideo:timeupdate', 'fideo:play', 'fideo:pause'].forEach((event) =>
+        newEl.addEventListener(event, renderNewState),
+      );
+      document.querySelector('[data-new-play]').addEventListener('click', () => newPlayer.play());
+      document.querySelector('[data-new-pause]').addEventListener('click', () => newPlayer.pause());
+      document.querySelector('[data-new-seek]').addEventListener('click', () => newPlayer.seek(8));
+
+      /* createFideo() */
+      createFideo(document.querySelector('#player-create'), {
+        muted: true,
+        loop: true,
+        controlVisibility: { settings: false },
+      });
+
+      /* mountFideo() idempotency */
+      const mountEl = document.querySelector('#player-mount');
+      const mountLog = document.querySelector('[data-mount-log]');
+      const first = mountFideo(mountEl, { muted: true, loop: true });
+      document.querySelector('[data-mount-identity]').textContent = '1 call → 1 instance';
+      log(mountLog, 'mountFideo(el, { muted: true }) → instance created');
+
+      let mountCalls = 1;
+      document.querySelector('[data-mount-again]').addEventListener('click', () => {
+        mountCalls += 1;
+        const again = mountFideo(mountEl, { muted: false, controls: false });
+        const same = again === first;
+        const wrappers = document.querySelectorAll('.fideo:has(#player-mount)').length;
+        log(
+          mountLog,
+          `call ${mountCalls}: returned ${same ? 'the same instance' : 'a NEW instance'} · wrappers around this video: ${wrappers}`,
+          same ? 'ok' : 'warn',
+        );
+        document.querySelector('[data-mount-identity]').textContent = `${mountCalls} calls → 1 instance`;
+      });
+
+      /* Precedence */
+      const precedencePlayer = mountFideo(document.querySelector('#player-precedence'), {
+        autoplay: true,
+        volume: 1,
+        muted: true,
+        loop: true,
+        // Deliberately different from the element's data-fideo-poster so the
+        // merge winner is visible in the player, not only in the table.
+        posters: { desktop: '../media/fideo-demo-poster-alt.jpg' },
+      });
+
+      const resolved = precedencePlayer.options;
+      const rows = [
+        ['autoplay', '"false"', 'true', String(resolved.autoplay), 'attr'],
+        ['volume', '"0.25"', '1', String(resolved.volume), 'attr'],
+        ['muted', '—', 'true', String(resolved.muted), 'js'],
+        ['posters.desktop', 'poster.jpg', 'poster-alt.jpg', (resolved.posters.desktop ?? '—').split('/').pop(), 'js'],
+      ];
+      document.querySelector('[data-precedence-body]').innerHTML = rows
+        .map(
+          ([option, attr, js, value, winner]) => `
+            <tr>
+              <td class="mono">${option}</td>
+              <td class="mono">${winner === 'attr' ? `<b>${attr}</b>` : attr}</td>
+              <td class="mono">${winner === 'js' ? `<b>${js}</b>` : js}</td>
+              <td class="mono"><b>${value}</b></td>
+            </tr>`,
+        )
+        .join('');
+
+      /* Lifecycle */
+      const lifecycleEl = document.querySelector('#player-lifecycle');
+      const lifecycleLog = document.querySelector('[data-lifecycle-log]');
+      const lifecycleStatus = document.querySelector('[data-lifecycle-status]');
+      const buttons = {
+        mount: document.querySelector('[data-lifecycle-mount]'),
+        remount: document.querySelector('[data-lifecycle-remount]'),
+        destroy: document.querySelector('[data-lifecycle-destroy]'),
+      };
+      let lifecyclePlayer = null;
+
+      function syncLifecycleButtons() {
+        const mounted = Boolean(lifecyclePlayer);
+        buttons.mount.disabled = mounted;
+        buttons.remount.disabled = mounted;
+        buttons.destroy.disabled = !mounted;
+        lifecycleStatus.textContent = mounted ? 'mounted' : 'unmounted — plain <video>';
+      }
+
+      function mountLifecycle(options, label) {
+        lifecyclePlayer = mountFideo(lifecycleEl, { muted: true, loop: true, ...options });
+        log(lifecycleLog, `${label} → wrapper: .${lifecyclePlayer.wrapper.className.split(' ').join('.')}`, 'ok');
+        syncLifecycleButtons();
+      }
+
+      buttons.mount.addEventListener('click', () => mountLifecycle({}, 'mountFideo(el, { muted: true })'));
+      buttons.remount.addEventListener('click', () =>
+        mountLifecycle(
+          { cssVars: { '--fideo-accent': '#7ab8ff' } },
+          "mountFideo(el, { cssVars: { '--fideo-accent': '#7ab8ff' } })",
+        ),
+      );
+      buttons.destroy.addEventListener('click', () => {
+        lifecyclePlayer.destroy();
+        lifecyclePlayer = null;
+        log(lifecycleLog, `destroy() → wrapper removed: ${!lifecycleEl.closest('.fideo')}`, 'warn');
+        syncLifecycleButtons();
+      });
+
+      mountLifecycle({}, 'mountFideo(el, { muted: true })');
+    </script>
+  </body>
+</html>

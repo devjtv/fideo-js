@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Background video — Fideo JS docs</title>
+    <meta name="description" content="Use Fideo JS as a muted, looping, cover-filling background video for heroes and sections, with any provider." />
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+    <link rel="preconnect" href="https://rsms.me/" />
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+    <link rel="stylesheet" href="./_assets/docs.css" />
+    <script>
+      window.__fideoAutoInit = { selector: '[data-fideo-auto]' };
+    </script>
+  </head>
+  <body>
+    <header class="top-nav">
+      <div class="top-nav-inner">
+        <a class="brand" href="../index.html">
+          <span class="brand-mark" aria-hidden="true"><img src="../favicon.svg" alt="" /></span>
+          <span>fideo-js</span>
+          <span class="tag" data-version>docs</span>
+        </a>
+        <button class="nav-toggle" data-nav-toggle aria-expanded="false">Menu</button>
+        <div class="top-nav-links">
+          <a href="../index.html">Overview</a>
+          <a href="../improvements.html">Benchmarks</a>
+          <a href="https://github.com/devjtv/fideo-js">GitHub</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar" data-docs-sidebar></aside>
+
+      <main class="content">
+        <p class="page-kicker">Configure</p>
+        <h1>Background video</h1>
+        <p class="lede">
+          Background mode turns a player into decoration: muted, looping, cover-filled, no controls, and paused
+          automatically when it scrolls out of view. It works the same way for an MP4 as it does for a YouTube or
+          Vimeo embed.
+        </p>
+
+        <div class="demo">
+          <div class="demo-stage flush">
+            <div class="bg-stage" id="bg-stage">
+              <video id="bg-video" src="../media/fideo-demo.mp4" playsinline></video>
+              <div class="bg-copy">
+                <h3>A hero that moves</h3>
+                <p>Muted, looping, cover-filled — and paused when you scroll away.</p>
+              </div>
+            </div>
+          </div>
+          <div class="demo-foot"><span>Playback state</span><span class="mono" data-bg-state>—</span></div>
+        </div>
+
+        <h2 id="markup">The markup</h2>
+        <p>
+          The wrapper needs a size. Background mode drops the default 16:9 aspect ratio and fills its container
+          instead, so give the container a height.
+        </p>
+        <div class="code">
+          <div class="code-head"><span>One attribute</span><span class="lang">html</span></div>
+<pre><span class="tk-tag">&lt;div</span> <span class="tk-attr">class</span>=<span class="tk-str">"hero"</span><span class="tk-tag">&gt;</span>
+  <span class="tk-tag">&lt;video</span> <span class="tk-attr">data-fideo</span> <span class="tk-attr">data-fideo-background</span> <span class="tk-attr">src</span>=<span class="tk-str">"/media/clip.mp4"</span><span class="tk-tag">&gt;&lt;/video&gt;</span>
+  <span class="tk-tag">&lt;div</span> <span class="tk-attr">class</span>=<span class="tk-str">"hero-copy"</span><span class="tk-tag">&gt;</span>…<span class="tk-tag">&lt;/div&gt;</span>
+<span class="tk-tag">&lt;/div&gt;</span></pre>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>The container styles you supply</span><span class="lang">css</span></div>
+<pre>.hero {
+  position: relative;
+  min-height: 70vh;
+}
+
+.hero-copy {
+  position: relative;
+  z-index: 4; <span class="tk-com">/* above the video and its overlay */</span>
+}</pre>
+        </div>
+
+        <h2 id="forced">What background mode forces</h2>
+        <p>
+          These four are switched on regardless of what you passed or what the markup says, because a background video
+          cannot function without them. Browsers will not autoplay an unmuted video, and a decorative video that stops
+          after one pass reads as broken.
+        </p>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Option</th><th>Forced to</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">autoplay</td><td class="default">true</td></tr>
+                <tr><td class="mono">muted</td><td class="default">true</td></tr>
+                <tr><td class="mono">loop</td><td class="default">true</td></tr>
+                <tr><td class="mono">playsInline</td><td class="default">true</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p>Two more change their default but stay overridable:</p>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Option</th><th>Default in background mode</th><th>Override with</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">controls</td><td class="default">false</td><td><code>data-fideo-controls="true"</code></td></tr>
+                <tr><td class="mono">viewport</td><td class="default">'play-pause'</td><td><code>data-fideo-viewport="none"</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="note">
+          <strong>Viewport pausing is the reason background video is cheap.</strong> A hero that has scrolled past
+          stops decoding entirely, which matters most on the low-powered devices least able to afford it.
+        </div>
+
+        <h2 id="cover">Cover sizing</h2>
+        <p>
+          A <code>&lt;video&gt;</code> can simply use <code>object-fit: cover</code>. An iframe cannot, so Fideo
+          measures the wrapper and sizes the frame to overflow it on the short axis, keeping it centred. That maths
+          needs to know the source's aspect ratio.
+        </p>
+        <div class="code">
+          <div class="code-head"><span>Non-16:9 sources</span><span class="lang">html</span></div>
+<pre><span class="tk-tag">&lt;iframe</span>
+  <span class="tk-attr">data-fideo</span>
+  <span class="tk-attr">data-fideo-background</span>
+  <span class="tk-attr">data-fideo-background-aspect-ratio</span>=<span class="tk-str">"9:16"</span>
+  <span class="tk-attr">src</span>=<span class="tk-str">"https://www.youtube.com/shorts/ot-vAzEBxlI"</span>
+<span class="tk-tag">&gt;&lt;/iframe&gt;</span></pre>
+        </div>
+        <div class="table-wrap">
+          <div class="scroller">
+            <table>
+              <thead><tr><th>Provider</th><th>How it fills</th></tr></thead>
+              <tbody>
+                <tr><td class="mono">html5</td><td><code>object-fit: cover</code> — the ratio option is not needed</td></tr>
+                <tr><td class="mono">youtube</td><td>Measured and sized by Fideo, re-run on resize</td></tr>
+                <tr><td class="mono">vimeo</td><td>Measured and sized by Fideo, plus Vimeo's own <code>background=1</code></td></tr>
+                <tr><td class="mono">wistia</td><td>Wistia's <code>fit-strategy="cover"</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="note warn">
+          <strong>Pointer events are disabled on background embeds</strong> so clicks reach your own content instead of
+          the provider's frame. Enabling controls on a background player gives them back through the control bar.
+        </div>
+
+        <h2 id="providers">Per provider</h2>
+        <div class="code">
+          <div class="code-head"><span>MP4</span><span class="lang">html</span></div>
+<pre><span class="tk-tag">&lt;video</span> <span class="tk-attr">data-fideo</span> <span class="tk-attr">data-fideo-background</span> <span class="tk-attr">src</span>=<span class="tk-str">"/media/loop.mp4"</span><span class="tk-tag">&gt;&lt;/video&gt;</span></pre>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>Vimeo</span><span class="lang">html</span></div>
+<pre><span class="tk-tag">&lt;iframe</span> <span class="tk-attr">data-fideo</span> <span class="tk-attr">data-fideo-background</span> <span class="tk-attr">src</span>=<span class="tk-str">"https://vimeo.com/347119375"</span><span class="tk-tag">&gt;&lt;/iframe&gt;</span></pre>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>YouTube</span><span class="lang">html</span></div>
+<pre><span class="tk-tag">&lt;iframe</span> <span class="tk-attr">data-fideo</span> <span class="tk-attr">data-fideo-background</span> <span class="tk-attr">src</span>=<span class="tk-str">"https://www.youtube.com/watch?v=pb-j3svRQLI"</span><span class="tk-tag">&gt;&lt;/iframe&gt;</span></pre>
+        </div>
+        <div class="code">
+          <div class="code-head"><span>Wistia</span><span class="lang">html</span></div>
+<pre><span class="tk-tag">&lt;iframe</span> <span class="tk-attr">data-fideo</span> <span class="tk-attr">data-fideo-background</span> <span class="tk-attr">src</span>=<span class="tk-str">"https://fast.wistia.com/embed/medias/358edhd4og"</span><span class="tk-tag">&gt;&lt;/iframe&gt;</span></pre>
+        </div>
+
+        <h2 id="fullscreen">Fullscreen</h2>
+        <p>
+          If you enable controls on a background player, going fullscreen suspends the cover maths and lets the video
+          letterbox normally, then restores cover sizing on exit. Nothing to configure.
+        </p>
+
+        <h2 id="practices">Worth knowing</h2>
+        <ul class="plain">
+          <li><b>Give the container a height.</b> Background players inherit their box; a container with no height renders a zero-height player.</li>
+          <li><b>Add a poster.</b> It covers the gap before the first frame decodes, especially on slow connections.</li>
+          <li><b>Keep text legible.</b> Fideo does not add a scrim in background mode — apply your own gradient or overlay.</li>
+          <li><b>Respect reduced motion.</b> Consider skipping the video entirely for <code>prefers-reduced-motion: reduce</code>; Fideo does not make that decision for you.</li>
+        </ul>
+        <div class="code">
+          <div class="code-head"><span>Opting out for reduced motion</span><span class="lang">js</span></div>
+<pre><span class="tk-kw">const</span> calm = window.<span class="tk-fn">matchMedia</span>(<span class="tk-str">'(prefers-reduced-motion: reduce)'</span>).matches;
+
+<span class="tk-kw">if</span> (!calm) {
+  <span class="tk-fn">mountFideo</span>(el, { background: <span class="tk-kw">true</span> });
+}</pre>
+        </div>
+
+        <nav class="page-nav" data-docs-pagenav></nav>
+      </main>
+    </div>
+
+    <script src="../../dist/fideo.global.js"></script>
+    <script type="module" src="./_assets/docs.js"></script>
+    <script type="module">
+      const player = mountFideo(document.querySelector('#bg-video'), { background: true });
+      const state = document.querySelector('[data-bg-state]');
+      const render = () => {
+        state.textContent = player.getState().paused ? 'paused — scrolled out of view' : 'playing';
+      };
+      render();
+      ['fideo:play', 'fideo:pause'].forEach((event) => player.element.addEventListener(event, render));
+    </script>
+  </body>
+</html>
