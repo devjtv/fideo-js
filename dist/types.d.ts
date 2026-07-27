@@ -60,6 +60,12 @@ export interface FideoOptions {
     className?: string;
     cssVars?: Record<string, string>;
     disabledProviders?: FideoProviderName[];
+    /**
+     * Adds the page-scope stylesheet to <head> on first mount so no separate
+     * `<link>` is required. Set to `false` when linking `dist/fideo.css`
+     * yourself or shipping your own wrapper styles. Defaults to `true`.
+     */
+    injectStyles?: boolean;
 }
 export interface FideoResolvedOptions extends Omit<FideoOptions, 'provider' | 'breakpoints' | 'controlVisibility' | 'backgroundAspectRatio'> {
     provider: FideoProviderName;

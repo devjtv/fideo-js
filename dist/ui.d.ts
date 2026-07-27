@@ -16,6 +16,12 @@ export declare class FideoControls {
     private volumePanel;
     private settingsGroup;
     private seeking;
+    private speedButtons;
+    private lastRenderedTime;
+    private lastRenderedDuration;
+    private lastTrackProgress;
+    private lastBufferedProgress;
+    private lastRenderedRate;
     private smoothFrame?;
     private smoothStartState?;
     private smoothStartMs;
@@ -50,7 +56,10 @@ export declare class FideoControls {
     private syncVolumeState;
     private enqueueVolumeMutation;
     private syncPlaybackState;
+    private renderTimeText;
+    private renderSpeedState;
     private setTrackProgress;
+    private setBufferedProgress;
     private startSmoothProgress;
     private stopSmoothProgress;
     private tickSmoothProgress;

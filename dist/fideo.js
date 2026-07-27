@@ -1,7 +1,7 @@
-var U = Object.defineProperty;
-var j = (s, t, e) => t in s ? U(s, t, { enumerable: !0, configurable: !0, writable: !0, value: e }) : s[t] = e;
-var a = (s, t, e) => j(s, typeof t != "symbol" ? t + "" : t, e);
-class E extends EventTarget {
+var G = Object.defineProperty;
+var Y = (s, t, e) => t in s ? G(s, t, { enumerable: !0, configurable: !0, writable: !0, value: e }) : s[t] = e;
+var a = (s, t, e) => Y(s, typeof t != "symbol" ? t + "" : t, e);
+class x extends EventTarget {
   constructor() {
     super(...arguments);
     a(this, "state", {
@@ -21,7 +21,7 @@ class E extends EventTarget {
     this.state = { ...this.state, ...e }, this.dispatchEvent(new CustomEvent(i, { detail: this.getState() }));
   }
 }
-class O extends E {
+class q extends x {
   constructor(e) {
     super();
     a(this, "provider", "html5");
@@ -39,7 +39,7 @@ class O extends E {
     this.element.currentTime = e;
   }
   async setVolume(e) {
-    this.element.volume = G(e);
+    this.element.volume = W(e);
   }
   async setMuted(e) {
     this.element.muted = e;
@@ -80,13 +80,13 @@ class O extends E {
     };
   }
 }
-function G(s) {
+function W(s) {
   return Math.min(1, Math.max(0, s));
 }
 const L = {
   mobile: 767,
   tablet: 1024
-}, B = /* @__PURE__ */ new Set(["", "true", "1", "yes", "on"]), I = /* @__PURE__ */ new Set(["false", "0", "no", "off"]), D = "[data-fideo]", v = {
+}, D = /* @__PURE__ */ new Set(["", "true", "1", "yes", "on"]), N = /* @__PURE__ */ new Set(["false", "0", "no", "off"]), $ = "[data-fideo]", y = {
   play: !0,
   timeline: !0,
   currentTime: !0,
@@ -95,17 +95,17 @@ const L = {
   settings: !0,
   fullscreen: !0
 };
-function h(s, t) {
+function c(s, t) {
   if (s == null) return t;
   const e = s.trim().toLowerCase();
-  return B.has(e) ? !0 : I.has(e) ? !1 : t;
+  return D.has(e) ? !0 : N.has(e) ? !1 : t;
 }
-function w(s, t) {
+function k(s, t) {
   if (s == null || s.trim() === "") return t;
   const e = Number(s);
   return Number.isFinite(e) ? e : t;
 }
-function q(s, t) {
+function K(s, t) {
   if (typeof s == "number") return Number.isFinite(s) && s > 0 ? s : t;
   if (s == null || s.trim() === "") return t;
   const e = s.trim(), i = e.split(/[:/]/).map((o) => Number(o.trim()));
@@ -114,12 +114,12 @@ function q(s, t) {
   const r = Number(e);
   return Number.isFinite(r) && r > 0 ? r : t;
 }
-function Y(s, t) {
+function Q(s, t) {
   if (!s) return t;
   const e = s.split(",").map((i) => Number(i.trim())).filter((i) => Number.isFinite(i) && i > 0);
   return e.length ? e : t;
 }
-function W(s, t = {}) {
+function Z(s, t = {}) {
   if (s instanceof HTMLVideoElement) return "html5";
   const e = [s.getAttribute("src") || s.src, t.desktop, t.tablet, t.mobile].filter(
     (i) => !!i
@@ -131,20 +131,20 @@ function W(s, t = {}) {
   }
   return "html5";
 }
-function K(s, t) {
+function J(s, t) {
   if (!s) return t;
   const e = s.trim().toLowerCase();
-  return I.has(e) || e === "none" ? !1 : e === "play" || e === "pause" || e === "play-pause" ? e : B.has(e) ? "play-pause" : t;
+  return N.has(e) || e === "none" ? !1 : e === "play" || e === "pause" || e === "play-pause" ? e : D.has(e) ? "play-pause" : t;
 }
-function Q(s, t) {
+function X(s, t) {
   if (!s) return t;
   const e = s.trim().toLowerCase();
   return e === "none" || e === "metadata" || e === "auto" ? e : t;
 }
-function x(s) {
+function T(s) {
   return typeof s == "string" ? { desktop: s } : s ?? {};
 }
-function Z(s) {
+function ee(s) {
   const t = s.dataset;
   return {
     desktop: t.fideoSrcDesktop || t.fideoSrc || void 0,
@@ -152,7 +152,7 @@ function Z(s) {
     mobile: t.fideoSrcMobile || void 0
   };
 }
-function J(s) {
+function te(s) {
   const t = s.dataset;
   return {
     desktop: t.fideoPosterDesktop || t.fideoPoster || void 0,
@@ -160,58 +160,58 @@ function J(s) {
     mobile: t.fideoPosterMobile || void 0
   };
 }
-function X(s, t = {}) {
-  var y, m;
+function ie(s, t = {}) {
+  var f, h;
   const e = s.dataset, i = {
-    mobile: w(e.fideoBreakpointMobile, ((y = t.breakpoints) == null ? void 0 : y.mobile) ?? L.mobile),
-    tablet: w(e.fideoBreakpointTablet, ((m = t.breakpoints) == null ? void 0 : m.tablet) ?? L.tablet)
-  }, r = e.fideoProvider, o = t.provider ?? r ?? "auto", n = { ...Z(s), ...x(t.sources) }, d = o === "auto" ? W(s, n) : o, l = t.viewport ?? !1, u = h(e.fideoBackground, t.background ?? !1), c = d !== "html5";
+    mobile: k(e.fideoBreakpointMobile, ((f = t.breakpoints) == null ? void 0 : f.mobile) ?? L.mobile),
+    tablet: k(e.fideoBreakpointTablet, ((h = t.breakpoints) == null ? void 0 : h.tablet) ?? L.tablet)
+  }, r = e.fideoProvider, o = t.provider ?? r ?? "auto", n = { ...ee(s), ...T(t.sources) }, d = o === "auto" ? Z(s, n) : o, l = t.viewport ?? !1, u = c(e.fideoBackground, t.background ?? !1), m = d !== "html5";
   return {
-    selector: t.selector ?? D,
+    selector: t.selector ?? $,
     provider: d,
-    autoplay: u || h(e.fideoAutoplay, t.autoplay ?? !1),
-    muted: u || h(e.fideoMuted, t.muted ?? !1),
-    loop: u || h(e.fideoLoop, t.loop ?? !1),
-    playsInline: u || h(e.fideoPlaysinline ?? e.fideoPlaysInline, t.playsInline ?? !0),
-    controls: h(e.fideoControls, t.controls ?? !u),
+    autoplay: u || c(e.fideoAutoplay, t.autoplay ?? !1),
+    muted: u || c(e.fideoMuted, t.muted ?? !1),
+    loop: u || c(e.fideoLoop, t.loop ?? !1),
+    playsInline: u || c(e.fideoPlaysinline ?? e.fideoPlaysInline, t.playsInline ?? !0),
+    controls: c(e.fideoControls, t.controls ?? !u),
     background: u,
-    lazy: h(e.fideoLazy, t.lazy ?? c),
+    lazy: c(e.fideoLazy, t.lazy ?? m),
     lazyRootMargin: e.fideoLazyRootMargin || t.lazyRootMargin || "800px 0px",
-    preload: Q(e.fideoPreload, t.preload ?? "metadata"),
-    controlVisibility: ee(s, t.controlVisibility),
-    viewport: K(e.fideoViewport, l),
-    viewportThreshold: w(e.fideoViewportThreshold, t.viewportThreshold ?? 0.35),
-    volume: w(e.fideoVolume, t.volume ?? 1),
-    playbackRates: Y(e.fideoPlaybackRates, t.playbackRates ?? [0.5, 1, 1.25, 1.5, 2]),
-    backgroundAspectRatio: q(e.fideoBackgroundAspectRatio ?? t.backgroundAspectRatio, 16 / 9),
+    preload: X(e.fideoPreload, t.preload ?? "metadata"),
+    controlVisibility: se(s, t.controlVisibility),
+    viewport: J(e.fideoViewport, l),
+    viewportThreshold: k(e.fideoViewportThreshold, t.viewportThreshold ?? 0.35),
+    volume: k(e.fideoVolume, t.volume ?? 1),
+    playbackRates: Q(e.fideoPlaybackRates, t.playbackRates ?? [0.5, 1, 1.25, 1.5, 2]),
+    backgroundAspectRatio: K(e.fideoBackgroundAspectRatio ?? t.backgroundAspectRatio, 16 / 9),
     sources: n,
-    posters: { ...J(s), ...x(t.posters) },
+    posters: { ...te(s), ...T(t.posters) },
     breakpoints: i,
     icons: t.icons ?? {},
     className: e.fideoClass || t.className || "",
     cssVars: {
-      ...te(s),
+      ...re(s),
       ...t.cssVars ?? {}
     },
     disabledProviders: t.disabledProviders ?? []
   };
 }
-function ee(s, t = {}) {
-  const e = s.dataset, i = h(e.fideoShowTime, !0);
+function se(s, t = {}) {
+  const e = s.dataset, i = c(e.fideoShowTime, !0);
   return {
-    play: h(e.fideoShowPlay, t.play ?? v.play),
-    timeline: h(e.fideoShowTimeline, t.timeline ?? v.timeline),
-    currentTime: h(
+    play: c(e.fideoShowPlay, t.play ?? y.play),
+    timeline: c(e.fideoShowTimeline, t.timeline ?? y.timeline),
+    currentTime: c(
       e.fideoShowCurrentTime,
-      t.currentTime ?? i ?? v.currentTime
+      t.currentTime ?? i ?? y.currentTime
     ),
-    duration: h(e.fideoShowDuration, t.duration ?? i ?? v.duration),
-    volume: h(e.fideoShowVolume, t.volume ?? v.volume),
-    settings: h(e.fideoShowSettings, t.settings ?? v.settings),
-    fullscreen: h(e.fideoShowFullscreen, t.fullscreen ?? v.fullscreen)
+    duration: c(e.fideoShowDuration, t.duration ?? i ?? y.duration),
+    volume: c(e.fideoShowVolume, t.volume ?? y.volume),
+    settings: c(e.fideoShowSettings, t.settings ?? y.settings),
+    fullscreen: c(e.fideoShowFullscreen, t.fullscreen ?? y.fullscreen)
   };
 }
-function te(s) {
+function re(s) {
   const t = {}, e = [
     ["--fideo-accent", s.dataset.fideoAccent],
     ["--fideo-control-bg", s.dataset.fideoControlBg],
@@ -224,17 +224,17 @@ function te(s) {
     r && (t[i] = r);
   return t;
 }
-function T(s, t, e = window.innerWidth) {
+function A(s, t, e = window.innerWidth) {
   return e <= t.mobile ? s.mobile ?? s.tablet ?? s.desktop : e <= t.tablet ? s.tablet ?? s.desktop ?? s.mobile : s.desktop ?? s.tablet ?? s.mobile;
 }
-function S(s, t) {
+function E(s, t) {
   if (!s) return s;
   const e = new URL(s, window.location.href);
   for (const [i, r] of Object.entries(t))
     e.searchParams.set(i, String(r));
   return e.toString();
 }
-function A(s) {
+function C(s) {
   if (!s) return s;
   const t = new URL(s, window.location.href), e = t.hostname.replace(/^www\./, "").toLowerCase();
   let i;
@@ -251,7 +251,7 @@ function A(s) {
     n !== "v" && r.searchParams.set(n, o);
   }), r.toString();
 }
-function C(s) {
+function z(s) {
   if (!s) return s;
   const t = new URL(s, window.location.href), e = t.hostname.replace(/^www\./, "").toLowerCase(), i = t.pathname.split("/").filter(Boolean);
   if (e === "player.vimeo.com" || e !== "vimeo.com" || !i[0])
@@ -263,12 +263,12 @@ function p(s, t) {
   const e = document.createElement(s);
   return t && (e.className = t), e;
 }
-function ie(s, t = "fideo") {
+function ae(s, t = "fideo") {
   return s.id || (s.id = `${t}-${Math.random().toString(36).slice(2, 10)}`), s.id;
 }
-const z = /* @__PURE__ */ new Map();
-function N(s) {
-  const t = z.get(s);
+const R = /* @__PURE__ */ new Map();
+function H(s) {
+  const t = R.get(s);
   if (t) return t;
   const e = new Promise((i, r) => {
     const o = document.querySelector(`script[src="${s}"]`);
@@ -281,9 +281,9 @@ function N(s) {
       n.dataset.loaded = "true", i();
     }), n.addEventListener("error", () => r(new Error(`Could not load ${s}`))), o || document.head.append(n);
   });
-  return z.set(s, e), e;
+  return R.set(s, e), e;
 }
-class se extends E {
+class oe extends x {
   constructor(e, i) {
     var n;
     super();
@@ -297,8 +297,8 @@ class se extends E {
       controls: 0,
       playsinline: 1
     };
-    this.options.autoplay && (r.autoplay = 1), this.options.muted && (r.muted = 1), this.options.loop && (r.loop = 1), this.options.background && (r.background = 1), this.element.src = S(C(this.element.src), r);
-    const o = (n = window.Vimeo) != null && n.Player ? Promise.resolve() : N("https://player.vimeo.com/api/player.js");
+    this.options.autoplay && (r.autoplay = 1), this.options.muted && (r.muted = 1), this.options.loop && (r.loop = 1), this.options.background && (r.background = 1), this.element.src = E(z(this.element.src), r);
+    const o = (n = window.Vimeo) != null && n.Player ? Promise.resolve() : H("https://player.vimeo.com/api/player.js");
     this.ready = o.then(() => {
       if (!this.destroyed)
         return this.player = new window.Vimeo.Player(this.element), this.bind(), this.sync();
@@ -318,7 +318,7 @@ class se extends E {
   }
   async setVolume(e) {
     var i;
-    await this.ready, !this.destroyed && (await ((i = this.player) == null ? void 0 : i.setVolume(re(e))), await this.sync("volumechange"));
+    await this.ready, !this.destroyed && (await ((i = this.player) == null ? void 0 : i.setVolume(ne(e))), await this.sync("volumechange"));
   }
   async setMuted(e) {
     var i;
@@ -331,7 +331,7 @@ class se extends E {
   }
   async setSource(e) {
     var i;
-    await this.ready, !this.destroyed && (await ((i = this.player) == null ? void 0 : i.loadVideo({ url: S(C(e), this.providerParams()) })), await this.sync());
+    await this.ready, !this.destroyed && (await ((i = this.player) == null ? void 0 : i.loadVideo({ url: E(z(e), this.providerParams()) })), await this.sync());
   }
   destroy() {
     var e;
@@ -375,10 +375,10 @@ class se extends E {
     return this.options.autoplay && (e.autoplay = 1), this.options.muted && (e.muted = 1), this.options.loop && (e.loop = 1), this.options.background && (e.background = 1), e;
   }
 }
-function re(s) {
+function ne(s) {
   return Math.min(1, Math.max(0, s));
 }
-class ae extends E {
+class de extends x {
   constructor(e, i) {
     super();
     a(this, "provider", "wistia");
@@ -396,7 +396,7 @@ class ae extends E {
     const n = new Promise((d, l) => {
       o.addEventListener("load", () => d()), o.addEventListener("error", () => l(new Error(`Could not load Wistia embed ${this.mediaId}.`)));
     });
-    document.head.appendChild(o), this.ready = Promise.all([N("https://fast.wistia.com/player.js"), n]).then(
+    document.head.appendChild(o), this.ready = Promise.all([H("https://fast.wistia.com/player.js"), n]).then(
       () => new Promise((d) => {
         if (this.readyResolver = d, this.destroyed) {
           d();
@@ -424,7 +424,7 @@ class ae extends E {
     await this.ready, !this.destroyed && (this.player && (this.player.currentTime = e), this.sync());
   }
   async setVolume(e) {
-    await this.ready, !this.destroyed && (this.player && (this.player.volume = oe(e)), this.sync("volumechange"));
+    await this.ready, !this.destroyed && (this.player && (this.player.volume = le(e)), this.sync("volumechange"));
   }
   async setMuted(e) {
     await this.ready, !this.destroyed && (this.player && (this.player.muted = e), this.sync("volumechange"));
@@ -475,11 +475,11 @@ function V(s) {
   var t;
   return ((t = s.match(/(?:medias|iframe)\/([a-zA-Z0-9]+)/)) == null ? void 0 : t[1]) ?? "";
 }
-function oe(s) {
+function le(s) {
   return Math.min(1, Math.max(0, s));
 }
-let k;
-class ne extends E {
+let S;
+class ue extends x {
   constructor(e, i) {
     super();
     a(this, "provider", "youtube");
@@ -490,7 +490,7 @@ class ne extends E {
     a(this, "timer");
     a(this, "destroyed", !1);
     this.element = e, this.options = i, this.options.muted && (this.state.muted = !0);
-    const r = A(this.element.src), o = {
+    const r = C(this.element.src), o = {
       enablejsapi: 1,
       playsinline: 1,
       controls: 0,
@@ -506,11 +506,11 @@ class ne extends E {
       const d = F(r);
       d && (o.playlist = d);
     }
-    this.element.src = S(r, o);
-    const n = ie(this.element, "fideo-youtube");
+    this.element.src = E(r, o);
+    const n = ae(this.element, "fideo-youtube");
     this.ready = new Promise((d, l) => {
       this.readyResolver = d, this.readyRejecter = l;
-    }), de().then(() => {
+    }), ce().then(() => {
       var d;
       if (this.destroyed) {
         (d = this.readyResolver) == null || d.call(this);
@@ -519,12 +519,12 @@ class ne extends E {
       this.player = new window.YT.Player(n, {
         events: {
           onReady: () => {
-            var l, u, c;
+            var l, u, m;
             if (this.destroyed) {
               (l = this.player) == null || l.destroy(), (u = this.readyResolver) == null || u.call(this);
               return;
             }
-            this.sync(), (c = this.readyResolver) == null || c.call(this);
+            this.sync(), (m = this.readyResolver) == null || m.call(this);
           },
           onStateChange: ({ data: l }) => {
             this.destroyed || this.handleStateChange(l);
@@ -551,7 +551,7 @@ class ne extends E {
   async setVolume(e) {
     var r;
     if (await this.ready, this.destroyed) return;
-    const i = le(e);
+    const i = he(e);
     (r = this.player) == null || r.setVolume(Math.round(i * 100)), this.sync(), this.state.volume = i, this.dispatchEvent(new CustomEvent("volumechange", { detail: this.getState() }));
   }
   async setMuted(e) {
@@ -565,7 +565,7 @@ class ne extends E {
   async setSource(e) {
     var n;
     if (await this.ready, this.destroyed) return;
-    const i = A(e), r = F(i), o = S(i, {
+    const i = C(e), r = F(i), o = E(i, {
       ...this.providerParams(),
       ...this.options.loop && r ? { loop: 1, playlist: r } : {}
     });
@@ -579,16 +579,16 @@ class ne extends E {
     this.sync(), e === 1 && (this.startTimer(), this.dispatchEvent(new CustomEvent("play", { detail: this.getState() }))), e === 2 && (this.stopTimer(), this.dispatchEvent(new CustomEvent("pause", { detail: this.getState() }))), e === 0 && (this.stopTimer(), this.dispatchEvent(new CustomEvent("ended", { detail: this.getState() })));
   }
   sync() {
-    var r, o, n, d, l, u, c, y, m, f;
+    var r, o, n, d, l, u, m, f, h, g;
     if (!this.player) return;
     const e = ((o = (r = this.player).getDuration) == null ? void 0 : o.call(r)) || 0, i = this.state.paused;
     this.state = {
       currentTime: ((d = (n = this.player).getCurrentTime) == null ? void 0 : d.call(n)) || 0,
       duration: e,
       volume: (((u = (l = this.player).getVolume) == null ? void 0 : u.call(l)) ?? 100) / 100,
-      muted: ((y = (c = this.player).isMuted) == null ? void 0 : y.call(c)) ?? !1,
+      muted: ((f = (m = this.player).isMuted) == null ? void 0 : f.call(m)) ?? !1,
       paused: i,
-      playbackRate: ((f = (m = this.player).getPlaybackRate) == null ? void 0 : f.call(m)) || 1,
+      playbackRate: ((g = (h = this.player).getPlaybackRate) == null ? void 0 : g.call(h)) || 1,
       buffered: 0
     };
   }
@@ -616,18 +616,18 @@ class ne extends E {
     };
   }
 }
-function de() {
+function ce() {
   var s;
-  return (s = window.YT) != null && s.Player ? Promise.resolve() : k || (k = new Promise((t, e) => {
+  return (s = window.YT) != null && s.Player ? Promise.resolve() : S || (S = new Promise((t, e) => {
     const i = window.onYouTubeIframeAPIReady;
     window.onYouTubeIframeAPIReady = () => {
       i == null || i(), t();
     };
     const r = document.createElement("script");
     r.src = "https://www.youtube.com/iframe_api", r.async = !0, r.onerror = () => e(new Error("Could not load the YouTube IFrame API.")), document.head.append(r);
-  }), k);
+  }), S);
 }
-function le(s) {
+function he(s) {
   return Math.min(1, Math.max(0, s));
 }
 function F(s) {
@@ -635,22 +635,22 @@ function F(s) {
   const e = new URL(s, window.location.href).pathname.split("/").filter(Boolean);
   return e[0] === "embed" ? e[1] : void 0;
 }
-function ue(s, t, e) {
+function pe(s, t, e) {
   if (e.disabledProviders.includes(s))
     throw new Error(`Fideo provider "${s}" is disabled via disabledProviders.`);
   if (s === "html5") {
     if (!(t instanceof HTMLVideoElement))
       throw new Error("Fideo html5 provider needs a <video> element.");
-    return new O(t);
+    return new q(t);
   }
   if (!(t instanceof HTMLIFrameElement))
     throw new Error(`Fideo ${s} provider needs an <iframe> element.`);
-  return e.lazy ? new ce(s, t, e) : H(s, t, e);
+  return e.lazy ? new me(s, t, e) : U(s, t, e);
 }
-function H(s, t, e) {
-  return s === "youtube" ? new ne(t, e) : s === "vimeo" ? new se(t, e) : new ae(t, e);
+function U(s, t, e) {
+  return s === "youtube" ? new ue(t, e) : s === "vimeo" ? new oe(t, e) : new de(t, e);
 }
-class ce extends EventTarget {
+class me extends EventTarget {
   constructor(e, i, r) {
     super();
     a(this, "element");
@@ -688,7 +688,7 @@ class ce extends EventTarget {
     await (i == null ? void 0 : i.seek(e));
   }
   async setVolume(e) {
-    if (this.pendingVolume = he(e), !this.adapter) {
+    if (this.pendingVolume = fe(e), !this.adapter) {
       this.update({ volume: this.pendingVolume }, "volumechange");
       return;
     }
@@ -734,7 +734,7 @@ class ce extends EventTarget {
     var r;
     if (this.adapter || this.destroyed) return this.adapter;
     (r = this.observer) == null || r.disconnect(), this.source && (this.element.src = this.source);
-    const e = { ...this.options, lazy: !1 }, i = H(this.provider, this.element, e);
+    const e = { ...this.options, lazy: !1 }, i = U(this.provider, this.element, e);
     return this.adapter = i, this.bindAdapter(i), await i.setVolume(this.pendingVolume).catch(() => {
     }), await i.setMuted(this.pendingMuted).catch(() => {
     }), i;
@@ -750,10 +750,10 @@ class ce extends EventTarget {
     this.state = { ...this.state, ...e }, this.dispatchEvent(new CustomEvent(i, { detail: this.getState() }));
   }
 }
-function he(s) {
+function fe(s) {
   return Math.min(1, Math.max(0, s));
 }
-const pe = '.fideo{--fideo-accent: #46d9a7;--fideo-bg: transparent;--fideo-control-bg: transparent;--fideo-control-color: #ffffff;--fideo-muted-color: rgba(255, 255, 255, .92);--fideo-track: rgba(255, 255, 255, .46);--fideo-track-fill: rgba(255, 255, 255, .9);--fideo-track-size: 5px;--fideo-thumb-size: 13px;--fideo-radius: 8px;--fideo-button-size: 26px;--fideo-button-radius: 4px;--fideo-icon-size: 17px;--fideo-gap: 10px;position:relative;display:block;overflow:hidden;width:100%;aspect-ratio:16 / 9;background:var(--fideo-bg);color:var(--fideo-control-color);border-radius:var(--fideo-radius)}.fideo:after{position:absolute;inset:auto 0 0;z-index:1;height:104px;pointer-events:none;content:"";background:linear-gradient(to top,#0000006b,#00000042 38%,#0000);opacity:0;transition:opacity .16s ease}.fideo:hover:after,.fideo:focus-within:after,.fideo.is-paused:after,.fideo.is-user-active:after{opacity:1}.fideo__media{position:relative;z-index:0;display:block;width:100%;height:100%;border:0;object-fit:cover}.fideo__poster{position:absolute;top:0;right:0;bottom:0;left:0;z-index:1;width:100%;height:100%;object-fit:cover;pointer-events:none;opacity:0;transition:opacity .18s ease}.fideo.has-poster.is-poster-visible .fideo__poster{opacity:1}.fideo--background{width:100%;height:100%;min-height:inherit;aspect-ratio:auto;border-radius:inherit}.fideo--background:after,.fideo--no-controls:after{display:none}.fideo--background .fideo__media{position:absolute;top:0;right:0;bottom:0;left:0;width:100%;height:100%;max-width:none;max-height:none;object-fit:cover}.fideo--background iframe.fideo__media,.fideo--background wistia-player.fideo__media{inset:auto;object-fit:initial;pointer-events:none}.fideo__click-target{position:absolute;top:0;right:0;bottom:0;left:0;z-index:2;padding:0;background:transparent;border:0;cursor:pointer}.fideo.is-fullscreen{border-radius:0}.fideo.is-fullscreen .fideo__media{object-fit:contain}.fideo--background.is-fullscreen .fideo__media{position:static;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain}.fideo--background.is-fullscreen iframe.fideo__media,.fideo--background.is-fullscreen wistia-player.fideo__media{inset:auto;object-fit:initial;pointer-events:auto}.fideo__controls{position:absolute;right:16px;bottom:10px;left:16px;z-index:3;display:grid;grid-template-rows:auto auto;gap:6px;padding:0;background:var(--fideo-control-bg);border:0;border-radius:0;box-shadow:none;filter:none;opacity:0;pointer-events:none;transform:translateY(5px);transition:opacity .16s ease,transform .16s ease}.fideo:hover .fideo__controls,.fideo:focus-within .fideo__controls,.fideo.is-paused .fideo__controls,.fideo.is-user-active .fideo__controls{opacity:1;pointer-events:auto;transform:translateY(0)}.fideo__button{display:inline-grid;place-items:center;position:relative;z-index:1;width:var(--fideo-button-size);height:var(--fideo-button-size);padding:0;color:var(--fideo-control-color);background:transparent;border:0;border-radius:var(--fideo-button-radius);cursor:pointer;line-height:0;transition:opacity .14s ease,color .14s ease}.fideo__button:hover,.fideo__button:focus-visible{color:var(--fideo-accent);background:transparent}.fideo__button svg{display:block;width:var(--fideo-icon-size);height:var(--fideo-icon-size);pointer-events:none}.fideo__control-row{display:flex;gap:var(--fideo-gap);align-items:center;min-width:0}.fideo__play{margin-right:-4px}.fideo__spacer{flex:1 1 auto}.fideo__timeline{display:block;min-width:0}.fideo__time-group{display:inline-flex;gap:3px;align-items:center;margin-left:2px}.fideo__time{min-width:auto;color:var(--fideo-muted-color);font:600 12px/1 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-variant-numeric:tabular-nums;text-align:left}.fideo__time-separator{color:var(--fideo-muted-color);font:600 12px/1 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}.fideo__track,.fideo__volume{--fideo-progress: 0%;width:100%;height:18px;padding:0;background:transparent;accent-color:var(--fideo-accent);cursor:pointer;-webkit-appearance:none;-moz-appearance:none;appearance:none}.fideo__track::-webkit-slider-runnable-track,.fideo__volume::-webkit-slider-runnable-track{height:var(--fideo-track-size);background:linear-gradient(to right,var(--fideo-track-fill) 0%,var(--fideo-track-fill) var(--fideo-progress),var(--fideo-track) var(--fideo-progress),var(--fideo-track) 100%);border-radius:999px}.fideo__volume::-webkit-slider-runnable-track{width:var(--fideo-track-size);height:100%;background:linear-gradient(to top,var(--fideo-track-fill) 0%,var(--fideo-track-fill) var(--fideo-progress),var(--fideo-track) var(--fideo-progress),var(--fideo-track) 100%)}.fideo__track::-moz-range-track,.fideo__volume::-moz-range-track{height:var(--fideo-track-size);background:var(--fideo-track);border-radius:999px}.fideo__volume::-moz-range-track{width:var(--fideo-track-size);height:100%}.fideo__track::-moz-range-progress,.fideo__volume::-moz-range-progress{height:var(--fideo-track-size);background:var(--fideo-track-fill);border-radius:999px}.fideo__volume::-moz-range-progress{width:var(--fideo-track-size)}.fideo__track::-webkit-slider-thumb,.fideo__volume::-webkit-slider-thumb{width:var(--fideo-thumb-size);height:var(--fideo-thumb-size);margin-top:calc((var(--fideo-thumb-size) - var(--fideo-track-size)) / -2);background:var(--fideo-control-color);border:0;border-radius:999px;-webkit-appearance:none;-moz-appearance:none;appearance:none}.fideo__volume::-webkit-slider-thumb{margin-top:0;margin-left:calc((var(--fideo-thumb-size) - var(--fideo-track-size)) / -2)}.fideo__track::-webkit-slider-thumb{opacity:0}.fideo__track:hover::-webkit-slider-thumb,.fideo__track:focus-visible::-webkit-slider-thumb{opacity:1}.fideo__track::-moz-range-thumb,.fideo__volume::-moz-range-thumb{width:var(--fideo-thumb-size);height:var(--fideo-thumb-size);background:var(--fideo-control-color);border:0;border-radius:999px}.fideo__track::-moz-range-thumb{opacity:0}.fideo__track:hover::-moz-range-thumb,.fideo__track:focus-visible::-moz-range-thumb{opacity:1}.fideo__volume-group{position:relative;display:inline-grid;place-items:center;width:var(--fideo-button-size);height:var(--fideo-button-size)}.fideo__volume-panel{position:absolute;bottom:calc(100% + 10px);left:50%;display:grid;place-items:center;width:24px;height:76px;opacity:0;pointer-events:none;transform:translate(-50%);transition:opacity .14s ease,bottom .14s ease}.fideo__volume-panel:after{position:absolute;right:-10px;bottom:-14px;left:-10px;height:14px;content:""}.fideo__volume{width:18px;height:76px;direction:rtl;writing-mode:vertical-lr}.fideo__volume-group:hover .fideo__volume-panel,.fideo__volume-group.is-open .fideo__volume-panel,.fideo__volume-group:focus-within .fideo__volume-panel{bottom:calc(100% + 14px);opacity:1;pointer-events:auto}.fideo__settings{position:relative}.fideo__settings-menu{position:absolute;right:0;bottom:calc(100% + 8px);display:grid;min-width:90px;padding:6px;pointer-events:none;background:#080a0de0;border:1px solid rgba(255,255,255,.12);border-radius:8px;box-shadow:none;opacity:0;transform:translateY(4px);transition:opacity .14s ease,transform .14s ease}.fideo__settings.is-open .fideo__settings-menu{pointer-events:auto;opacity:1;transform:translateY(0)}.fideo__speed{min-height:32px;padding:0 12px;color:var(--fideo-control-color);text-align:left;background:transparent;border:0;border-radius:6px;cursor:pointer}.fideo__speed:hover,.fideo__speed:focus-visible{color:#07100d;background:var(--fideo-accent)}@media(max-width:700px){.fideo__controls{right:12px;bottom:8px;left:12px}.fideo__time,.fideo__time-separator{font-size:11px}}', me = {
+const ye = {
   play: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M6 4v16a1 1 0 0 0 1.524 .852l13 -8a1 1 0 0 0 0 -1.704l-13 -8a1 1 0 0 0 -1.524 .852z"/></svg>',
   pause: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 4h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h2a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2z"/><path d="M17 4h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h2a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2z"/></svg>',
   volume: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M15 8a5 5 0 0 1 0 8"/><path d="M17.7 5a9 9 0 0 1 0 14"/><path d="M6 15h-2a1 1 0 0 1 -1 -1v-4a1 1 0 0 1 1 -1h2l3.5 -4.5a.8 .8 0 0 1 1.5 .5v14a.8 .8 0 0 1 -1.5 .5l-3.5 -4.5"/></svg>',
@@ -762,8 +762,34 @@ const pe = '.fideo{--fideo-accent: #46d9a7;--fideo-bg: transparent;--fideo-contr
   settings: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M14.647 4.081a.724 .724 0 0 0 1.08 .448c2.439 -1.485 5.23 1.305 3.745 3.744a.724 .724 0 0 0 .447 1.08c2.775 .673 2.775 4.62 0 5.294a.724 .724 0 0 0 -.448 1.08c1.485 2.439 -1.305 5.23 -3.744 3.745a.724 .724 0 0 0 -1.08 .447c-.673 2.775 -4.62 2.775 -5.294 0a.724 .724 0 0 0 -1.08 -.448c-2.439 1.485 -5.23 -1.305 -3.745 -3.744a.724 .724 0 0 0 -.447 -1.08c-2.775 -.673 -2.775 -4.62 0 -5.294a.724 .724 0 0 0 .448 -1.08c-1.485 -2.439 1.305 -5.23 3.744 -3.745a.722 .722 0 0 0 1.08 -.447c.673 -2.775 4.62 -2.775 5.294 0zm-2.647 4.919a3 3 0 1 0 0 6a3 3 0 0 0 0 -6"/></svg>',
   fullscreen: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 8v-2a2 2 0 0 1 2 -2h2"/><path d="M4 16v2a2 2 0 0 0 2 2h2"/><path d="M16 4h2a2 2 0 0 1 2 2v2"/><path d="M16 20h2a2 2 0 0 0 2 -2v-2"/></svg>',
   fullscreenExit: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 8v-2c0 -.551 .223 -1.05 .584 -1.412"/><path d="M4 16v2a2 2 0 0 0 2 2h2"/><path d="M16 4h2a2 2 0 0 1 2 2v2"/><path d="M16 20h2c.545 0 1.04 -.218 1.4 -.572"/><path d="M3 3l18 18"/></svg>'
-};
-class fe {
+}, j = '.fideo__button{display:inline-grid;place-items:center;position:relative;z-index:1;width:var(--fideo-button-size, 26px);height:var(--fideo-button-size, 26px);padding:0;color:var(--fideo-control-color, #ffffff);background:transparent;border:0;border-radius:var(--fideo-button-radius, 4px);cursor:pointer;line-height:0;transition:opacity .14s ease,color .14s ease}.fideo__button:hover,.fideo__button:focus-visible{color:var(--fideo-accent, #46d9a7);background:transparent}.fideo__button svg{display:block;width:var(--fideo-icon-size, 17px);height:var(--fideo-icon-size, 17px);pointer-events:none}.fideo__control-row{display:flex;gap:var(--fideo-gap, 10px);align-items:center;min-width:0}.fideo__play{margin-right:-4px}.fideo__spacer{flex:1 1 auto}.fideo__timeline{display:block;min-width:0}.fideo__time-group{display:inline-flex;gap:3px;align-items:center;margin-left:2px}.fideo__time{min-width:auto;color:var(--fideo-muted-color, rgba(255, 255, 255, .92));font:600 12px/1 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;font-variant-numeric:tabular-nums;text-align:left}.fideo__time-separator{color:var(--fideo-muted-color, rgba(255, 255, 255, .92));font:600 12px/1 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif}.fideo__track,.fideo__volume{--fideo-progress: 0%;--fideo-buffered: 0%;width:100%;height:18px;padding:0;background:transparent;accent-color:var(--fideo-accent, #46d9a7);cursor:pointer;-webkit-appearance:none;-moz-appearance:none;appearance:none}.fideo__track::-webkit-slider-runnable-track,.fideo__volume::-webkit-slider-runnable-track{height:var(--fideo-track-size, 5px);background:linear-gradient(to right,var(--fideo-track-fill, rgba(255, 255, 255, .9)) 0%,var(--fideo-track-fill, rgba(255, 255, 255, .9)) var(--fideo-progress),var(--fideo-buffer-color, rgba(255, 255, 255, .68)) var(--fideo-progress),var(--fideo-buffer-color, rgba(255, 255, 255, .68)) var(--fideo-buffered),var(--fideo-track, rgba(255, 255, 255, .46)) var(--fideo-buffered),var(--fideo-track, rgba(255, 255, 255, .46)) 100%);border-radius:999px}.fideo__volume::-webkit-slider-runnable-track{width:var(--fideo-track-size, 5px);height:100%;background:linear-gradient(to top,var(--fideo-track-fill, rgba(255, 255, 255, .9)) 0%,var(--fideo-track-fill, rgba(255, 255, 255, .9)) var(--fideo-progress),var(--fideo-track, rgba(255, 255, 255, .46)) var(--fideo-progress),var(--fideo-track, rgba(255, 255, 255, .46)) 100%)}.fideo__track::-moz-range-track,.fideo__volume::-moz-range-track{height:var(--fideo-track-size, 5px);background:linear-gradient(to right,var(--fideo-buffer-color, rgba(255, 255, 255, .68)) 0%,var(--fideo-buffer-color, rgba(255, 255, 255, .68)) var(--fideo-buffered),var(--fideo-track, rgba(255, 255, 255, .46)) var(--fideo-buffered),var(--fideo-track, rgba(255, 255, 255, .46)) 100%);border-radius:999px}.fideo__volume::-moz-range-track{width:var(--fideo-track-size, 5px);height:100%;background:var(--fideo-track, rgba(255, 255, 255, .46))}.fideo__track::-moz-range-progress,.fideo__volume::-moz-range-progress{height:var(--fideo-track-size, 5px);background:var(--fideo-track-fill, rgba(255, 255, 255, .9));border-radius:999px}.fideo__volume::-moz-range-progress{width:var(--fideo-track-size, 5px)}.fideo__track::-webkit-slider-thumb,.fideo__volume::-webkit-slider-thumb{width:var(--fideo-thumb-size, 13px);height:var(--fideo-thumb-size, 13px);margin-top:calc((var(--fideo-thumb-size, 13px) - var(--fideo-track-size, 5px)) / -2);background:var(--fideo-control-color, #ffffff);border:0;border-radius:999px;-webkit-appearance:none;-moz-appearance:none;appearance:none}.fideo__volume::-webkit-slider-thumb{margin-top:0;margin-left:calc((var(--fideo-thumb-size, 13px) - var(--fideo-track-size, 5px)) / -2)}.fideo__track::-webkit-slider-thumb{opacity:0}.fideo__track:hover::-webkit-slider-thumb,.fideo__track:focus-visible::-webkit-slider-thumb{opacity:1}.fideo__track::-moz-range-thumb,.fideo__volume::-moz-range-thumb{width:var(--fideo-thumb-size, 13px);height:var(--fideo-thumb-size, 13px);background:var(--fideo-control-color, #ffffff);border:0;border-radius:999px}.fideo__track::-moz-range-thumb{opacity:0}.fideo__track:hover::-moz-range-thumb,.fideo__track:focus-visible::-moz-range-thumb{opacity:1}.fideo__volume-group{position:relative;display:inline-grid;place-items:center;width:var(--fideo-button-size, 26px);height:var(--fideo-button-size, 26px)}.fideo__volume-panel{position:absolute;bottom:calc(100% + 10px);left:50%;display:grid;place-items:center;width:24px;height:76px;opacity:0;pointer-events:none;transform:translate(-50%);transition:opacity .14s ease,bottom .14s ease}.fideo__volume-panel:after{position:absolute;right:-10px;bottom:-14px;left:-10px;height:14px;content:""}.fideo__volume{width:18px;height:76px;direction:rtl;writing-mode:vertical-lr}.fideo__volume-group:hover .fideo__volume-panel,.fideo__volume-group.is-open .fideo__volume-panel,.fideo__volume-group:focus-within .fideo__volume-panel{bottom:calc(100% + 14px);opacity:1;pointer-events:auto}.fideo__settings{position:relative}.fideo__settings-menu{position:absolute;right:0;bottom:calc(100% + 8px);display:grid;min-width:90px;padding:6px;pointer-events:none;background:#080a0de0;border:1px solid rgba(255,255,255,.12);border-radius:8px;box-shadow:none;opacity:0;transform:translateY(4px);transition:opacity .14s ease,transform .14s ease}.fideo__settings.is-open .fideo__settings-menu{pointer-events:auto;opacity:1;transform:translateY(0)}.fideo__speed{display:flex;gap:6px;align-items:center;min-height:32px;padding:0 12px 0 8px;color:var(--fideo-control-color, #ffffff);text-align:left;background:transparent;border:0;border-radius:6px;cursor:pointer}.fideo__speed:before{width:10px;content:"";opacity:0}.fideo__speed[aria-checked=true]:before{content:"✓";opacity:1}.fideo__speed[aria-checked=true]{color:var(--fideo-accent, #46d9a7)}.fideo__speed:hover,.fideo__speed:focus-visible{color:#07100d;background:var(--fideo-accent, #46d9a7)}@media(max-width:700px){.fideo__time,.fideo__time-separator{font-size:11px}}', ve = '.fideo{--fideo-accent: #46d9a7;--fideo-bg: transparent;--fideo-control-bg: transparent;--fideo-control-color: #ffffff;--fideo-muted-color: rgba(255, 255, 255, .92);--fideo-track: rgba(255, 255, 255, .46);--fideo-track-fill: rgba(255, 255, 255, .9);--fideo-buffer-color: rgba(255, 255, 255, .68);--fideo-track-size: 5px;--fideo-thumb-size: 13px;--fideo-radius: 8px;--fideo-button-size: 26px;--fideo-button-radius: 4px;--fideo-icon-size: 17px;--fideo-gap: 10px;position:relative;display:block;overflow:hidden;width:100%;aspect-ratio:16 / 9;background:var(--fideo-bg);color:var(--fideo-control-color);border-radius:var(--fideo-radius)}.fideo:after{position:absolute;inset:auto 0 0;z-index:1;height:104px;pointer-events:none;content:"";background:linear-gradient(to top,#0000006b,#00000042 38%,#0000);opacity:0;transition:opacity .16s ease}.fideo:hover:after,.fideo:focus-within:after,.fideo.is-paused:after,.fideo.is-user-active:after{opacity:1}.fideo__media{position:relative;z-index:0;display:block;width:100%;height:100%;border:0;object-fit:cover}.fideo__poster{position:absolute;top:0;right:0;bottom:0;left:0;z-index:1;width:100%;height:100%;object-fit:cover;pointer-events:none;opacity:0;transition:opacity .18s ease}.fideo.has-poster.is-poster-visible .fideo__poster{opacity:1}.fideo--background{width:100%;height:100%;min-height:inherit;aspect-ratio:auto;border-radius:inherit}.fideo--background:after,.fideo--no-controls:after{display:none}.fideo--background .fideo__media{position:absolute;top:0;right:0;bottom:0;left:0;width:100%;height:100%;max-width:none;max-height:none;object-fit:cover}.fideo--background iframe.fideo__media,.fideo--background wistia-player.fideo__media{inset:auto;object-fit:initial;pointer-events:none}.fideo__click-target{position:absolute;top:0;right:0;bottom:0;left:0;z-index:2;padding:0;background:transparent;border:0;cursor:pointer}.fideo__click-target:focus-visible{outline:2px solid var(--fideo-accent);outline-offset:-4px}.fideo.is-fullscreen{border-radius:0}.fideo.is-fullscreen .fideo__media{object-fit:contain}.fideo--background.is-fullscreen .fideo__media{position:static;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain}.fideo--background.is-fullscreen iframe.fideo__media,.fideo--background.is-fullscreen wistia-player.fideo__media{inset:auto;object-fit:initial;pointer-events:auto}.fideo__controls{position:absolute;right:16px;bottom:10px;left:16px;z-index:3;display:grid;grid-template-rows:auto auto;gap:6px;padding:0;background:var(--fideo-control-bg);border:0;border-radius:0;box-shadow:none;filter:none;opacity:0;pointer-events:none;transform:translateY(5px);transition:opacity .16s ease,transform .16s ease}.fideo:hover .fideo__controls,.fideo:focus-within .fideo__controls,.fideo.is-paused .fideo__controls,.fideo.is-user-active .fideo__controls{opacity:1;pointer-events:auto;transform:translateY(0)}@media(max-width:700px){.fideo__controls{right:12px;bottom:8px;left:12px}}', B = "fideo-host-styles";
+let v;
+function ge() {
+  if (typeof document > "u" || !document.head || document.getElementById(B)) return;
+  const s = document.createElement("style");
+  s.id = B, s.textContent = ve, document.head.prepend(s);
+}
+function be(s) {
+  const t = we();
+  if (t) {
+    s.adoptedStyleSheets = [...s.adoptedStyleSheets, t];
+    return;
+  }
+  const e = document.createElement("style");
+  e.textContent = j, s.appendChild(e);
+}
+function we() {
+  if (v !== void 0) return v;
+  if (v = null, typeof CSSStyleSheet == "function" && typeof CSSStyleSheet.prototype.replaceSync == "function")
+    try {
+      const s = new CSSStyleSheet();
+      s.replaceSync(j), v = s;
+    } catch {
+      v = null;
+    }
+  return v;
+}
+class ke {
   constructor(t, e, i) {
     a(this, "element");
     a(this, "playButton");
@@ -779,6 +805,12 @@ class fe {
     a(this, "volumePanel");
     a(this, "settingsGroup");
     a(this, "seeking", !1);
+    a(this, "speedButtons", []);
+    a(this, "lastRenderedTime", -1);
+    a(this, "lastRenderedDuration", -1);
+    a(this, "lastTrackProgress", -1);
+    a(this, "lastBufferedProgress", -1);
+    a(this, "lastRenderedRate", -1);
     a(this, "smoothFrame");
     a(this, "smoothStartState");
     a(this, "smoothStartMs", 0);
@@ -812,32 +844,34 @@ class fe {
       this.syncPlaybackState(t), t.paused ? this.stopSmoothProgress() : this.startSmoothProgress(t);
     });
     a(this, "onDocumentClick", (t) => this.closeMenus(t));
-    this.adapter = t, this.wrapper = e, this.icons = { ...me, ...i.icons }, this.element = p("div", "fideo__controls");
-    const r = this.element.attachShadow({ mode: "open" }), o = document.createElement("style");
-    o.textContent = pe, r.appendChild(o), this.playButton = this.button("fideo__button fideo__play", "Play", this.icons.play, "play-button"), this.muteButton = this.button("fideo__button fideo__mute", "Mute", this.icons.volume, "mute-button"), this.track = this.range("fideo__track", 0, 1e3, 1, "timeline"), this.track.setAttribute("aria-label", "Seek"), this.volume = this.range("fideo__volume", 0, 1, 0.01, "volume-slider"), this.volume.setAttribute("aria-label", "Volume"), this.currentTime = p("span", "fideo__time"), this.currentTime.setAttribute("part", "current-time"), this.duration = p("span", "fideo__time"), this.duration.setAttribute("part", "duration"), this.speedMenu = this.createSpeedMenu(i.playbackRates), this.fullscreenButton = this.button("fideo__button", "Fullscreen", this.icons.fullscreen, "fullscreen-button"), this.settingsButton = this.button("fideo__button fideo__settings-toggle", "Settings", this.icons.settings, "settings-button"), this.settingsButton.setAttribute("aria-haspopup", "menu"), this.settingsButton.setAttribute("aria-expanded", "false");
-    const n = this.settingsButton, d = p("div", "fideo__timeline");
-    d.append(this.track);
-    const l = p("span", "fideo__time-group"), u = p("span", "fideo__time-separator");
-    u.setAttribute("part", "time-separator"), u.textContent = "/", l.append(this.currentTime, u, this.duration), this.volumeGroup = p("div", "fideo__volume-group"), this.volumePanel = p("div", "fideo__volume-panel"), this.volumePanel.append(this.volume), this.volumeGroup.append(this.muteButton, this.volumePanel), this.settingsGroup = p("div", "fideo__settings"), this.settingsGroup.append(n, this.speedMenu);
-    const c = p("div", "fideo__control-row"), y = p("span", "fideo__spacer");
-    i.controlVisibility.play && c.append(this.playButton), (i.controlVisibility.currentTime || i.controlVisibility.duration) && c.append(l), c.append(y), i.controlVisibility.volume && c.append(this.volumeGroup), i.controlVisibility.settings && c.append(this.settingsGroup), i.controlVisibility.fullscreen && c.append(this.fullscreenButton), r.appendChild(c), i.controlVisibility.timeline && r.appendChild(d), this.wrapper.append(this.element), i.controlVisibility.currentTime || this.currentTime.remove(), i.controlVisibility.duration || this.duration.remove(), (!i.controlVisibility.currentTime || !i.controlVisibility.duration) && u.remove(), this.playButton.addEventListener("click", () => this.togglePlay()), this.muteButton.addEventListener("click", () => this.toggleMute()), this.volume.addEventListener("input", () => this.changeVolume()), this.track.addEventListener("pointerdown", () => {
+    this.adapter = t, this.wrapper = e, this.icons = { ...ye, ...i.icons }, this.element = p("div", "fideo__controls");
+    const r = this.element.attachShadow({ mode: "open" });
+    be(r), this.playButton = this.button("fideo__button fideo__play", "Play", this.icons.play, "play-button"), this.muteButton = this.button("fideo__button fideo__mute", "Mute", this.icons.volume, "mute-button"), this.track = this.range("fideo__track", 0, 1e3, 1, "timeline"), this.track.setAttribute("aria-label", "Seek"), this.volume = this.range("fideo__volume", 0, 1, 0.01, "volume-slider"), this.volume.setAttribute("aria-label", "Volume"), this.currentTime = p("span", "fideo__time"), this.currentTime.setAttribute("part", "current-time"), this.duration = p("span", "fideo__time"), this.duration.setAttribute("part", "duration"), this.speedMenu = this.createSpeedMenu(i.playbackRates), this.fullscreenButton = this.button("fideo__button", "Fullscreen", this.icons.fullscreen, "fullscreen-button"), this.settingsButton = this.button("fideo__button fideo__settings-toggle", "Settings", this.icons.settings, "settings-button"), this.settingsButton.setAttribute("aria-haspopup", "menu"), this.settingsButton.setAttribute("aria-expanded", "false");
+    const o = this.settingsButton, n = p("div", "fideo__timeline");
+    n.append(this.track);
+    const d = p("span", "fideo__time-group"), l = p("span", "fideo__time-separator");
+    l.setAttribute("part", "time-separator"), l.textContent = "/", d.append(this.currentTime, l, this.duration), this.volumeGroup = p("div", "fideo__volume-group"), this.volumePanel = p("div", "fideo__volume-panel"), this.volumePanel.append(this.volume), this.volumeGroup.append(this.muteButton, this.volumePanel), this.settingsGroup = p("div", "fideo__settings"), this.settingsGroup.append(o, this.speedMenu);
+    const u = p("div", "fideo__control-row"), m = p("span", "fideo__spacer");
+    i.controlVisibility.play && u.append(this.playButton), (i.controlVisibility.currentTime || i.controlVisibility.duration) && u.append(d), u.append(m), i.controlVisibility.volume && u.append(this.volumeGroup), i.controlVisibility.settings && u.append(this.settingsGroup), i.controlVisibility.fullscreen && u.append(this.fullscreenButton), r.appendChild(u), i.controlVisibility.timeline && r.appendChild(n), this.wrapper.append(this.element), i.controlVisibility.currentTime || this.currentTime.remove(), i.controlVisibility.duration || this.duration.remove(), (!i.controlVisibility.currentTime || !i.controlVisibility.duration) && l.remove(), this.playButton.addEventListener("click", () => this.togglePlay()), this.muteButton.addEventListener("click", () => this.toggleMute()), this.volume.addEventListener("input", () => this.changeVolume()), this.track.addEventListener("pointerdown", () => {
       this.seeking = !0, this.syncPlaybackState(this.adapter.getState(), !0);
     }), this.track.addEventListener("input", () => this.previewSeek()), this.track.addEventListener("change", () => this.commitSeek()), this.track.addEventListener("pointerup", () => {
       this.seeking = !1;
     }), this.track.addEventListener("pointercancel", () => {
       this.seeking = !1;
-    }), n.addEventListener("click", () => {
-      var P;
+    }), o.addEventListener("click", () => {
+      var g;
       this.wrapper.classList.add("is-user-active");
-      const f = this.settingsGroup.classList.toggle("is-open");
-      this.settingsButton.setAttribute("aria-expanded", String(f)), f && ((P = this.speedMenu.querySelector(".fideo__speed")) == null || P.focus());
-    }), this.volumeGroup.addEventListener("click", (f) => {
-      f.target !== this.volume && f.target !== this.muteButton && (this.wrapper.classList.add("is-user-active"), this.volumeGroup.classList.toggle("is-open"));
+      const h = this.settingsGroup.classList.toggle("is-open");
+      this.settingsButton.setAttribute("aria-expanded", String(h)), h && ((g = this.speedMenu.querySelector(".fideo__speed")) == null || g.focus());
+    }), this.volumeGroup.addEventListener("click", (h) => {
+      h.target !== this.volume && h.target !== this.muteButton && (this.wrapper.classList.add("is-user-active"), this.volumeGroup.classList.toggle("is-open"));
+    }), this.volumeGroup.addEventListener("keydown", (h) => {
+      h.key === "Escape" && (h.preventDefault(), this.volumeGroup.classList.remove("is-open"), this.muteButton.focus());
     }), this.fullscreenButton.addEventListener("click", () => {
       this.wrapper.classList.add("is-user-active"), this.toggleFullscreen();
     }), document.addEventListener("fullscreenchange", this.handleFullscreenChange), document.addEventListener("click", this.onDocumentClick), this.adapter.addEventListener("play", this.onAdapterPlay), this.adapter.addEventListener("pause", this.onAdapterPause), this.adapter.addEventListener("ended", this.onAdapterEnded), this.adapter.addEventListener("volumechange", this.onAdapterVolumeChange), this.adapter.addEventListener("durationchange", this.onAdapterDurationChange), this.adapter.addEventListener("timeupdate", this.onAdapterTimeUpdate), this.adapter.addEventListener("change", this.onAdapterChange);
-    const m = this.adapter.getState();
-    this.syncPlayState(m), this.syncVolumeState(m), this.syncPlaybackState(m, !0), this.renderFullscreenState();
+    const f = this.adapter.getState();
+    this.syncPlayState(f), this.syncVolumeState(f), this.syncPlaybackState(f, !0), this.renderFullscreenState();
   }
   destroy() {
     document.removeEventListener("fullscreenchange", this.handleFullscreenChange), document.removeEventListener("click", this.onDocumentClick), this.adapter.removeEventListener("play", this.onAdapterPlay), this.adapter.removeEventListener("pause", this.onAdapterPause), this.adapter.removeEventListener("ended", this.onAdapterEnded), this.adapter.removeEventListener("volumechange", this.onAdapterVolumeChange), this.adapter.removeEventListener("durationchange", this.onAdapterDurationChange), this.adapter.removeEventListener("timeupdate", this.onAdapterTimeUpdate), this.adapter.removeEventListener("change", this.onAdapterChange), this.stopSmoothProgress(), this.element.remove();
@@ -855,7 +889,7 @@ class fe {
     e.setAttribute("part", "settings-menu"), e.setAttribute("role", "menu"), e.setAttribute("aria-label", "Playback speed");
     for (const i of t) {
       const r = this.button("fideo__speed", `${i}x`, "", "speed-button");
-      r.textContent = `${i}x`, r.setAttribute("role", "menuitem"), r.addEventListener("click", () => {
+      r.textContent = `${i}x`, r.setAttribute("role", "menuitemradio"), r.setAttribute("aria-checked", "false"), this.speedButtons.push({ button: r, rate: i }), r.addEventListener("click", () => {
         this.wrapper.classList.add("is-user-active"), this.adapter.setPlaybackRate(i).catch(() => {
         }), this.closeSettings(), this.settingsButton.focus();
       }), e.append(r);
@@ -890,7 +924,7 @@ class fe {
   }
   changeVolume() {
     this.wrapper.classList.add("is-user-active");
-    const t = this.adapter.getState(), e = R(Number(this.volume.value)), i = e === 0;
+    const t = this.adapter.getState(), e = I(Number(this.volume.value)), i = e === 0;
     e > 0 && (this.lastAudibleVolume = e), this.enqueueVolumeMutation({ ...t, volume: e, muted: i }, async () => {
       await this.adapter.setVolume(e), await this.adapter.setMuted(i);
     });
@@ -898,7 +932,7 @@ class fe {
   previewSeek() {
     this.wrapper.classList.add("is-user-active");
     const t = this.adapter.getState();
-    this.setTrackProgress(Number(this.track.value)), t.duration && (this.currentTime.textContent = g(Number(this.track.value) / 1e3 * t.duration));
+    this.setTrackProgress(Number(this.track.value)), t.duration && (this.lastRenderedTime = -1, this.currentTime.textContent = P(Number(this.track.value) / 1e3 * t.duration));
   }
   commitSeek() {
     this.wrapper.classList.add("is-user-active");
@@ -907,19 +941,19 @@ class fe {
     }), this.startSmoothProgress(this.adapter.getState()));
   }
   toggleFullscreen() {
-    var t, e;
-    if (document.fullscreenElement) {
-      document.exitFullscreen();
+    var t, e, i;
+    if (document.fullscreenElement === this.wrapper) {
+      (t = document.exitFullscreen) == null || t.call(document);
       return;
     }
-    (e = (t = this.wrapper).requestFullscreen) == null || e.call(t);
+    (i = (e = this.wrapper).requestFullscreen) == null || i.call(e);
   }
   syncPlayState(t) {
     const e = t.paused ? this.icons.play : this.icons.pause, i = t.paused ? "Play" : "Pause";
     this.playButton.innerHTML !== e && (this.playButton.innerHTML = e), this.playButton.ariaLabel !== i && (this.playButton.ariaLabel = i), this.playButton.title !== i && (this.playButton.title = i);
   }
   syncVolumeState(t) {
-    const e = R(t.volume);
+    const e = I(t.volume);
     !t.muted && e > 0 && (this.lastAudibleVolume = e), this.volume.value = String(t.muted ? 0 : e), this.volume.style.setProperty("--fideo-progress", `${Number(this.volume.value) * 100}%`), this.volume.setAttribute("aria-valuetext", `${Math.round(Number(this.volume.value) * 100)}%`);
     let i = t.muted || e === 0 ? this.icons.muted : this.icons.volume;
     !t.muted && e > 0 && e <= 0.5 && (i = this.icons.volumeLow);
@@ -941,14 +975,37 @@ class fe {
     });
   }
   syncPlaybackState(t, e = !1) {
-    !e && this.seeking || (this.currentTime.textContent = g(t.currentTime), this.duration.textContent = g(t.duration), this.track.setAttribute("aria-valuetext", `${g(t.currentTime)} of ${g(t.duration)}`), this.setTrackProgress(t.duration ? t.currentTime / t.duration * 1e3 : 0));
+    !e && this.seeking || (this.setTrackProgress(t.duration ? t.currentTime / t.duration * 1e3 : 0), this.setBufferedProgress(t.buffered), this.renderTimeText(t), this.renderSpeedState(t.playbackRate));
+  }
+  // Called up to once per animation frame while playing, but the displayed
+  // time only changes once per second — skipping the no-op writes keeps the
+  // rAF loop to a single custom-property update and stops assistive tech from
+  // being flooded with duplicate aria-valuetext announcements.
+  renderTimeText(t) {
+    const e = Math.floor(t.currentTime), i = Math.floor(t.duration);
+    if (e === this.lastRenderedTime && i === this.lastRenderedDuration) return;
+    this.lastRenderedTime = e, this.lastRenderedDuration = i;
+    const r = P(t.currentTime), o = P(t.duration);
+    this.currentTime.textContent = r, this.duration.textContent = o, this.track.setAttribute("aria-valuetext", `${r} of ${o}`);
+  }
+  renderSpeedState(t) {
+    const e = Number.isFinite(t) && t > 0 ? t : 1;
+    if (e !== this.lastRenderedRate) {
+      this.lastRenderedRate = e;
+      for (const { button: i, rate: r } of this.speedButtons)
+        i.setAttribute("aria-checked", String(r === e));
+    }
   }
   setTrackProgress(t) {
     const e = Number.isFinite(t) ? Math.min(1e3, Math.max(0, t)) : 0;
-    this.track.value = String(e), this.track.style.setProperty("--fideo-progress", `${e / 10}%`);
+    e !== this.lastTrackProgress && (this.lastTrackProgress = e, this.track.value = String(e), this.track.style.setProperty("--fideo-progress", `${e / 10}%`));
+  }
+  setBufferedProgress(t) {
+    const e = Number.isFinite(t) ? Math.round(Math.min(1, Math.max(0, t)) * 100) : 0;
+    e !== this.lastBufferedProgress && (this.lastBufferedProgress = e, this.track.style.setProperty("--fideo-buffered", `${e}%`));
   }
   startSmoothProgress(t = this.adapter.getState()) {
-    t.paused || !t.duration || this.seeking || ye() || (this.stopSmoothProgress(), this.smoothStartState = t, this.smoothStartMs = performance.now(), this.smoothFrame = requestAnimationFrame(() => this.tickSmoothProgress()));
+    t.paused || !t.duration || this.seeking || Se() || (this.stopSmoothProgress(), this.smoothStartState = t, this.smoothStartMs = performance.now(), this.smoothFrame = requestAnimationFrame(() => this.tickSmoothProgress()));
   }
   stopSmoothProgress() {
     this.smoothFrame !== void 0 && cancelAnimationFrame(this.smoothFrame), this.smoothFrame = void 0, this.smoothStartState = void 0;
@@ -972,18 +1029,19 @@ class fe {
     this.fullscreenButton.innerHTML = t ? this.icons.fullscreenExit : this.icons.fullscreen, this.fullscreenButton.ariaLabel = t ? "Exit fullscreen" : "Fullscreen", this.fullscreenButton.title = t ? "Exit fullscreen" : "Fullscreen";
   }
 }
-function R(s) {
+function I(s) {
   return Number.isFinite(s) ? Math.min(1, Math.max(0, s)) : 0;
 }
-function ye() {
-  return typeof window < "u" && typeof window.matchMedia == "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+let b;
+function Se() {
+  return b === void 0 && (b = typeof window < "u" && typeof window.matchMedia == "function" ? window.matchMedia("(prefers-reduced-motion: reduce)") : null), (b == null ? void 0 : b.matches) ?? !1;
 }
-function g(s) {
+function P(s) {
   if (!Number.isFinite(s) || s <= 0) return "0:00";
-  const t = Math.floor(s), e = Math.floor(t / 60), i = t % 60;
-  return `${e}:${String(i).padStart(2, "0")}`;
+  const t = Math.floor(s), e = Math.floor(t / 3600), i = Math.floor(t % 3600 / 60), r = String(t % 60).padStart(2, "0");
+  return e > 0 ? `${e}:${String(i).padStart(2, "0")}:${r}` : `${i}:${r}`;
 }
-class ve {
+class _e {
   constructor(t, e, i) {
     a(this, "element");
     a(this, "wrapper");
@@ -1004,7 +1062,7 @@ class ve {
       const t = document.fullscreenElement === this.wrapper;
       this.wrapper.classList.toggle("is-fullscreen", t), this.options.background && this.applyBackgroundCover();
     });
-    this.onDestroy = i, this.element = t, this.options = e, this.wrapper = this.wrapElement(t, e), this.configureElement(), this.adapter = ue(e.provider, t, e), this.applyResponsiveMedia(), e.controls && (this.controls = new fe(this.adapter, this.wrapper, e)), this.bindAdapterEvents(), this.bindClickToToggle(), this.bindResponsiveMedia(), this.bindBackgroundCover(), this.bindViewportPlayback(), document.addEventListener("fullscreenchange", this.handleFullscreenChange), this.adapter.setVolume(e.volume).catch(() => {
+    this.onDestroy = i, this.element = t, this.options = e, this.wrapper = this.wrapElement(t, e), this.configureElement(), this.adapter = pe(e.provider, t, e), this.applyResponsiveMedia(), e.controls && (this.controls = new ke(this.adapter, this.wrapper, e)), this.bindAdapterEvents(), this.bindClickToToggle(), this.bindResponsiveMedia(), this.bindBackgroundCover(), this.bindViewportPlayback(), document.addEventListener("fullscreenchange", this.handleFullscreenChange), this.adapter.setVolume(e.volume).catch(() => {
     }), this.adapter.setMuted(e.muted).catch(() => {
     }), e.autoplay && !e.background && this.play().catch(() => {
     });
@@ -1048,7 +1106,7 @@ class ve {
     this.wrapper.classList.add(`fideo--${this.options.provider}`), this.options.background && this.wrapper.classList.add("fideo--background"), this.options.controls || this.wrapper.classList.add("fideo--no-controls"), this.wrapper.classList.add("is-ready"), this.wrapper.classList.add("is-paused"), this.element.classList.add("fideo__media"), this.element.setAttribute("data-fideo-ready", "true");
     for (const [t, e] of Object.entries(this.options.cssVars))
       this.wrapper.style.setProperty(t, e);
-    this.element instanceof HTMLVideoElement ? (this.element.controls = !1, this.element.loop = this.options.loop, this.element.muted = this.options.muted, this.element.playsInline = this.options.playsInline, this.element.preload = this.options.preload, this.element.setAttribute("playsinline", "")) : (this.element.allow = ge(this.element.allow, ["autoplay", "fullscreen", "picture-in-picture", "encrypted-media"]), this.element.setAttribute("allowfullscreen", ""));
+    this.element instanceof HTMLVideoElement ? (this.element.controls = !1, this.element.loop = this.options.loop, this.element.muted = this.options.muted, this.element.playsInline = this.options.playsInline, this.element.preload = this.options.preload, this.element.setAttribute("playsinline", "")) : (this.element.allow = Ee(this.element.allow, ["autoplay", "fullscreen", "picture-in-picture", "encrypted-media"]), this.element.setAttribute("allowfullscreen", ""));
   }
   bindAdapterEvents() {
     const t = ["play", "pause", "ended", "timeupdate", "volumechange", "change"];
@@ -1155,9 +1213,9 @@ class ve {
     }));
   }
   applyResponsiveMedia() {
-    const t = T(this.options.posters, this.options.breakpoints);
+    const t = A(this.options.posters, this.options.breakpoints);
     this.adapter.setPoster && this.adapter.setPoster(t ?? ""), this.applyPosterOverlay(t);
-    const e = T(this.options.sources, this.options.breakpoints);
+    const e = A(this.options.sources, this.options.breakpoints);
     e && e !== this.currentSource && (this.currentSource = e, this.syncPosterVisibility(), this.adapter.setSource(e).catch(() => {
     }));
   }
@@ -1217,17 +1275,17 @@ class ve {
     this.wrapper.classList.toggle("has-poster", t), this.wrapper.classList.toggle("is-poster-visible", e);
   }
 }
-function ge(s, t) {
+function Ee(s, t) {
   const e = new Set(
     (s ?? "").split(";").map((i) => i.trim()).filter(Boolean)
   );
   return t.forEach((i) => e.add(i)), Array.from(e).join("; ");
 }
 const _ = /* @__PURE__ */ new WeakMap();
-class be {
+class xe {
   constructor(t, e = {}) {
     a(this, "player");
-    this.player = b($(t), e);
+    this.player = w(O(t), e);
   }
   get element() {
     return this.player.element;
@@ -1272,16 +1330,22 @@ class be {
     return M(t);
   }
   static mount(t, e = {}) {
-    return b(t, e);
+    return w(t, e);
   }
 }
-function we(s, t = {}) {
-  return b($(s), t);
+function Pe(s, t = {}) {
+  return w(O(s), t);
 }
 function M(s = {}) {
-  const t = s.selector ?? D, i = Array.from(document.querySelectorAll(t)).filter(
+  const t = s.selector ?? $, e = Array.from(document.querySelectorAll(t)).filter(
     (r) => r instanceof HTMLVideoElement || r instanceof HTMLIFrameElement
-  ).map((r) => b(r, s));
+  ), i = [];
+  for (const r of e)
+    try {
+      i.push(w(r, s));
+    } catch (o) {
+      console.warn("[fideo] Skipped an element that could not be mounted.", r, o);
+    }
   return {
     players: i,
     destroy() {
@@ -1289,34 +1353,35 @@ function M(s = {}) {
     }
   };
 }
-function b(s, t = {}) {
+function w(s, t = {}) {
   const e = _.get(s);
   if (e) return e;
-  const i = X(s, t);
+  t.injectStyles !== !1 && ge();
+  const i = ie(s, t);
   if (i.disabledProviders.includes(i.provider))
     throw new Error(`Fideo provider "${i.provider}" is disabled via disabledProviders.`);
-  const r = new ve(s, i, (o, n) => {
+  const r = new _e(s, i, (o, n) => {
     _.get(o) === n && _.delete(o);
   });
   return _.set(s, r), r;
 }
-function $(s) {
+function O(s) {
   const t = typeof s == "string" ? document.querySelector(s) : s;
   if (t instanceof HTMLVideoElement || t instanceof HTMLIFrameElement)
     return t;
   throw new Error("Fideo target must resolve to a <video> or <iframe> element.");
 }
-typeof window < "u" && (Object.assign(window, { Fideo: be, createFideo: we, initFideo: M, mountFideo: b }), ke() || document.addEventListener("DOMContentLoaded", () => {
+typeof window < "u" && (Object.assign(window, { Fideo: xe, createFideo: Pe, initFideo: M, mountFideo: w }), Me() || document.addEventListener("DOMContentLoaded", () => {
   const s = window.__fideoAutoInit || {};
   M(s);
 }));
-function ke() {
+function Me() {
   return typeof document < "u" && document.currentScript == null;
 }
 export {
-  be as Fideo,
-  we as createFideo,
+  xe as Fideo,
+  Pe as createFideo,
   M as initFideo,
-  b as mountFideo
+  w as mountFideo
 };
 //# sourceMappingURL=fideo.js.map

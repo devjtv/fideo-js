@@ -1,4 +1,4 @@
-import './styles.css';
+import './styles/host.css';
 import type { FideoAdapter, FideoInitResult, FideoOptions, FideoPlayerInstance, FideoResolvedOptions, FideoState, FideoTarget } from './types';
 export declare class Fideo implements FideoPlayerInstance {
     private player;
