@@ -59,11 +59,10 @@ Full docs with live examples: [`examples/docs/`](./examples/docs/) — getting s
 npm install github:devjtv/fideo-js
 ```
 
-Import the JavaScript and stylesheet:
+Import and initialize. There is no stylesheet to include — mounting injects the wrapper styles:
 
 ```ts
 import { initFideo } from 'fideo-js';
-import 'fideo-js/fideo.css';
 
 initFideo();
 ```
@@ -71,7 +70,6 @@ initFideo();
 Or use the browser bundle:
 
 ```html
-<link rel="stylesheet" href="./dist/fideo.css" />
 <script src="./dist/fideo.global.js"></script>
 <script>
   Fideo.init();
@@ -127,8 +125,7 @@ When poster images are configured, Fideo renders them as a visual cover while th
 Because the compiled files are committed in `dist/`, Fideo JS can be loaded directly from jsDelivr. Pin a release tag for production:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.5.2/dist/fideo.css" />
-<script src="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.5.2/dist/fideo.global.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.7.0/dist/fideo.global.js"></script>
 <script>
   Fideo.init();
 </script>
@@ -137,9 +134,8 @@ Because the compiled files are committed in `dist/`, Fideo JS can be loaded dire
 ES module usage is also available:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.5.2/dist/fideo.css" />
 <script type="module">
-  import { initFideo } from 'https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.5.2/dist/fideo.js';
+  import { initFideo } from 'https://cdn.jsdelivr.net/gh/devjtv/fideo-js@v0.7.0/dist/fideo.js';
 
   initFideo();
 </script>
@@ -151,7 +147,6 @@ If you do not want configuration in markup, initialize with a JS object:
 
 ```ts
 import { Fideo } from 'fideo-js';
-import 'fideo-js/fideo.css';
 
 const player = new Fideo('#player', {
   muted: true,
@@ -525,7 +520,9 @@ new Fideo('#player', {
 
 ## Styling
 
-Fideo ships two halves of one stylesheet. The wrapper half is injected into `<head>` automatically on first mount, so a bare `<script>` renders a correct player with no `<link>`. The controls half is adopted into each player's shadow root as a single shared stylesheet. Link `dist/fideo.css` as well if you want the wrapper styled before the script runs, and pass `injectStyles: false` if you would rather manage it yourself.
+Fideo ships two halves of one stylesheet. The wrapper half is injected into `<head>` automatically on first mount, so a bare `<script>` renders a correct player with no `<link>`. The controls half is adopted into each player's shadow root as a single shared stylesheet.
+
+Linking `dist/fideo.css` is optional and buys nothing on its own: every selector it contains targets markup Fideo generates at mount, and the styles are injected before that markup is inserted. Reach for the file only when you pass `injectStyles: false` to manage the CSS yourself, or when your build pipeline wants it as a real asset.
 
 Every visible UI element is styled with CSS variables. Override globally, per wrapper, with data attributes, or through the `cssVars` option. The variables are declared on `.fideo` and inherit into the shadow root, so your overrides reach the controls.
 
@@ -784,7 +781,7 @@ For direct browser usage:
 </script>
 ```
 
-Add the stylesheet when you want the wrapper styled before the script executes:
+Add the stylesheet only if you turn injection off with `injectStyles: false`, or your build wants the CSS as a file:
 
 ```html
 <link rel="stylesheet" href="./dist/fideo.css" />

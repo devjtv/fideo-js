@@ -158,11 +158,16 @@
               <thead><tr><th>Situation</th><th>What to do</th></tr></thead>
               <tbody>
                 <tr><td>Default</td><td>Nothing. Wrapper styles are injected on first mount.</td></tr>
-                <tr><td>You want styles applied before the script runs</td><td>Also link <code>dist/fideo.css</code>. Injection is idempotent, so there is no conflict.</td></tr>
-                <tr><td>You ship your own wrapper CSS</td><td>Pass <code>injectStyles: false</code>.</td></tr>
+                <tr><td>You ship your own wrapper CSS</td><td>Pass <code>injectStyles: false</code> and link or bundle <code>dist/fideo.css</code> yourself.</td></tr>
+                <tr><td>Your build pipeline wants the CSS as a file</td><td>Import or link <code>dist/fideo.css</code>. Injection is idempotent, so there is no conflict.</td></tr>
               </tbody>
             </table>
           </div>
+        </div>
+        <div class="note">
+          <strong>There is nothing to style before the script runs.</strong> Every selector in the wrapper stylesheet
+          targets markup Fideo generates at mount, and injection happens before that markup is inserted — so linking
+          the stylesheet cannot prevent a flash, because there is none to prevent.
         </div>
         <div class="note">
           <strong>Injected styles are prepended to <code>&lt;head&gt;</code>.</strong> Your own stylesheets come later
